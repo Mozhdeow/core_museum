@@ -1,0 +1,23 @@
+{
+  "entrance": "Entrance",
+  "cpu": "CPU",
+  "gpu": "GPU",
+  "memory": "Memory",
+  "storage": "Storage",
+  "motherboard": "Motherboard",
+  "future": "Future",
+  "ending": "Ending",
+  "explore": "Explore the exhibit",
+  "section": "Section",
+  "of": "of",
+  "curatorMock": "CORE AI curator preview · answers are mocked in Phase 1",
+  "levels": {
+    "simple": "Simple",
+    "technical": "Technical",
+    "compare": "Compare"
+  },
+  "curatorHint": "Ask one focused question about this exhibit.",
+  "askPlaceholder": "Ask about this exhibit...",
+  "navigate": "navigate",
+  "museumGallery": "museum gallery"
+}

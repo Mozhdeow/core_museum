@@ -1,0 +1,14 @@
+{
+  "loginTitle": "دسترسی مدیریت",
+  "loginCopy": "آرشیو موزه را مدیریت کنید.",
+  "dashboardTitle": "نمای کلی آرشیو",
+  "itemsTitle": "آثار موزه",
+  "categoriesTitle": "دسته‌بندی‌ها",
+  "sectionsTitle": "بخش‌های موزه",
+  "usersTitle": "کاربران",
+  "itemsCount": "آثار موزه",
+  "categoriesCount": "دسته‌بندی‌ها",
+  "usersCount": "کاربران",
+  "publishedCount": "آثار منتشر شده",
+  "dataError": "خطا در دریافت داده‌ها"
+}

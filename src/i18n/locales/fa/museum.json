@@ -1,0 +1,23 @@
+{
+  "entrance": "ورودی",
+  "cpu": "پردازنده",
+  "gpu": "پردازنده گرافیکی",
+  "memory": "حافظه",
+  "storage": "ذخیره‌سازی",
+  "motherboard": "مادربرد",
+  "future": "آینده",
+  "ending": "پایان",
+  "explore": "کاوش اثر",
+  "section": "بخش",
+  "of": "از",
+  "curatorMock": "پیش‌نمایش متصدی CORE AI · پاسخ‌ها در فاز اول نمایشی هستند",
+  "levels": {
+    "simple": "ساده",
+    "technical": "فنی",
+    "compare": "مقایسه"
+  },
+  "curatorHint": "?? ???? ???? ?????? ??? ??? ??????.",
+  "askPlaceholder": "?????? ??? ??? ??????...",
+  "navigate": "??????",
+  "museumGallery": "????? ????"
+}

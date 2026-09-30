@@ -1,0 +1,14 @@
+{
+  "loginTitle": "ADMIN ACCESS",
+  "loginCopy": "Manage the museum archive.",
+  "dashboardTitle": "Archive overview",
+  "itemsTitle": "Museum items",
+  "categoriesTitle": "Categories",
+  "sectionsTitle": "Museum sections",
+  "usersTitle": "Users",
+  "itemsCount": "Museum items",
+  "categoriesCount": "Categories",
+  "usersCount": "Users",
+  "publishedCount": "Published items",
+  "dataError": "Unable to load data"
+}
