@@ -1,159 +1,166 @@
-﻿import {useCallback, useEffect, useState, type RefObject} from 'react'
+import {useCallback, useLayoutEffect, useRef, useState, type RefObject} from 'react'
 import gsap from 'gsap'
 import {ScrollTrigger} from 'gsap/ScrollTrigger'
 import {useMediaQuery, useReducedMotion} from '@/hooks/usePreferences'
+import {imageAroundScreen, journeyArtwork, journeyBounds, type Bounds} from '../config/journeyGeometry'
 
 gsap.registerPlugin(ScrollTrigger)
-const sectionIds = ['welcome', 'inside', 'components', 'timeline', 'visit']
+const stops = [0, .57, .94]
+const POSITION_KEY = 'core_landing_scroll_position'
+const clamp01 = (value: number) => Math.max(0, Math.min(1, value))
+const mix = (a: number, b: number, t: number) => a + (b - a) * t
+const blend = (a: Bounds, b: Bounds, t: number): Bounds => ({
+    x: mix(a.x, b.x, t), y: mix(a.y, b.y, t),
+    width: mix(a.width, b.width, t), height: mix(a.height, b.height, t),
+})
+function savedPosition() {
+    try {
+        const saved = JSON.parse(sessionStorage.getItem(POSITION_KEY) ?? 'null')
+        return saved?.url === location.href && saved?.key === (history.state?.key ?? 'initial')
+            && Number.isFinite(saved?.progress) ? clamp01(saved.progress) : null
+    } catch {return null}
+}
 
-export function useLandingMotion(root: RefObject<HTMLElement | null>, locale: string) {
+export function useLandingMotion(root: RefObject<HTMLElement | null>, enabled: boolean) {
     const [activeSection, setActiveSection] = useState(0)
+    const ownedTrigger = useRef<ScrollTrigger | null>(null)
+    const resumeProgress = useRef<number | null>(null)
     const reduced = useReducedMotion()
-    const desktop = useMediaQuery('(min-width: 901px)')
+    const portrait = useMediaQuery('(max-width: 900px) and (orientation: portrait)')
 
-    useEffect(() => {
-        if (!root.current) return
+    useLayoutEffect(() => {
         const host = root.current
-        const setActive = (index: number) => setActiveSection(current => current === index ? current : index)
-        const progressTriggers: ScrollTrigger[] = []
-        let removePointer: (() => void) | undefined
-        const context = gsap.context(() => {
-            const touch = window.matchMedia('(pointer: coarse)').matches
-            const announce = (index: number) => setActive(index)
-            const intro = gsap.timeline({defaults: {ease: 'power3.out'}})
-            if (!reduced) {
-                intro.from('.hero-section__backdrop', {opacity: 0, duration: 1.1})
-                    .from('.hero-section__light-leak', {opacity: 0, duration: 1.2}, '-=.9')
-                    .from('.hero-section__workstation', {opacity: 0, scale: 1.06, y: 18, duration: 1.35}, '-=.95')
-                    .from('.hero-section__content > *', {opacity: 0, y: 18, stagger: .12, duration: .7}, '-=.8')
-                    .from('.hero-section__scroll', {opacity: 0, duration: .45}, '-=.2')
-            } else {
-                gsap.set('.hero-section__backdrop, .hero-section__light-leak, .hero-section__workstation, .hero-section__content > *, .hero-section__scroll', {clearProps: 'all', opacity: 1})
-            }
+        if (!host) return
+        const stage = host.querySelector<HTMLElement>('.core-stage')
+        const world = host.querySelector<HTMLElement>('.core-stage__world')
+        const copy = host.querySelector<HTMLElement>('.core-stage__copy')
+        const about = host.querySelector<HTMLElement>('#about')
+        const visit = host.querySelector<HTMLElement>('#visit')
+        const engine = host.querySelector<HTMLElement>('.core-stage__engine')
+        if (!stage || !world || !copy || !about || !visit || !engine) return
 
-            if (!desktop || reduced) {
-                sectionIds.forEach((id, index) => progressTriggers.push(ScrollTrigger.create({
-                    trigger: `#${id}`, start: 'top 45%', end: 'bottom 45%',
-                    onEnter: () => announce(index), onEnterBack: () => announce(index), onLeaveBack: () => announce(Math.max(0, index - 1)),
-                })))
-            }
+        const stageArtwork = portrait ? journeyArtwork.portrait : journeyArtwork.desktop
+        let restoreProgress = enabled ? resumeProgress.current ?? savedPosition() : null
+        // A saved zero needs no restoration and must not reset a new scroll after fonts load.
+        if (!restoreProgress) restoreProgress = null
+        const motion = {dive: 0, phase: 0}
+        let bounds = journeyBounds(stage.clientWidth, stage.clientHeight, portrait)
+        let lastPhase = -1
 
-            if (desktop && !reduced) {
-                const machine = gsap.timeline({scrollTrigger: {
-                    id: 'landing-machine', trigger: '.machine-journey', start: 'top top', end: '+=2600', scrub: 1.05, pin: true, anticipatePin: 1,
-                    onUpdate: self => announce(self.progress < .54 ? 0 : 1), onLeave: () => announce(2), onLeaveBack: () => announce(0),
-                }})
-                machine.set('.inside-section__content, .inside-section__backdrop, .inside-section__machine--complete, .inside-section__machine--exploded', {opacity: 0})
-                    .to('.hero-section__content', {opacity: 0, y: -34, duration: .18, ease: 'power2.inOut'}, .18)
-                    .to('.hero-section__scroll', {opacity: 0, duration: .08}, .18)
-                    .to('.hero-section__backdrop', {scale: 1.035, opacity: .58, duration: .3, ease: 'power2.inOut'}, .18)
-                    .to('.hero-section__workstation', {scale: 1.2, xPercent: 3, yPercent: 8, duration: .4, ease: 'power2.inOut'}, .18)
-                    .to('.hero-section__haze', {xPercent: 3, opacity: .25, duration: .35}, .2)
-                    .to('.hero-section__backdrop', {opacity: .18, duration: .2}, .53)
-                    .to('.inside-section__backdrop', {opacity: .72, duration: .22}, .5)
-                    .to('.hero-section__workstation', {opacity: .16, scale: 1.26, duration: .25, ease: 'power2.inOut'}, .53)
-                    .to('.inside-section__machine--exploded', {opacity: 1, scale: 1.02, y: 0, duration: .27, ease: 'power2.inOut'}, .56)
-                    .to('.inside-section__content', {opacity: 1, y: 0, duration: .2, ease: 'power3.out'}, .68)
-                    .fromTo('.parts-list span', {opacity: .08, x: -16}, {opacity: 1, x: 0, stagger: .07, duration: .28, ease: 'power2.out'}, .72)
-                    .to('.inside-section__spotlight', {opacity: .7, scale: 1.12, duration: .25}, .72)
-                gsap.utils.toArray<HTMLElement>('.parts-list span').forEach((label, index) => {
-                    machine.to(label, {color: '#ffb547', duration: .08}, .73 + index * .045).to(label, {color: '#babbb4', duration: .1}, .8 + index * .045)
+        const sizeWorld = () => {
+            const locked = imageAroundScreen(bounds.locked, stageArtwork)
+            world.style.width = `${locked.width}px`
+            world.style.height = `${locked.height}px`
+        }
+        const renderGeometry = () => {
+            const glass = blend(bounds.hero, bounds.locked, motion.dive)
+            const current = imageAroundScreen(glass, stageArtwork)
+            const locked = imageAroundScreen(bounds.locked, stageArtwork)
+            // Photograph, bezel, HTML and WebGL travel as one rigid scene.
+            // Only position and uniform scale change; no handoff event exists.
+            world.style.transform = `translate3d(${current.x}px,${current.y}px,0) scale(${current.width / locked.width})`
+        }
+        const syncSemantics = () => {
+            const phase = motion.phase < 1.55 ? 0 : motion.phase < 2.46 ? 1 : 2
+            if (phase !== lastPhase) {
+                lastPhase = phase
+                setActiveSection(phase)
+                const focus = document.activeElement
+                ;[copy, about, visit].forEach((element, index) => {
+                    element.inert = index !== phase
+                    element.setAttribute('aria-hidden', String(index !== phase))
                 })
-            } else {
-                gsap.from('.hero-section__content > *', {opacity: 0, y: 18, stagger: .1, duration: .7, delay: .1})
-                gsap.fromTo('.inside-section__machine--exploded', {opacity: 0, scale: .94, y: 20}, {opacity: 1, scale: 1, y: 0, duration: .8, scrollTrigger: {trigger: '#inside', start: 'top 72%', end: 'center center', scrub: .8}})
-                gsap.from('.parts-list span', {opacity: 0, x: -12, stagger: .08, scrollTrigger: {trigger: '#inside', start: 'top 70%', end: 'center 42%', scrub: .8}})
-            }
-
-            if (desktop && !reduced) {
-                const artifacts = gsap.utils.toArray<HTMLElement>('.artifact')
-                gsap.set(artifacts, {opacity: .38, scale: .94, y: 8})
-                const showcase = gsap.timeline({scrollTrigger: {
-                    id: 'landing-components', trigger: '#components', start: 'top top', end: '+=2450', pin: true, scrub: 1, anticipatePin: 1,
-                    onEnter: () => announce(2), onEnterBack: () => announce(2), onLeave: () => announce(3), onLeaveBack: () => announce(1),
-                }})
-                artifacts.forEach((artifact, index) => {
-                    showcase.to(artifact, {opacity: 1, scale: 1.1, y: -10, duration: .42, ease: 'power2.inOut'}, index)
-                    if (index < artifacts.length - 1) showcase.to(artifact, {opacity: .38, scale: .94, y: 8, duration: .42, ease: 'power2.inOut'}, index + .58)
-                })
-            } else {
-                gsap.from('.artifact', {opacity: 0, y: 26, stagger: .1, scrollTrigger: {trigger: '#components', start: 'top 76%', end: 'center 50%', scrub: .8}})
-            }
-
-            if (desktop && !reduced) {
-                const milestones = gsap.utils.toArray<HTMLElement>('.milestone')
-                const years = gsap.utils.toArray<HTMLElement>('.timeline-year')
-                gsap.set(milestones, {opacity: .35, scale: .92})
-                gsap.set(years, {opacity: 0})
-                gsap.set(milestones[0], {opacity: 1, scale: 1.06})
-                gsap.set(years[0], {opacity: .13})
-                const history = gsap.timeline({scrollTrigger: {
-                    id: 'landing-timeline', trigger: '#timeline', start: 'top top', end: '+=2450', pin: true, scrub: 1, anticipatePin: 1,
-                    onEnter: () => announce(3), onEnterBack: () => announce(3), onLeave: () => announce(4), onLeaveBack: () => announce(2),
-                }})
-                milestones.forEach((milestone, index) => {
-                    if (index > 0) history.to(milestones, {opacity: .35, scale: .92, duration: .2, ease: 'power2.inOut'}, index)
-                        .to(years, {opacity: 0, duration: .18}, index)
-                        .to(milestone, {opacity: 1, scale: 1.06, duration: .4, ease: 'power2.inOut'}, index + .15)
-                        .to(years[index], {opacity: .13, duration: .22}, index + .16)
-                    if (index < milestones.length - 1) history.to(milestone, {opacity: .35, scale: .92, duration: .4, ease: 'power2.inOut'}, index + .72)
-                })
-            } else {
-                gsap.from('.milestone', {opacity: 0, x: 24, stagger: .12, scrollTrigger: {trigger: '#timeline', start: 'top 75%', end: 'center 48%', scrub: .8}})
-            }
-
-            const finale = gsap.timeline({scrollTrigger: {
-                id: 'landing-visit', trigger: '#visit', start: desktop && !reduced ? 'top top' : 'top 72%', end: desktop && !reduced ? '+=1450' : 'bottom 72%', scrub: 1,
-                pin: desktop && !reduced, anticipatePin: 1, onEnter: () => announce(4), onEnterBack: () => announce(4), onLeaveBack: () => announce(3),
-            }})
-            if (!reduced) {
-                finale.fromTo('.section-backdrop--visit img', {scale: 1}, {scale: desktop ? 1.1 : 1.05, duration: .72, ease: 'power2.inOut'}, 0)
-                    .fromTo('.visit-section__shadow', {opacity: .18}, {opacity: .62, duration: .35}, .08)
-                    .from('.visit-section__content .museum-label, .visit-section__content h2, .visit-section__content p', {opacity: 0, y: 22, stagger: .11, duration: .28, ease: 'power3.out'}, .43)
-                    .from('.visit-section__content .button', {opacity: 0, y: 18, scale: .97, duration: .25, ease: 'power3.out'}, .72)
-            }
-
-            if (!touch && !reduced) {
-                const hero = host.querySelector<HTMLElement>('.hero-section')
-                if (hero) {
-                    const layers = [
-                        [hero.querySelector<HTMLElement>('.hero-section__backdrop'), 3],
-                        [hero.querySelector<HTMLElement>('.hero-section__workstation'), 10],
-                        [hero.querySelector<HTMLElement>('.hero-section__light-leak'), 15],
-                    ] as const
-                    const onPointerMove = (event: PointerEvent) => {
-                        const bounds = hero.getBoundingClientRect(); const x = (event.clientX - bounds.left) / bounds.width - .5; const y = (event.clientY - bounds.top) / bounds.height - .5
-                        layers.forEach(([layer, amount]) => { if (layer) gsap.to(layer, {x: x * amount, y: y * amount, duration: .75, ease: 'power2.out', overwrite: true}) })
-                    }
-                    const resetPointer = () => layers.forEach(([layer]) => { if (layer) gsap.to(layer, {x: 0, y: 0, duration: .9, ease: 'power2.out'}) })
-                    hero.addEventListener('pointermove', onPointerMove); hero.addEventListener('pointerleave', resetPointer)
-                    removePointer = () => { hero.removeEventListener('pointermove', onPointerMove); hero.removeEventListener('pointerleave', resetPointer) }
+                if (focus instanceof HTMLElement && focus.closest('[inert]')) {
+                    (phase === 1 ? about : phase === 2 ? visit : copy.querySelector('button'))?.focus({preventScroll: true})
                 }
             }
-        }, host)
-
-        const refresh = () => ScrollTrigger.refresh()
-        window.addEventListener('resize', refresh)
-        const onKeyDown = (event: KeyboardEvent) => {
-            if (event.key !== 'Escape') return
-            const active = document.activeElement as HTMLElement | null
-            active?.blur()
+            copy.inert = motion.phase > 1.02
+            copy.setAttribute('aria-hidden', String(copy.inert))
         }
-        window.addEventListener('keydown', onKeyDown)
-        return () => { window.removeEventListener('resize', refresh); window.removeEventListener('keydown', onKeyDown); removePointer?.(); progressTriggers.forEach(trigger => trigger.kill()); context.revert(); ScrollTrigger.refresh() }
-    }, [desktop, locale, reduced, root])
+        const context = gsap.context(() => {
+            sizeWorld(); renderGeometry()
+            const timeline = gsap.timeline({paused: !enabled, defaults: {ease: 'power2.inOut'},
+                onUpdate: () => {renderGeometry(); syncSemantics()},
+                scrollTrigger: enabled ? {
+                    id: 'landing-computer-journey', trigger: stage, start: 'top top',
+                    end: () => `+=${stage.clientHeight * (reduced ? 2.6 : portrait ? 3.6 : 5.2)}`,
+                    pin: true, scrub: reduced ? true : .4, anticipatePin: 1, invalidateOnRefresh: true,
+                    onRefresh: () => {
+                        bounds = journeyBounds(stage.clientWidth, stage.clientHeight, portrait)
+                        sizeWorld(); renderGeometry()
+                    },
+                } : undefined,
+            })
+            timeline.to(motion, {phase: 3.2, duration: 3.2, ease: 'none'}, 0)
+                .to(motion, {dive: 1, duration: reduced ? .3 : 1.04, ease: 'power2.inOut'}, .24)
+                .to(copy, {autoAlpha: 0, y: reduced ? 0 : -18, duration: .54}, .43)
+                .to('.core-stage__scroll', {autoAlpha: 0, duration: .22}, .3)
+                .to('.core-stage__artifact-label', {autoAlpha: 0, duration: .2}, 1.3)
+                .to(engine, {autoAlpha: 0, scale: reduced ? 1 : 1.035, duration: .32}, 1.35)
+                .fromTo(about, {autoAlpha: 0}, {autoAlpha: 1, duration: .38}, 1.36)
+                .fromTo('#about .core-screen-chapter__copy', {autoAlpha: 0, y: reduced ? 0 : 8},
+                    {autoAlpha: 1, y: 0, duration: .22}, 1.53)
+                .to('.core-stage__caption', {autoAlpha: 1, duration: .3}, 1.4)
+                .to('#about .core-screen-chapter__copy', {autoAlpha: 0, y: reduced ? 0 : -6, duration: .18}, 2.17)
+                .to(about, {autoAlpha: 0, duration: .45}, 2.23)
+                .fromTo(visit, {autoAlpha: 0}, {autoAlpha: 1, duration: .45}, 2.23)
+                .fromTo('#visit .core-screen-chapter__copy', {autoAlpha: 0, y: reduced ? 0 : 8},
+                    {autoAlpha: 1, y: 0, duration: .24}, 2.46)
+                .fromTo('.core-screen-chapter__hall', {scale: reduced ? 1 : 1.025},
+                    {scale: 1, duration: .62, ease: 'power2.out'}, 2.23)
+            ownedTrigger.current = timeline.scrollTrigger ?? null
+            syncSemantics()
+        }, host)
+        let refreshFrame = 0
+        let pageShown = document.readyState === 'complete'
+        let disposed = false
+        const refresh = () => {
+            cancelAnimationFrame(refreshFrame)
+            refreshFrame = requestAnimationFrame(() => {
+                const trigger = ownedTrigger.current
+                trigger?.refresh()
+                if (trigger && restoreProgress !== null && pageShown) {
+                    trigger.scroll(trigger.start + (trigger.end - trigger.start) * restoreProgress)
+                    trigger.update(); trigger.animation?.progress(restoreProgress)
+                    restoreProgress = null; resumeProgress.current = null
+                    try {sessionStorage.removeItem(POSITION_KEY)} catch { /* optional storage */ }
+                }
+            })
+        }
+        const savePosition = () => {
+            const trigger = ownedTrigger.current
+            if (trigger) try {
+                sessionStorage.setItem(POSITION_KEY, JSON.stringify({url: location.href,
+                    key: history.state?.key ?? 'initial', progress: trigger.progress}))
+            } catch { /* optional storage */ }
+        }
+        const showPage = () => {pageShown = true; refresh()}
+        window.addEventListener('pageshow', showPage)
+        window.addEventListener('pagehide', savePosition)
+        host.querySelectorAll('img').forEach(image => image.addEventListener('load', refresh))
+        void document.fonts.ready.then(() => {if (!disposed) refresh()})
+        const hashIndex = ['#welcome', '#about', '#visit'].indexOf(location.hash)
+        if (enabled && hashIndex > 0) {
+            restoreProgress = stops[hashIndex]
+            refresh()
+        }
+        return () => {
+            disposed = true
+            cancelAnimationFrame(refreshFrame)
+            window.removeEventListener('pageshow', showPage)
+            window.removeEventListener('pagehide', savePosition)
+            host.querySelectorAll('img').forEach(image => image.removeEventListener('load', refresh))
+            resumeProgress.current = restoreProgress ?? ownedTrigger.current?.progress ?? null
+            ownedTrigger.current = null
+            context.revert()
+        }
+    }, [enabled, portrait, reduced, root])
 
     const goToSection = useCallback((index: number) => {
-        const triggerId = index <= 1 ? 'landing-machine' : index === 2 ? 'landing-components' : index === 3 ? 'landing-timeline' : 'landing-visit'
-        const trigger = ScrollTrigger.getById(triggerId)
-        if (trigger && !reduced) {
-            const progress = index === 1 ? .68 : 0
-            const y = trigger.start + (trigger.end - trigger.start) * progress
-            window.scrollTo({top: y, behavior: 'smooth'})
-            return
-        }
-        document.getElementById(sectionIds[index])?.scrollIntoView({behavior: reduced ? 'auto' : 'smooth', block: 'start'})
+        const trigger = ownedTrigger.current
+        if (!trigger) return
+        window.scrollTo({top: trigger.start + (trigger.end - trigger.start) * (stops[index] ?? 0),
+            behavior: reduced ? 'instant' : 'smooth'})
     }, [reduced])
-
     return {activeSection, goToSection}
 }

@@ -8,6 +8,10 @@ export function AudioToggle({compact = false}: { compact?: boolean }) {
     return <button type="button" onClick={toggle} className="icon-button"
                    aria-label={enabled ? t('soundOff') : t('soundOn')}
                    title={enabled ? t('soundOff') : t('soundOn')}>{enabled ? <Volume2 size={16}/> :
-        <VolumeX size={16}/>}{!compact && <span
-        className="hidden font-mono text-[10px] uppercase tracking-[0.16em] md:inline">{enabled ? t('soundOn') : t('soundOff')}</span>}</button>
+        <VolumeX size={16}/>
+    }
+        {!compact &&
+            <span className="hidden font-mono text-[10px] uppercase tracking-[0.16em] md:inline">{enabled ? t('soundOn') : t('soundOff')}</span>
+        }
+    </button>
 }

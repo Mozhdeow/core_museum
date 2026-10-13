@@ -1,0 +1,526 @@
+/* One physical stage. These rules do not target the approved loading screen. */
+.core-journey {
+    background: #050505;
+}
+
+.core-stage {
+    position: relative;
+    height: 100svh;
+    min-height: 440px;
+    overflow: hidden;
+    isolation: isolate;
+    background: #050505;
+}
+
+.core-stage__atmosphere {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 78% 48%, #38231045, transparent 60%), #050505;
+}
+
+/* A single physical scene moves from Hero to the locked monitor stage. */
+.core-stage__portal {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    transform-origin: 0 0;
+    pointer-events: none;
+}
+.core-stage__world {
+    position: absolute;
+    left: 0;
+    top: 0;
+    transform-origin: 0 0;
+    will-change: transform;
+}
+.core-stage__computer-image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    opacity: 1;
+    pointer-events: none;
+    user-select: none;
+    mask-image: linear-gradient(90deg, transparent, #000 3%, #000 97%, transparent);
+}
+.core-stage__screen {
+    position: absolute;
+    z-index: 2;
+    overflow: hidden;
+    container-type: size;
+    background: #030303;
+    border-radius: 1px;
+    pointer-events: auto;
+}
+.core-entry-shield {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    touch-action: none;
+}
+
+.core-screen-chapter--about {
+    background: #080706;
+}
+
+.core-screen-chapter__hardware {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    width: 67%;
+    object-fit: cover;
+    mask-image: linear-gradient(90deg, transparent, #000 36%);
+}
+
+.core-stage__engine {
+    position: absolute;
+    inset: 0;
+    pointer-events: auto;
+    touch-action: pan-y;
+    background: #050506;
+}
+
+/*
+ * The 3D artifact is hover-interactive only on devices
+ * that actually have a fine pointer. On touch devices,
+ * let gestures pass through to normal page scrolling.
+ */
+@media (hover: none), (pointer: coarse) {
+    .core-stage__engine {
+        pointer-events: none;
+    }
+}
+
+.core-stage__artifact-label {
+    position: absolute;
+    bottom: 5%;
+    left: 5%;
+    color: #a49886;
+    font: 9px/1.5 'IBM Plex Mono', monospace;
+    letter-spacing: .09em;
+}
+
+.core-stage__copy {
+    position: absolute;
+    z-index: 0;
+    left: 6.2%;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 32%;
+    max-width: 520px;
+}
+
+.core-stage__eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #bcb09f;
+    font: 10px/1.5 'IBM Plex Mono', monospace;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+}
+
+.core-stage__eyebrow i {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #eda256;
+    box-shadow: 0 0 12px #db843d70;
+}
+
+.core-stage__copy h1 {
+    display: grid;
+    gap: 1.2rem;
+    margin: 1.3rem 0 0;
+}
+
+.core-stage__copy h1 > span {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(80px, 10vw, 160px);
+    font-weight: 600;
+    letter-spacing: -.085em;
+    line-height: .86;
+}
+
+.core-stage__copy h1 em {
+    max-width: 14ch;
+    font-size: clamp(24px, 2.4vw, 38px);
+    font-weight: 400;
+    font-style: normal;
+    line-height: 1.13;
+    letter-spacing: -.035em;
+    color: #d3cfc7;
+}
+
+.core-stage__copy p {
+    max-width: 35ch;
+    margin-top: 1.4rem;
+    font-size: clamp(14px, 1.1vw, 17px);
+    line-height: 1.75;
+    color: #aca69c;
+    text-wrap: pretty;
+}
+
+.core-stage__copy .landing-actions {
+    margin-top: 1.7rem;
+    gap: 1.4rem;
+}
+
+.core-stage__copy .text-link {
+    font-size: 11px;
+}
+
+.core-stage__scroll, .core-stage__caption {
+    position: absolute;
+    bottom: 24px;
+    z-index: 4;
+    font: 10px/1.5 'IBM Plex Mono', monospace;
+    letter-spacing: .08em;
+    color: #b4a58e;
+}
+
+.core-stage__scroll {
+    left: 6.2%;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.core-stage__scroll i {
+    width: 60px;
+    height: 1px;
+    background: #c5894a;
+}
+
+.core-stage__caption {
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    visibility: hidden;
+    white-space: nowrap;
+}
+
+.core-screen-chapter {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    visibility: hidden;
+    display: flex;
+    align-items: center;
+    padding: 6% 7%;
+    overflow: auto;
+    overscroll-behavior: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #946531 #080808;
+}
+
+.core-screen-chapter__copy {
+    position: relative;
+    z-index: 2;
+    width: 47%;
+    max-width: 520px;
+}
+
+.core-screen-kicker {
+    color: #dba566;
+    font: clamp(10px, 1.05cqw, 13px)/1.5 'IBM Plex Mono', monospace;
+    letter-spacing: .11em;
+}
+
+.core-screen-chapter h2 {
+    font-size: clamp(30px, 6cqw, 80px);
+    line-height: 1.02;
+    font-weight: 500;
+    letter-spacing: -.055em;
+    margin: 1rem 0;
+    text-wrap: balance;
+}
+
+.core-screen-chapter p {
+    color: #c7bfb2;
+    font-size: clamp(14px, 1.5cqw, 19px);
+    line-height: 1.8;
+    margin: 0;
+    max-width: 35ch;
+    text-wrap: pretty;
+}
+
+.core-screen-note {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 2rem;
+    color: #b89771;
+    font-size: clamp(10px, 1.1cqw, 14px);
+}
+
+.core-screen-note::before {
+    content: '';
+    width: 32px;
+    height: 1px;
+    background: #a97841;
+}
+
+.core-screen-chapter--visit::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, #050403eb, #050403a3 42%, #05040312 76%);
+    pointer-events: none;
+}
+
+.core-screen-chapter__hall {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 65% 50%;
+    opacity: .8;
+}
+
+.core-screen-chapter--visit .button {
+    margin-top: 1.5rem;
+}
+
+.core-stage .button {
+    min-height: 44px;
+}
+
+.core-stage :focus-visible {
+    outline: 2px solid #ffc07d;
+    outline-offset: 4px;
+}
+
+.core-journey .landing-progress {
+    top: auto;
+    bottom: 22px;
+    right: 3%;
+    left: auto;
+    transform: none;
+    display: flex;
+    gap: 10px;
+}
+
+.core-journey .landing-progress a {
+    min-width: 32px;
+    min-height: 32px;
+    justify-content: center;
+}
+
+.core-journey .landing-progress a span {
+    opacity: 1;
+}
+
+.core-journey .landing-progress a::before {
+    display: none;
+}
+
+.core-journey .landing-progress a.is-active {
+    border-bottom: 1px solid #c58b49;
+}
+
+[dir='rtl'] .core-stage__copy {
+    text-align: right;
+}
+
+[dir='rtl'] .core-stage__copy h1 em {
+    letter-spacing: 0;
+}
+
+[dir='rtl'] .core-stage__eyebrow, [dir='rtl'] .core-screen-kicker {
+    font-family: 'Vazirmatn', sans-serif;
+    letter-spacing: 0;
+}
+
+[dir='rtl'] .core-stage .button, [dir='rtl'] .core-stage .text-link,
+[dir='rtl'] .core-stage__scroll, [dir='rtl'] .core-stage__caption,
+[dir='rtl'] .core-stage__artifact-label {
+    font-family: 'Vazirmatn', sans-serif;
+    letter-spacing: 0;
+}
+
+[dir='rtl'] .core-screen-chapter h2 {
+    letter-spacing: 0;
+    line-height: 1.35;
+}
+
+[dir='rtl'] .core-screen-chapter--about {
+    flex-direction: row-reverse;
+}
+
+[dir='rtl'] .core-screen-chapter--visit::after {
+    background: linear-gradient(-90deg, #050403eb, #050403a3 42%, #05040312 76%);
+}
+
+@media (max-width: 900px) and (orientation: portrait) {
+    .core-stage {
+        min-height: 640px;
+    }
+
+    .core-stage__computer-image {
+        mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 92%, transparent);
+    }
+
+    .core-stage__copy {
+        left: 7%;
+        top: 13%;
+        bottom: auto;
+        width: 86%;
+        max-width: none;
+    }
+
+    .core-stage__copy h1 {
+        gap: 10px;
+        margin-top: 14px;
+    }
+
+    .core-stage__copy h1 > span {
+        font-size: clamp(64px, 18vw, 110px);
+    }
+
+    .core-stage__copy h1 em {
+        font-size: clamp(21px, 4.8vw, 30px);
+        max-width: 24ch;
+    }
+
+    .core-stage__copy p {
+        font-size: 14px;
+        line-height: 1.65;
+        max-width: 38ch;
+        margin-top: 14px;
+    }
+
+    .core-stage__copy .landing-actions {
+        margin-top: 18px;
+        gap: 20px;
+    }
+
+    .core-stage__copy .button {
+        font-size: 11px;
+        padding-inline: 16px;
+    }
+
+    .core-stage__artifact-label {
+        font-size: 8px;
+    }
+
+    .core-screen-chapter {
+        padding: 6% 7%;
+    }
+
+    .core-screen-chapter__copy {
+        width: 100%;
+        max-width: none;
+    }
+
+    .core-screen-chapter__hardware {
+        width: 100%;
+        opacity: .25;
+    }
+
+    .core-screen-kicker {
+        font-size: 10px;
+    }
+
+    .core-screen-chapter h2 {
+        font-size: clamp(28px, 8cqw, 52px);
+        margin: 8px 0 10px;
+    }
+
+    .core-screen-chapter p {
+        font-size: clamp(13px, 3.6cqw, 18px);
+        line-height: 1.65;
+        max-width: 44ch;
+    }
+
+    .core-screen-note {
+        margin-top: 14px;
+        font-size: 11px;
+    }
+
+    .core-screen-chapter--visit .button {
+        margin-top: 16px;
+        font-size: 11px;
+        padding: 10px 16px;
+    }
+
+    .core-screen-chapter--visit::after {
+        background: linear-gradient(90deg, #050403eb, #050403a3);
+    }
+
+    [dir='rtl'] .core-screen-chapter--visit::after {
+        background: linear-gradient(-90deg, #050403eb, #050403a3);
+    }
+
+    .core-stage__caption {
+        bottom: 65px;
+        font-size: 9px;
+    }
+
+    .core-stage__scroll {
+        bottom: 65px;
+    }
+}
+
+@media (max-height: 740px) and (orientation: portrait) {
+    .core-stage__copy {
+        top: 12%;
+    }
+
+    .core-stage__eyebrow {
+        display: none;
+    }
+
+    .core-stage__copy h1 > span {
+        font-size: 60px;
+    }
+
+    .core-stage__copy h1 em {
+        font-size: 20px;
+    }
+}
+
+@media (orientation: landscape) and (max-height: 600px) {
+    .core-stage__copy h1 > span {
+        font-size: 70px;
+    }
+
+    .core-stage__copy h1 em {
+        font-size: 22px;
+    }
+
+    .core-stage__copy p {
+        font-size: 12px;
+        margin-top: 12px;
+    }
+
+    .core-stage__copy .landing-actions {
+        margin-top: 14px;
+    }
+
+    .core-stage__eyebrow {
+        display: none;
+    }
+
+    .core-screen-chapter h2 {
+        font-size: 32px;
+        margin: 8px 0;
+    }
+
+    .core-screen-chapter p {
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+    .core-screen-note {
+        margin-top: 12px;
+    }
+}
+
+

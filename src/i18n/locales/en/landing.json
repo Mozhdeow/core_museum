@@ -1,7 +1,7 @@
 {
   "welcome": "Welcome",
   "heroTitle": "Interactive Computer Museum",
-  "heroDescription": "Explore the machines and components that shaped the digital world.",
+  "heroDescription": "Explore the machines, ideas, and technologies that shaped the digital world.",
   "enterMuseum": "Enter Museum",
   "exploreCollection": "Explore the Collection",
   "signIn": "Sign in",
@@ -70,5 +70,22 @@
   "artifact05": "05",
   "heroWorkstationAlt": "A desktop computer workstation displayed in the museum",
   "explodedAlt": "An exploded view of a desktop computer and its components",
-  "skipToContent": "Skip to museum experience"
+  "skipToContent": "Skip to museum experience",
+  "aboutCta": "About CORE",
+  "introPreparing": "Preparing the museum",
+  "introLoading": "Loading the CORE experience",
+  "introEntering": "Entering CORE",
+  "skipIntro": "Skip intro",
+  "scrollToEnter": "Scroll to enter",
+  "aboutEyebrow": "02 / About CORE",
+  "aboutTitle": "About CORE",
+  "aboutDescription": "CORE is an interactive computer museum built to explore the machines, ideas, and technologies behind the digital world.",
+  "aboutAside": "The screen becomes the space",
+  "heroSetupAlt": "A desktop computer setup with monitor, tower, keyboard and mouse",
+  "heroArtifactLabel": "A live computing artifact",
+  "introStatus": "Restoring machines. Preserving ideas.",
+  "monitorWorldHint": "The screen becomes the space",
+  "visitEyebrow": "03 / Begin your visit",
+  "visitTitle": "Begin Your Visit",
+  "visitDescription": "Step inside CORE and explore the machines and stories behind computing."
 }
