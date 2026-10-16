@@ -19,5 +19,21 @@
   "curatorHint": "Ask one focused question about this exhibit.",
   "askPlaceholder": "Ask about this exhibit...",
   "navigate": "navigate",
-  "museumGallery": "museum gallery"
+  "museumGallery": "museum gallery",
+  "unassigned": "Unassigned section",
+  "retryModel": "Retry 3D model",
+  "uncategorized": "Uncategorized",
+  "collectionNavigation": "Museum collection",
+  "model": {
+    "error": "The 3D model is unavailable. Showing the CORE display.",
+    "missing": "No 3D model is available. Showing the CORE display.",
+    "loading": "Loading the exhibit model…",
+    "ready": "Exhibit model loaded."
+  },
+  "emptyCollection": "No published exhibits are available.",
+  "selectExhibit": "Select exhibit",
+  "emptySection": "No published exhibits in this section.",
+  "loadingCollection": "Loading the museum collection…",
+  "retry": "Reload collection",
+  "dataError": "The museum collection could not be loaded."
 }

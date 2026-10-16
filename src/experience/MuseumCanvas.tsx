@@ -1,4 +1,20 @@
-import { Canvas } from '@react-three/fiber'; import { Suspense, useEffect, useRef } from 'react'; import gsap from 'gsap'; import { ScrollTrigger } from 'gsap/ScrollTrigger'; import { MuseumScene } from './MuseumScene'; import { useMuseumStore } from '@/features/museum/museumStore'; import { useReducedMotion } from '@/hooks/usePreferences'; import {useMuseumItems} from '@/hooks/useMuseumItems'
-gsap.registerPlugin(ScrollTrigger)
-function CameraRig() { const setJourney = useMuseumStore(s => s.setJourney); const reduced = useReducedMotion(); const ref = useRef<HTMLDivElement>(null); useEffect(() => { if (reduced) return; const trigger = ScrollTrigger.create({ trigger: ref.current, start: 'top top', end: '+=1600', scrub: true, onUpdate: self => setJourney(self.progress) }); return () => trigger.kill() }, [reduced, setJourney]); return <div ref={ref} className="pointer-events-none absolute inset-x-0 top-0 h-[1600px]" aria-hidden="true" /> }
-export function MuseumCanvas({ className = '', fixed = false }: { className?: string; fixed?: boolean }) { const progress = useMuseumStore(s => s.progress); const {items}=useMuseumItems(); const modelUrl=items[0]?.model3DUrl; return <><div className={`${fixed ? 'fixed' : 'absolute'} inset-0 ${className}`}><Canvas dpr={[1, 1.6]} gl={{ antialias: true, alpha: false }} camera={{ position: [0, .2, 8], fov: 42 }}><Suspense fallback={null}><MuseumScene progress={progress} modelUrl={modelUrl} /></Suspense></Canvas></div>{!fixed && <CameraRig />}</> }
+import {Canvas} from '@react-three/fiber'
+import {MuseumScene} from './MuseumScene'
+import {useReducedMotion} from '@/hooks/usePreferences'
+import type {MuseumItem} from '@/types/museum'
+import type {ModelStatus} from '@/features/museum/museumState'
+
+export function MuseumCanvas({className = '', fixed = false, item, progress = 0, revision = 0, modelStatus = 'missing', onModelStatus}: {
+    className?: string; fixed?: boolean; item?: MuseumItem; progress?: number; revision?: number
+    modelStatus?: ModelStatus; onModelStatus?: (status: ModelStatus) => void
+}) {
+    const reduced = useReducedMotion()
+    return <div className={`${fixed ? 'fixed' : 'absolute'} inset-0 ${className}`} data-museum-scene
+        data-item-id={item?.id ?? ''} data-model-url={item?.model3DUrl ?? ''} data-model-state={modelStatus}>
+        <Canvas dpr={[1,1.6]} frameloop={reduced ? 'demand' : 'always'} gl={{antialias: true, alpha: false}}
+            camera={{position: [0,.2,8], fov: 42}} fallback={<div role="status">3D unavailable</div>}>
+            <MuseumScene progress={progress} modelUrl={item?.model3DUrl} itemId={item?.id} revision={revision}
+                reduced={reduced} onModelStatus={onModelStatus}/>
+        </Canvas>
+    </div>
+}

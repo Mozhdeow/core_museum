@@ -6,8 +6,10 @@ import {HeroMonitorCanvas} from '../components/HeroMonitorCanvas'
 import {journeyArtwork} from '../config/journeyGeometry'
 import {AboutCoreSection} from './AboutCoreSection'
 
-export function HeroSection({onEnter, onFinalEnter = onEnter, entering = false,
-    active, engineActive = true, onAbout}: {
+export function HeroSection({
+                                onEnter, onFinalEnter = onEnter, entering = false,
+                                active, engineActive = true, onAbout
+                            }: {
     onEnter: () => void; onFinalEnter?: () => void; entering?: boolean;
     active: boolean; engineActive?: boolean; onAbout: () => void
 }) {
@@ -19,7 +21,7 @@ export function HeroSection({onEnter, onFinalEnter = onEnter, entering = false,
         <div className="core-stage__portal">
             <div className="core-stage__world" dir="ltr">
                 <img className="core-stage__computer-image" src={artwork.src} alt=""
-                    aria-hidden="true" fetchPriority="high" decoding="async"/>
+                     aria-hidden="true" fetchPriority="high" decoding="async"/>
                 <div className="core-stage__screen" dir={i18n.dir()} style={{
                     left: `${artwork.screen.left}%`, top: `${artwork.screen.top}%`,
                     width: `${artwork.screen.width}%`, height: `${artwork.screen.height}%`,
@@ -38,7 +40,10 @@ export function HeroSection({onEnter, onFinalEnter = onEnter, entering = false,
             <p>{t('heroDescription')}</p>
             <div className="landing-actions">
                 <Button onClick={onEnter}>{t('enterMuseum')} <ArrowUpRight size={16}/></Button>
-                <a className="text-link" href="#about" onClick={event => {event.preventDefault(); onAbout()}}>
+                <a className="text-link" href="#about" onClick={event => {
+                    event.preventDefault();
+                    onAbout()
+                }}>
                     {t('aboutCta')} <ArrowDown size={15}/>
                 </a>
             </div>

@@ -1,7 +1,12 @@
 import i18n from '@/i18n'
+import {AssetValidationError} from './supabase/assetValidation'
+import {ExhibitValidationError} from './supabase/exhibitValidation'
 export class AppError extends Error { key: string; constructor(key: string) { super(key); this.key = key } }
 export function errorMessage(error: unknown): string {
-  if (error instanceof AppError) return i18n.t(error.key, {ns: 'phase2'})
+  const validation=error instanceof ExhibitValidationError?error:error instanceof Error && error.cause instanceof ExhibitValidationError?error.cause:null
+  if(validation)return i18n.t(`cms.validation.${validation.issues[0]?.key ?? 'required'}`,{ns:'admin'})
+  if (error instanceof AppError || error instanceof AssetValidationError) return i18n.t(error.key, {ns: 'phase2'})
+  if (error instanceof Error && error.cause instanceof AssetValidationError) return i18n.t(error.cause.key, {ns: 'phase2'})
   const value = error as {code?: string; message?: string; status?: number} | null
   let key = 'requestFailed'
   if (value?.code === '23503') key = 'referenced'

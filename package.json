@@ -8,7 +8,13 @@
     "build": "tsc -b && vite build",
     "typecheck": "tsc -b",
     "lint": "eslint .",
-    "preview": "vite preview --host 0.0.0.0"
+    "test:users": "node --test tests/admin-users.test.ts tests/admin-users-sql.test.ts",
+    "test:backend": "node --test tests/backend-integrity.test.ts",
+    "test:storage": "node --test tests/storage-assets.test.ts",
+    "test:museum": "node --test tests/museum-integration.test.ts",
+    "preview": "vite preview --host 0.0.0.0",
+    "test:cms": "node --test tests/admin-cms.test.ts",
+    "test:roles": "node --test tests/auth-roles.test.ts tests/auth-roles-sql.test.ts"
   },
   "dependencies": {
     "@fontsource/ibm-plex-mono": "^5.3.0",

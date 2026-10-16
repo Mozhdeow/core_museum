@@ -4,10 +4,19 @@ project_id = "core-museum"
 enabled = true
 
 [db]
-major_version = 15
+major_version = 17
 
 [studio]
 enabled = true
 
 [auth]
+secret_key = "env(CORE_LOCAL_AUTH_SECRET_KEY)"
+jwt_secret = "env(CORE_LOCAL_AUTH_JWT_SECRET)"
+anon_key = "env(CORE_LOCAL_AUTH_ANON_KEY)"
+service_role_key = "env(CORE_LOCAL_AUTH_SERVICE_ROLE_KEY)"
 enabled = true
+
+[functions.admin-users]
+enabled = true
+verify_jwt = true
+entrypoint = "./functions/admin-users/index.ts"

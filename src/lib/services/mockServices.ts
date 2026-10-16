@@ -19,6 +19,9 @@ export const mockAuthService: AuthService = {
 // Deliberately in memory: changes reset when the application reloads.
 let items = structuredClone(mockItems)
 export const mockMuseumItemsService: MuseumItemsService = {
+    async page(query){const selected=items.filter(item=>query.status==='all'||item.status===query.status);return {items:structuredClone(selected.slice((query.page-1)*query.perPage,query.page*query.perPage)),total:selected.length,page:query.page,perPage:query.perPage}},
+    async taxonomy(){return {categories:[],sections:structuredClone(mockSections)}},
+    async catalog() { return {items: structuredClone(items.filter(item => item.status === 'published')), categories: [], sections: structuredClone(mockSections)} },
     async list() {
         return structuredClone(items).sort((a, b) => a.sortOrder - b.sortOrder)
     },

@@ -2,12 +2,13 @@ import type {AuthChangeEvent, Session} from '@supabase/supabase-js'
 import {requireSupabase} from '@/lib/supabase/client'
 import type {AuthService, AuthUser, Credentials} from '@/types/services'
 import type {Locale} from '@/types/museum'
+import {databaseRole, displayRole, type DatabaseRole} from '@/features/auth/permissions'
 
 export type Profile = {
     id: string;
     email: string;
     full_name: string;
-    role: 'user' | 'admin';
+    role: DatabaseRole;
     preferred_locale: Locale;
     created_at: string;
     updated_at: string
@@ -16,7 +17,7 @@ const mapUser = (session: Session, profile: Profile): AuthUser => ({
     id: session.user.id,
     name: profile.full_name || session.user.email?.split('@')[0] || 'Archive visitor',
     email: session.user.email || profile.email,
-    role: profile.role === 'admin' ? 'admin' : 'visitor'
+    role: displayRole(profile.role)
 })
 export const supabaseAuthService: AuthService & {
     getSession: () => Promise<{ session: Session | null; profile: Profile | null; user: AuthUser | null }>
@@ -60,6 +61,7 @@ export const supabaseAuthService: AuthService & {
         } = await client.from('profiles').select('*').eq('id', session.user.id).single();
         if (profileError) throw profileError;
         const profile = data as Profile;
+        if(profile.id!==session.user.id || !databaseRole(profile.role))throw new Error('Profile authorization is unavailable');
         return {session, profile, user: mapUser(session, profile)}
     },
     onAuthStateChange(callback) {
@@ -67,7 +69,7 @@ export const supabaseAuthService: AuthService & {
         return () => data.subscription.unsubscribe()
     },
     async updateProfile(id, patch) {
-        const {data, error} = await requireSupabase().from('profiles').update(patch).eq('id', id).select('*').single();
+        const {data, error} = await requireSupabase().from('profiles').update({full_name:patch.full_name,preferred_locale:patch.preferred_locale}).eq('id', id).select('*').single();
         if (error) throw error;
         return data as Profile
     },

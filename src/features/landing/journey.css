@@ -69,7 +69,7 @@
     right: 0;
     top: 0;
     height: 100%;
-    width: 67%;
+    width: 50%;
     object-fit: cover;
     mask-image: linear-gradient(90deg, transparent, #000 36%);
 }
@@ -213,7 +213,7 @@
     display: flex;
     align-items: center;
     padding: 6% 7%;
-    overflow: auto;
+    overflow: hidden;
     overscroll-behavior: auto;
     scrollbar-width: thin;
     scrollbar-color: #946531 #080808;

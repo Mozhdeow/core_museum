@@ -13,12 +13,15 @@ const blend = (a: Bounds, b: Bounds, t: number): Bounds => ({
     x: mix(a.x, b.x, t), y: mix(a.y, b.y, t),
     width: mix(a.width, b.width, t), height: mix(a.height, b.height, t),
 })
+
 function savedPosition() {
     try {
         const saved = JSON.parse(sessionStorage.getItem(POSITION_KEY) ?? 'null')
         return saved?.url === location.href && saved?.key === (history.state?.key ?? 'initial')
-            && Number.isFinite(saved?.progress) ? clamp01(saved.progress) : null
-    } catch {return null}
+        && Number.isFinite(saved?.progress) ? clamp01(saved.progress) : null
+    } catch {
+        return null
+    }
 }
 
 export function useLandingMotion(root: RefObject<HTMLElement | null>, enabled: boolean) {
@@ -78,16 +81,22 @@ export function useLandingMotion(root: RefObject<HTMLElement | null>, enabled: b
             copy.setAttribute('aria-hidden', String(copy.inert))
         }
         const context = gsap.context(() => {
-            sizeWorld(); renderGeometry()
-            const timeline = gsap.timeline({paused: !enabled, defaults: {ease: 'power2.inOut'},
-                onUpdate: () => {renderGeometry(); syncSemantics()},
+            sizeWorld();
+            renderGeometry()
+            const timeline = gsap.timeline({
+                paused: !enabled, defaults: {ease: 'power2.inOut'},
+                onUpdate: () => {
+                    renderGeometry();
+                    syncSemantics()
+                },
                 scrollTrigger: enabled ? {
                     id: 'landing-computer-journey', trigger: stage, start: 'top top',
                     end: () => `+=${stage.clientHeight * (reduced ? 2.6 : portrait ? 3.6 : 5.2)}`,
                     pin: true, scrub: reduced ? true : .4, anticipatePin: 1, invalidateOnRefresh: true,
                     onRefresh: () => {
                         bounds = journeyBounds(stage.clientWidth, stage.clientHeight, portrait)
-                        sizeWorld(); renderGeometry()
+                        sizeWorld();
+                        renderGeometry()
                     },
                 } : undefined,
             })
@@ -121,24 +130,37 @@ export function useLandingMotion(root: RefObject<HTMLElement | null>, enabled: b
                 trigger?.refresh()
                 if (trigger && restoreProgress !== null && pageShown) {
                     trigger.scroll(trigger.start + (trigger.end - trigger.start) * restoreProgress)
-                    trigger.update(); trigger.animation?.progress(restoreProgress)
-                    restoreProgress = null; resumeProgress.current = null
-                    try {sessionStorage.removeItem(POSITION_KEY)} catch { /* optional storage */ }
+                    trigger.update();
+                    trigger.animation?.progress(restoreProgress)
+                    restoreProgress = null;
+                    resumeProgress.current = null
+                    try {
+                        sessionStorage.removeItem(POSITION_KEY)
+                    } catch { /* optional storage */
+                    }
                 }
             })
         }
         const savePosition = () => {
             const trigger = ownedTrigger.current
             if (trigger) try {
-                sessionStorage.setItem(POSITION_KEY, JSON.stringify({url: location.href,
-                    key: history.state?.key ?? 'initial', progress: trigger.progress}))
-            } catch { /* optional storage */ }
+                sessionStorage.setItem(POSITION_KEY, JSON.stringify({
+                    url: location.href,
+                    key: history.state?.key ?? 'initial', progress: trigger.progress
+                }))
+            } catch { /* optional storage */
+            }
         }
-        const showPage = () => {pageShown = true; refresh()}
+        const showPage = () => {
+            pageShown = true;
+            refresh()
+        }
         window.addEventListener('pageshow', showPage)
         window.addEventListener('pagehide', savePosition)
         host.querySelectorAll('img').forEach(image => image.addEventListener('load', refresh))
-        void document.fonts.ready.then(() => {if (!disposed) refresh()})
+        void document.fonts.ready.then(() => {
+            if (!disposed) refresh()
+        })
         const hashIndex = ['#welcome', '#about', '#visit'].indexOf(location.hash)
         if (enabled && hashIndex > 0) {
             restoreProgress = stops[hashIndex]
@@ -159,8 +181,10 @@ export function useLandingMotion(root: RefObject<HTMLElement | null>, enabled: b
     const goToSection = useCallback((index: number) => {
         const trigger = ownedTrigger.current
         if (!trigger) return
-        window.scrollTo({top: trigger.start + (trigger.end - trigger.start) * (stops[index] ?? 0),
-            behavior: reduced ? 'instant' : 'smooth'})
+        window.scrollTo({
+            top: trigger.start + (trigger.end - trigger.start) * (stops[index] ?? 0),
+            behavior: reduced ? 'instant' : 'smooth'
+        })
     }, [reduced])
     return {activeSection, goToSection}
 }

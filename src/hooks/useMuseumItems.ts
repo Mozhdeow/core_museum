@@ -1,27 +1,30 @@
-import {useCallback, useEffect, useState} from 'react'
+import {useCallback, useEffect, useRef, useState} from 'react'
 import {museumItemsService} from '@/lib/services'
 import type {MuseumItem} from '@/types/museum'
 import {useAuthStore} from '@/features/auth/authStore'
+import {canUseContentWorkspace} from '@/features/auth/permissions'
 
 export function useMuseumItems() {
-    const [items, setItems] = useState<MuseumItem[]>([])
-    const [loading, setLoading] = useState(true)
-    const [error, setError] = useState(false)
-    const isAdmin = useAuthStore(s => s.isAdmin)
+    const id=useAuthStore(s=>s.user?.id),role=useAuthStore(s=>s.user?.role)
+    const owner=`${id}:${role}`
+    const [data,setData]=useState<{owner:string;items:MuseumItem[];loading:boolean;error:boolean}>()
+    const sequence=useRef({generation:0})
     const refresh = useCallback(async () => {
+        const request=++sequence.current.generation
+        setData({owner,items:[],loading:true,error:false})
         try {
-            setItems(await museumItemsService.list({admin: isAdmin}));
-            setError(false)
+            const items=await museumItemsService.list({admin:canUseContentWorkspace(role),...(role==='editor'?{status:'draft' as const}:{})})
+            if(request===sequence.current.generation)setData({owner,items,loading:false,error:false})
         } catch {
-            setError(true)
-        } finally {
-            setLoading(false)
+            if(request===sequence.current.generation)setData({owner,items:[],loading:false,error:true})
         }
-    }, [isAdmin])
+    }, [owner,role])
     useEffect(() => {
-        // The service fetch resolves asynchronously; this initial load is intentional.
+        const requests=sequence.current
+        // The service fetch resolves asynchronously; preserve the existing initial-load exception.
         // eslint-disable-next-line react-hooks/set-state-in-effect
         void refresh()
+        return ()=>{requests.generation++}
     }, [refresh])
-    return {items, loading, error, refresh}
+    return {items:data?.owner===owner?data.items:[],loading:data?.owner!==owner || data.loading,error:data?.owner===owner && data.error,refresh}
 }

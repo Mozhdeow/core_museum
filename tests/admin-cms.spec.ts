@@ -1,0 +1,253 @@
+import {test,expect,type Page} from '@playwright/test'
+
+type Row=Record<string,unknown>
+const id='11111111-1111-4111-8111-111111111111',category='22222222-2222-4222-8222-222222222222',section='33333333-3333-4333-8333-333333333333',inactive='44444444-4444-4444-8444-444444444444'
+const version='2026-10-15T00:00:00.000001Z'
+const row=(index:number):Row=>({id:index===0?id:`10000000-0000-4000-8000-${String(index).padStart(12,'0')}`,slug:`item-${index}`,title_en:`Exhibit ${String(index).padStart(2,'0')}`,title_fa:`اثر ${index}`,brand:'CORE',release_year:1971,category_id:category,section_id:section,status:'published',sort_order:index,featured:false,updated_at:version,thumbnail_path:null,model_path:null,enable_gallery:true,enable_ai_curator:false,enable_exploded_view:false,source_url:'https://example.test/source',license:'museum-owned'})
+async function cms(page:Page,options:{count?:number;path?:string;inactiveCurrent?:boolean;missing?:boolean;taxonomyFailure?:boolean}={}){
+    const state={items:Array.from({length:options.count??1},(_,i)=>row(i)),specs:[{id:'spec-a',item_id:id,label_en:'Clock',label_fa:'فرکانس',value:'1MHz',sort_order:0}],gallery:[{id:'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',item_id:id,storage_path:`items/${id}/gallery/a.png`,caption_en:'Front',caption_fa:'جلو',sort_order:0},{id:'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',item_id:id,storage_path:`items/${id}/gallery/b.png`,caption_en:'Back',caption_fa:'پشت',sort_order:1}],calls:[] as Array<{method:string;url:URL;body:Row}>,failure:'',taxonomyFailure:options.taxonomyFailure??false}
+    if(options.inactiveCurrent)state.items[0].category_id=inactive
+    if(options.missing)state.items=[]
+    await page.route('**/*.supabase.co/**',async route=>{
+        const request=route.request(),url=new URL(request.url()),name=url.pathname.split('/').at(-1)!,method=request.method()
+        if(!url.pathname.startsWith('/rest/v1/'))return route.fulfill({status:403,contentType:'application/json',body:'{}'})
+        const body=request.postDataJSON()??{}
+        state.calls.push({method,url,body})
+        const reply=(data:unknown,status=200,total?:number)=>route.fulfill({status,contentType:'application/json',body:method==='HEAD'?undefined:JSON.stringify(data),headers:{'access-control-expose-headers':'content-range',...(total!==undefined?{'content-range':`0-0/${total}`}:{})}})
+        if(url.pathname.includes('/rpc/')){
+            if(name==='is_admin')return reply(true)
+            if(name!=='save_museum_item')return reply({code:'42501'},403)
+            if(state.failure)return reply({code:state.failure,message:'Controlled rejection'},400)
+            const previous=state.items.find(item=>item.id===body.item.id)
+            if(!previous)return reply({code:'P0002'},400)
+            if(previous.updated_at!==body.expected_updated_at)return reply({code:'40001',message:'Conflict'},400)
+            if(state.items.some(item=>item.id!==previous.id&&item.slug===body.item.slug))return reply({code:'23505'},409)
+            Object.assign(previous,body.item,{updated_at:`2026-10-15T00:00:00.${String(state.calls.length).padStart(6,'0')}Z`})
+            state.specs=body.specs.map((spec:Row,index:number)=>({...spec,id:`spec-${index}`,item_id:previous.id,sort_order:index}))
+            state.gallery=body.gallery.map((image:Row,index:number)=>({...image,item_id:previous.id,sort_order:index}))
+            return reply(previous.id)
+        }
+        if(name==='museum_items'&&method==='POST'){
+            if(state.items.some(item=>item.id===body.id||item.slug===body.slug))return reply({code:'23505'},409)
+            const created={...body,updated_at:version};state.items.push(created);return reply(created)
+        }
+        if(name==='museum_items'&&method==='DELETE')return reply({code:'40001',message:'Concurrent deletion'},400)
+        if(state.taxonomyFailure&&['categories','museum_sections'].includes(name))return reply({code:'42501',message:'Denied'},403)
+        let data:Row[]=name==='museum_items'?structuredClone(state.items):name==='museum_item_specs'?structuredClone(state.specs):name==='gallery_images'?structuredClone(state.gallery):name==='categories'?[
+            {id:category,slug:'renamed-processors',name_en:'Live processors',name_fa:'پردازنده‌های زنده',sort_order:0,active:true},
+            {id:inactive,slug:'retired',name_en:'Retired category',name_fa:'دستهٔ غیرفعال',sort_order:1,active:false},
+        ]:name==='museum_sections'?[{id:section,slug:'custom-room',title_en:'Custom room',title_fa:'تالار سفارشی',sort_order:0,active:true}]:[]
+        for(const [key,value] of url.searchParams){
+            if(value.startsWith('eq.'))data=data.filter(row=>String(row[key])===value.slice(3))
+            if(value==='is.null')data=data.filter(row=>row[key]==null)
+            if(value.startsWith('in.(')){const ids=value.slice(4,-1).split(',');data=data.filter(row=>ids.includes(String(row[key])))}
+        }
+        const or=url.searchParams.get('or')
+        if(or){const quoted=or.match(/title_en\.imatch\.("(?:\\.|[^"\\])*")/)?.[1];if(!quoted)throw new Error('Unexpected search syntax');const regex=new RegExp(JSON.parse(quoted),'iu');data=data.filter(row=>['title_en','title_fa','slug','brand'].some(key=>regex.test(String(row[key]??''))))}
+        data.sort((a,b)=>Number(a.sort_order??0)-Number(b.sort_order??0)||String(a.id).localeCompare(String(b.id)))
+        const count=data.length
+        const object=request.headers().accept?.includes('vnd.pgrst.object')
+        if(object)return data.length===1?reply(data[0]):reply({code:'PGRST116',message:'Missing'},406)
+        const from=Number(url.searchParams.get('offset')??0),limit=Number(url.searchParams.get('limit')??1000)
+        return reply(data.slice(from,from+limit),200,count)
+    })
+    await page.addInitScript(()=>{localStorage.setItem('core-locale','en');localStorage.setItem('core_intro_last_seen_at',String(Date.now()));localStorage.setItem('core_intro_last_full_seen_at',String(Date.now()))})
+    await page.goto('/')
+    await page.waitForFunction(async()=>{const path='/src/features/auth/authStore.ts';return !(await import(path)).useAuthStore.getState().isLoading})
+    await page.evaluate(async target=>{
+        const auth='/src/features/auth/authStore.ts',routing='/src/app/router/index.tsx'
+        ;(await import(auth)).useAuthStore.setState({user:{id:'fixture-admin',name:'Admin',role:'admin'},isAuthenticated:true,isAdmin:true,isLoading:false})
+        await (await import(routing)).router.navigate(target)
+    },options.path??`/admin/items/${id}/edit`)
+    return state
+}
+const save=(page:Page)=>page.getByRole('button',{name:'SAVE ITEM',exact:true})
+async function navigate(page:Page,path:string){await page.evaluate(async path=>{const source='/src/app/router/index.tsx';await (await import(source)).router.navigate(path)},path)}
+test('database taxonomy uses real IDs, localization, ordering and current inactive assignments',async({page})=>{
+    await cms(page,{inactiveCurrent:true})
+    await expect(page.getByLabel('Slug',{exact:true})).toHaveValue('item-0')
+    const categories=page.getByLabel(/^category$/i),sections=page.getByLabel('Museum section',{exact:true})
+    await expect(categories).toHaveValue(inactive)
+    await expect(categories.locator('option:checked')).toHaveAttribute('disabled','')
+    await expect(categories.locator('option')).toHaveText(['Unassigned','Live processors','Retired category — Inactive'])
+    await expect(sections).toHaveValue(section)
+    await page.getByRole('button',{name:'FA',exact:true}).click()
+    await expect(page.locator(`select option[value="${category}"]`)).toHaveText('پردازنده‌های زنده')
+    await expect(page.locator(`select option[value="${section}"]`)).toHaveText('تالار سفارشی')
+})
+test('server listing paginates and searches Persian titles with combinable UUID and status filters',async({page})=>{
+    const state=await cms(page,{count:26,path:'/admin/items'})
+    await expect(page.getByText('Exhibit 00',{exact:true})).toBeVisible()
+    await expect(page.locator('tbody tr')).toHaveCount(25)
+    await page.getByRole('button',{name:'Next page',exact:true}).click()
+    await expect(page.locator('tbody tr')).toHaveCount(1);await expect(page.getByText('Exhibit 25',{exact:true})).toBeVisible()
+    await page.getByLabel('Search',{exact:true}).fill('اثر 9')
+    await page.getByRole('button',{name:'Search',exact:true}).click()
+    await expect(page.getByText('Exhibit 09',{exact:true})).toBeVisible()
+    await page.getByLabel(/^category$/i).selectOption(category)
+    await page.getByLabel('Museum section',{exact:true}).selectOption(section)
+    await page.getByLabel('Status',{exact:true}).selectOption('draft')
+    await expect(page.locator('tbody tr')).toHaveCount(0)
+    await expect(page.getByText('No items found',{exact:true})).toBeVisible()
+    expect(state.calls.some(c=>c.url.searchParams.get('category_id')===`eq.${category}`&&c.url.searchParams.get('section_id')===`eq.${section}`&&c.url.searchParams.get('status')==='eq.draft')).toBe(true)
+})
+test('a page removed by concurrent deletion can return to the first page after a range error',async({page})=>{
+    const state=await cms(page,{count:26,path:'/admin/items'})
+    await expect(page.getByText('Exhibit 00',{exact:true})).toBeVisible()
+    await page.getByRole('button',{name:'Next page',exact:true}).click()
+    await expect(page.getByText('Exhibit 25',{exact:true})).toBeVisible()
+    state.items=[]
+    await page.route('**/rest/v1/museum_items?**',route=>new URL(route.request().url()).searchParams.get('offset')==='25'?route.fulfill({status:416,contentType:'application/json',body:JSON.stringify({code:'PGRST103',message:'Requested range not satisfiable'})}):route.fallback())
+    await page.getByRole('button',{name:'Refresh data',exact:true}).click()
+    await expect(page.getByRole('alert')).toBeVisible()
+    await page.getByRole('button',{name:'First page',exact:true}).click()
+    await expect(page.getByText('No items found',{exact:true})).toBeVisible()
+    await expect(page.getByRole('alert')).toHaveCount(0)
+})
+test('specifications and gallery reordering save bilingual data once through the versioned RPC',async({page})=>{
+    const state=await cms(page)
+    await expect(page.getByLabel('Specification 1 / Persian',{exact:true})).toHaveValue('فرکانس')
+    await page.getByRole('button',{name:'Add specification',exact:true}).click()
+    await page.getByLabel('Specification 2 / English',{exact:true}).fill('Memory')
+    await page.getByLabel('Specification 2 / Persian',{exact:true}).fill('حافظه')
+    await page.getByLabel('Value 2',{exact:true}).fill('64 KB')
+    await page.getByRole('button',{name:'Move specification 2 up',exact:true}).click()
+    await page.getByRole('button',{name:'Move gallery image 2 up',exact:true}).click()
+    await page.getByLabel('Caption / Persian',{exact:true}).first().fill('پشت برد')
+    await page.getByLabel('Source URL',{exact:true}).fill('')
+    await save(page).click();await expect(page).toHaveURL(/\/admin\/items$/)
+    const calls=state.calls.filter(c=>c.url.pathname.endsWith('/rpc/save_museum_item'))
+    expect(calls).toHaveLength(1);expect(calls[0].body.expected_updated_at).toBe(version)
+    expect(calls[0].body.item).toMatchObject({id,category_id:category,section_id:section,source_url:''})
+    expect(calls[0].body.specs.map((s:Row)=>[s.label_en,s.label_fa,s.value])).toEqual([['Memory','حافظه','64 KB'],['Clock','فرکانس','1MHz']])
+    expect(calls[0].body.gallery.map((g:Row)=>g.id)).toEqual(['bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb','aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'])
+    expect(state.gallery[0].caption_fa).toBe('پشت برد')
+})
+test('invalid metadata identifies fields bilingually and sends no save or upload request',async({page})=>{
+    const state=await cms(page)
+    await page.getByLabel('Title / Persian',{exact:true}).fill('')
+    await page.getByLabel('Source URL',{exact:true}).fill('javascript:bad')
+    await save(page).click()
+    await expect(page.getByRole('alert')).toContainText('Title / Persian')
+    await expect(page.getByLabel('Title / Persian',{exact:true})).toHaveAttribute('aria-invalid','true')
+    expect(state.calls.filter(c=>c.method!=='GET')).toHaveLength(0)
+    await page.getByRole('button',{name:'FA',exact:true}).click()
+    await page.locator('form').evaluate(form=>(form as HTMLFormElement).requestSubmit())
+    await expect(page.getByRole('alert')).toContainText('این فیلد الزامی است')
+})
+test('failed atomic save retains draft edits; conflict recovery explicitly loads the winner',async({page})=>{
+    const state=await cms(page)
+    await page.getByLabel('Slug',{exact:true}).fill('unsaved')
+    state.items[0].slug='winner';state.items[0].updated_at='2026-10-15T01:00:00Z'
+    await save(page).click()
+    await expect(page.getByRole('alert')).toContainText('This record changed')
+    await expect(page.getByLabel('Slug',{exact:true})).toHaveValue('unsaved')
+    page.once('dialog',dialog=>dialog.accept())
+    await page.getByRole('button',{name:'Discard edits and reload exhibit',exact:true}).click()
+    await expect(page.getByLabel('Slug',{exact:true})).toHaveValue('winner')
+    await save(page).click();await expect(page).toHaveURL(/\/admin\/items$/)
+    expect(state.calls.filter(c=>c.url.pathname.endsWith('/rpc/save_museum_item'))).toHaveLength(1)
+})
+test('a failed publish preserves the draft and metadata, and a safe retry keeps its UUID',async({page})=>{
+    const state=await cms(page)
+    state.items[0].status='draft'
+    await navigate(page,'/admin/items')
+    await navigate(page,`/admin/items/${id}/edit`)
+    await expect(page.getByLabel('Status',{exact:true})).toHaveValue('draft')
+    await page.getByLabel('Status',{exact:true}).selectOption('published')
+    await page.getByLabel('Title / English',{exact:true}).fill('Published title')
+    state.failure='23514';await save(page).click()
+    await expect(page.getByRole('alert')).toBeVisible()
+    expect(state.items[0]).toMatchObject({id,status:'draft',title_en:'Exhibit 00'})
+    await expect(page.getByLabel('Title / English',{exact:true})).toHaveValue('Published title')
+    state.failure='';await save(page).click();await expect(page).toHaveURL(/\/admin\/items$/)
+    expect(state.items).toHaveLength(1);expect(state.items[0]).toMatchObject({id,status:'published',title_en:'Published title'})
+})
+test('taxonomy failures disable save and retry recovers without clearing entered metadata',async({page})=>{
+    const state=await cms(page,{taxonomyFailure:true,path:'/admin/items/new'})
+    await expect(page.getByRole('alert')).toContainText('Categories and sections could not be loaded')
+    await expect(save(page)).toBeDisabled()
+    await page.getByLabel('Slug',{exact:true}).fill('retained')
+    state.taxonomyFailure=false
+    await page.getByRole('button',{name:/retry/i}).click()
+    await expect(save(page)).toBeEnabled();await expect(page.getByLabel('Slug',{exact:true})).toHaveValue('retained')
+})
+test('publish rejects inactive placements; draft retains them and active reassignment publishes safely',async({page})=>{
+    const state=await cms(page,{inactiveCurrent:true})
+    await expect(page.getByLabel('Slug',{exact:true})).toHaveValue('item-0')
+    await save(page).click();await expect(page.getByRole('alert')).toContainText('active category and section')
+    expect(state.calls.some(c=>c.url.pathname.endsWith('/rpc/save_museum_item'))).toBe(false)
+    await page.getByLabel('Status',{exact:true}).selectOption('draft')
+    await save(page).click();await expect(page).toHaveURL(/\/admin\/items$/)
+    expect(state.items[0].status).toBe('draft')
+    await navigate(page,`/admin/items/${id}/edit`)
+    await page.getByLabel(/^category$/i).selectOption(category)
+    await page.getByLabel('Status',{exact:true}).selectOption('published')
+    await save(page).click();await expect(page).toHaveURL(/\/admin\/items$/)
+    expect(state.items[0]).toMatchObject({id,status:'published',category_id:category})
+})
+test('create, publish, edit and unpublish propagate through the actual catalog only on explicit refresh',async({page})=>{
+    const state=await cms(page,{missing:true,path:'/admin/items/new'})
+    await page.getByLabel('Slug',{exact:true}).fill('new-core')
+    await page.getByLabel('Title / English',{exact:true}).fill('New CORE')
+    await page.getByLabel('Title / Persian',{exact:true}).fill('اثر تازه')
+    await page.getByLabel(/^category$/i).selectOption(category)
+    await page.getByLabel('Museum section',{exact:true}).selectOption(section)
+    await page.getByLabel('Status',{exact:true}).selectOption('published')
+    await save(page).click();await expect(page).toHaveURL(/\/admin\/items$/)
+    const newId=String(state.items[0].id)
+    const catalog=()=>page.evaluate(async()=>{const source='/src/features/museum/museumStore.ts';return (await import(source)).useMuseumStore.getState().items.map((item:{id:string;title:{en:string}})=>({id:item.id,title:item.title.en}))})
+    const refresh=()=>page.evaluate(async()=>{const source='/src/features/museum/museumStore.ts';await (await import(source)).useMuseumStore.getState().load('fixture-admin',true)})
+    await refresh();expect(await catalog()).toEqual([{id:newId,title:'New CORE'}])
+    await navigate(page,`/admin/items/${newId}/edit`)
+    await page.getByLabel('Title / English',{exact:true}).fill('Updated CORE')
+    await save(page).click();await expect(page).toHaveURL(/\/admin\/items$/)
+    expect(await catalog()).toEqual([{id:newId,title:'New CORE'}])
+    await refresh();expect(await catalog()).toEqual([{id:newId,title:'Updated CORE'}])
+    await navigate(page,`/admin/items/${newId}/edit`)
+    await page.getByLabel('Status',{exact:true}).selectOption('draft')
+    await save(page).click();await expect(page).toHaveURL(/\/admin\/items$/)
+    expect(await catalog()).toEqual([{id:newId,title:'Updated CORE'}])
+    await refresh();expect(await catalog()).toEqual([])
+    expect(state.items).toHaveLength(1);expect(state.items[0].id).toBe(newId)
+})
+test('failed delete blocks repeated attempts until a successful explicit list refresh',async({page})=>{
+    const state=await cms(page,{path:'/admin/items'})
+    const remove=page.getByRole('button',{name:'Delete',exact:true})
+    page.once('dialog',dialog=>dialog.accept());await remove.click()
+    await expect(page.getByRole('status').filter({hasText:'inspect the result'})).toBeVisible()
+    await expect(remove).toBeDisabled();expect(state.items).toHaveLength(1)
+    await page.getByRole('button',{name:'Refresh data',exact:true}).click();await expect(remove).toBeEnabled()
+    expect(state.calls.filter(c=>c.method==='DELETE')).toHaveLength(1)
+})
+test('a late deletion response cannot refresh the list under the previous authenticated owner',async({page})=>{
+    const state=await cms(page,{path:'/admin/items'})
+    await expect(page.getByText('Exhibit 00',{exact:true})).toBeVisible()
+    const listRequests=()=>state.calls.filter(c=>c.method==='GET'&&c.url.pathname.endsWith('/museum_items')&&c.url.searchParams.get('limit')==='25').length
+    const initialRequests=listRequests()
+    await page.evaluate(async()=>{
+        const source='/src/lib/services/index.ts'
+        ;(await import(source)).museumItemsService.remove=()=>new Promise(resolve=>{(window as unknown as {finishCmsDelete:()=>void}).finishCmsDelete=()=>resolve({cleanupFailed:false})})
+    })
+    page.once('dialog',dialog=>dialog.accept())
+    await page.getByRole('button',{name:'Delete',exact:true}).click()
+    await page.evaluate(async()=>{
+        const source='/src/features/auth/authStore.ts',store=(await import(source)).useAuthStore
+        store.setState({user:{...store.getState().user,id:'second-admin',role:'admin'}})
+    })
+    await expect.poll(listRequests).toBe(initialRequests+1)
+    await expect(page.getByText('Exhibit 00',{exact:true})).toBeVisible()
+    await page.evaluate(()=>(window as unknown as {finishCmsDelete:()=>void}).finishCmsDelete())
+    await expect(page.getByRole('button',{name:'Delete',exact:true})).toBeEnabled()
+    await expect(page.getByText('Exhibit 00',{exact:true})).toBeVisible()
+    expect(listRequests()).toBe(initialRequests+1)
+})
+test('missing exhibit and failed list display explicit errors instead of an editable new item',async({page})=>{
+    await cms(page,{missing:true})
+    await expect(page.getByRole('alert')).toContainText('removed or is unavailable')
+    await expect(save(page)).toHaveCount(0)
+    await page.route('**/rest/v1/museum_items?**',route=>route.fulfill({status:403,contentType:'application/json',body:JSON.stringify({code:'42501',message:'Denied'})}))
+    await navigate(page,'/admin/items')
+    await expect(page.getByRole('alert')).toBeVisible();await expect(page.locator('tbody tr')).toHaveCount(0)
+    await expect(page.getByText('No items found',{exact:true})).toHaveCount(0)
+})

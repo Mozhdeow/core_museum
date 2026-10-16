@@ -8,6 +8,7 @@ import {LoginPage, RegisterPage, ForgotPasswordPage, ResetPasswordPage} from '@/
 import {MuseumPage} from '@/pages/Museum/MuseumPage';
 import {ProfilePage} from '@/pages/Profile/ProfilePage';
 import {AdminLoginPage, DashboardPage, ItemsPage, ItemFormPage, PlaceholderAdminPage} from '@/pages/Admin/AdminPages';
+import {AdminUsersPage} from '@/pages/Admin/AdminUsersPage';
 import {ProtectedRoute, AdminGuard} from './guards'
 
 export const router = createBrowserRouter([{
@@ -30,22 +31,21 @@ export const router = createBrowserRouter([{
             }, {path: 'profile', element: <ProfilePage/>}]
         },
         {path: 'admin', element: <AdminLoginPage/>}, {
-            element: <AdminGuard/>,
+            element: <AdminGuard content/>,
             children: [{
                 element: <AdminLayout/>,
-                children: [{path: 'admin/dashboard', element: <DashboardPage/>}, {
+                children: [{
                     path: 'admin/items',
                     element: <ItemsPage/>
                 }, {path: 'admin/items/new', element: <ItemFormPage/>}, {
                     path: 'admin/items/:id/edit',
                     element: <ItemFormPage/>
-                }, {
-                    path: 'admin/categories',
-                    element: <PlaceholderAdminPage section="categories"/>
-                }, {path: 'admin/sections', element: <PlaceholderAdminPage section="sections"/>}, {
-                    path: 'admin/users',
-                    element: <PlaceholderAdminPage section="users"/>
-                }]
+                }, {element:<AdminGuard/>,children:[
+                    {path:'admin/dashboard',element:<DashboardPage/>},
+                    {path:'admin/categories',element:<PlaceholderAdminPage section="categories"/>},
+                    {path:'admin/sections',element:<PlaceholderAdminPage section="sections"/>},
+                    {path:'admin/users',element:<AdminUsersPage/>},
+                ]}]
             }]
         },
         {path: '*', element: <Navigate to="/" replace/>},

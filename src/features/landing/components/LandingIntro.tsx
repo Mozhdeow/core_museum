@@ -57,13 +57,6 @@ function TypingText({
             dir={direction}
             aria-label={fullText}
         >
-            {/*
-                This invisible copy reserves the FINAL width of the line.
-
-                Without it, a centered parent would re-center the string
-                on every new character and the typing would visually
-                appear to expand from the middle.
-            */}
             <span
                 className="landing-intro__typing-measure"
                 aria-hidden="true"
@@ -317,8 +310,8 @@ export function LandingIntro({
 
         const speedFactor =
             mode === 'short'
-                ? 0.62
-                : 1
+                ? 0.4
+                : .55
 
         const initialDelay =
             mode === 'short'
@@ -381,7 +374,7 @@ export function LandingIntro({
                     window.setTimeout(
                         typeCharacter,
                         Math.max(
-                            28,
+                            14,
                             Math.round(
                                 line.charDelay
                                 * speedFactor,
@@ -691,16 +684,13 @@ export function LandingIntro({
         const duration =
             mode === 'short'
                 ? 1300
-                : 4000
+                : 3000
 
         const tick = (
             now: number,
         ) => {
             const delta =
-                Math.min(
-                    now - previousTime,
-                    50,
-                )
+                Math.min(now - previousTime, 50,)
 
             previousTime = now
 

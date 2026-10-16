@@ -8,6 +8,8 @@ import {useAuthStore} from '@/features/auth/authStore'
 export function AdminLayout() {
     const {t} = useTranslation(['common', 'admin']);
     const signOut = useAuthStore(s => s.signOut);
+    const role=useAuthStore(s=>s.user?.role);
+    const home=role==='admin'?'/admin/dashboard':'/admin/items';
     const links = [{to: '/admin/dashboard', icon: LayoutDashboard, label: t('dashboard')}, {
         to: '/admin/items',
         icon: Boxes,
@@ -16,10 +18,10 @@ export function AdminLayout() {
         to: '/admin/sections',
         icon: Map,
         label: t('sections')
-    }, {to: '/admin/users', icon: Users, label: t('users')}];
+    }, {to: '/admin/users', icon: Users, label: t('users')}].filter(link=>role==='admin' || link.to==='/admin/items');
     return <div className="min-h-screen bg-void text-ink">
         <aside className="fixed inset-y-0 start-0 z-30 hidden w-64 border-e border-border bg-surface p-6 lg:block"><Logo
-            to="/admin/dashboard"/>
+            to={home}/>
             <div className="mt-12 space-y-1">{links.map(({to, icon: Icon, label}) => <NavLink key={to} to={to}
                                                                                               className={({isActive}) => `flex items-center gap-3 border-s-2 px-3 py-3 font-mono text-xs uppercase tracking-widest transition-colors ${isActive ? 'border-orange bg-elevated text-orange' : 'border-transparent text-muted hover:text-ink'}`}><Icon
                 size={16}/>{label}</NavLink>)}</div>
@@ -30,9 +32,9 @@ export function AdminLayout() {
         <header
             className="fixed inset-x-0 top-0 z-20 flex items-center justify-between border-b border-border bg-void/90 p-4 backdrop-blur-lg lg:start-64 lg:px-8">
             <div className="flex items-center gap-4">
-                <div className="lg:hidden"><Logo to="/admin/dashboard" compact/></div>
+                <div className="lg:hidden"><Logo to={home} compact/></div>
                 <span
-                    className="hidden font-mono text-xs uppercase tracking-widest text-muted md:inline">{t('admin')} / <span
+                    className="hidden font-mono text-xs uppercase tracking-widest text-muted md:inline">{role==='editor'?t('rbac.roles.editor',{ns:'admin'}):t('admin')} / <span
                     className="text-orange">{t('online')}</span></span></div>
             <div className="flex items-center gap-2"><LanguageSwitcher/><Link to="/museum"
                                                                               className="button button-outline hidden py-2 text-[10px] md:block">{t('exit')} museum</Link>

@@ -4,6 +4,7 @@ import {useTranslation} from 'react-i18next';
 import {Logo} from '@/components/common/Logo';
 import {useAuthStore} from '@/features/auth/authStore';
 import {Button} from '@/components/ui/Button'
+import {canUseContentWorkspace} from '@/features/auth/permissions'
 
 export function ProfilePage() {
     const {t} = useTranslation('common');
@@ -16,7 +17,7 @@ export function ProfilePage() {
         <header className="flex items-center justify-between"><Logo/><Link to="/museum"
                                                                            className="font-mono text-xs uppercase tracking-widest text-muted hover:text-orange">{t('back')}</Link>
         </header>
-        <main className="mx-auto max-w-2xl pt-24"><span className="eyebrow">{t('profile')}</span><h1
+        <main className="mx-auto max-w-2xl pt-24"><p className="mb-4 text-sm text-muted">{t('rbac.role',{ns:'admin'})}: {t(`rbac.roles.${user?.role==='visitor'?'user':user?.role ?? 'user'}`,{ns:'admin'})}</p>{canUseContentWorkspace(user?.role) && <Link className="button button-outline mb-5" to={user?.role==='admin'?'/admin/dashboard':'/admin/items'}>{t('rbac.workspace',{ns:'admin'})}</Link>}<span className="eyebrow">{t('profile')}</span><h1
             className="mt-5 font-display text-5xl">{user?.name ?? 'Archive visitor'}</h1>
             <div className="mt-10 grid gap-4 border-y border-border py-6 text-sm">
                 <div className="flex justify-between"><span

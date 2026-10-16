@@ -53,7 +53,16 @@ export interface MuseumItem {
 
 export interface MuseumSectionData {
     id: SectionId;
+    slug?: string;
     title: LocalizedText;
+    description?: LocalizedText;
     sortOrder: number;
     available: boolean
+}
+
+export interface MuseumCategoryData {
+    id: string; slug: string; name: LocalizedText; sortOrder: number; active: boolean
+}
+export interface MuseumCatalog {
+    items: MuseumItem[]; categories: MuseumCategoryData[]; sections: MuseumSectionData[]
 }

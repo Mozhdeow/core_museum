@@ -1,5 +1,7 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuthStore } from '@/features/auth/authStore';
+import {canUseContentWorkspace} from '@/features/auth/permissions';
+import {PermissionDenied} from '@/components/common/PermissionDenied';
 
 export function ProtectedRoute() {
     const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -25,8 +27,9 @@ export function ProtectedRoute() {
     );
 }
 
-export function AdminGuard() {
-    const isAdmin = useAuthStore((state) => state.isAdmin);
+export function AdminGuard({content=false}:{content?:boolean}) {
+    const user = useAuthStore((state) => state.user);
+    const authenticated = useAuthStore((state) => state.isAuthenticated);
     const isLoading = useAuthStore((state) => state.isLoading);
 
     if (isLoading) {
@@ -37,9 +40,10 @@ export function AdminGuard() {
         );
     }
 
-    return isAdmin ? (
+    if(!authenticated)return <Navigate to="/admin" replace/>;
+    return (content ? canUseContentWorkspace(user?.role) : user?.role==='admin') ? (
         <Outlet />
     ) : (
-        <Navigate to="/admin" replace />
+        <PermissionDenied/>
     );
 }

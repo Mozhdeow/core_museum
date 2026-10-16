@@ -1,18 +1,21 @@
-﻿import {create} from 'zustand'
-import type {Session} from '@supabase/supabase-js'
-import type {AuthUser, Credentials, UserRole} from '@/types/services'
-import type {Locale} from '@/types/museum'
 import {supabaseAuthService} from '@/lib/services'
 import i18n from '@/i18n'
-export type AuthProfile = {id: string; email: string | null; full_name: string | null; role: 'user' | 'admin'; preferred_locale: Locale; created_at: string; updated_at: string}
-interface AuthState { session: Session | null; user: AuthUser | null; profile: AuthProfile | null; role: 'user' | 'admin' | null; isAuthenticated: boolean; isAdmin: boolean; isLoading: boolean; error: string | null; initialize: () => Promise<void>; signIn: (credentials: Credentials, role?: UserRole) => Promise<void>; register: (input: Credentials & {name: string}) => Promise<void>; signOut: (role?: UserRole) => Promise<void>; updateProfile: (patch: {full_name?: string; preferred_locale?: Locale}) => Promise<void> }
-export const useAuthStore = create<AuthState>((set, get) => ({
- session:null,user:null,profile:null,role:null,isAuthenticated:false,isAdmin:false,isLoading:true,error:null,
- async initialize() { try { const result = await supabaseAuthService.getSession(); if (result.profile?.preferred_locale && !localStorage.getItem('core-locale')) await i18n.changeLanguage(result.profile.preferred_locale); set({session:result.session,profile:result.profile,user:result.user,role:result.profile?.role ?? null,isAuthenticated:Boolean(result.session),isAdmin:result.profile?.role === 'admin',isLoading:false}) } catch (error) { set({isLoading:false,error:error instanceof Error ? error.message : 'Unable to restore session'}) } },
- async signIn(credentials) { set({isLoading:true,error:null}); try { const user = await supabaseAuthService.signIn(credentials); const result = await supabaseAuthService.getSession(); set({session:result.session,profile:result.profile,user,role:result.profile?.role ?? null,isAuthenticated:true,isAdmin:result.profile?.role === 'admin',isLoading:false}) } catch (error) { set({isLoading:false,error:error instanceof Error ? error.message : 'Unable to sign in'}); throw error } },
- async register(input) { set({isLoading:true,error:null}); try { const user = await supabaseAuthService.register(input); const result = await supabaseAuthService.getSession(); set({session:result.session,profile:result.profile,user,role:result.profile?.role ?? null,isAuthenticated:Boolean(result.session),isAdmin:false,isLoading:false}) } catch (error) { set({isLoading:false,error:error instanceof Error ? error.message : 'Unable to register'}); throw error } },
- async signOut() { await supabaseAuthService.signOut(); set({session:null,user:null,profile:null,role:null,isAuthenticated:false,isAdmin:false}) },
- async updateProfile(patch) { const profile=get().profile; if (!profile) return; const updated=await supabaseAuthService.updateProfile(profile.id,patch); set({profile:updated,user:get().user ? {...get().user!,name:updated.full_name ?? get().user!.name} : null}) },
-}))
+import {createAuthState} from './sessionState'
+export type {AuthProfile} from './sessionState'
+
+export const useAuthStore=createAuthState(supabaseAuthService,async profile=>{
+    if(!localStorage.getItem('core-locale'))await i18n.changeLanguage(profile.preferred_locale)
+})
 let initialized=false
-export function initializeAuth() { if (initialized) return; initialized=true; void useAuthStore.getState().initialize(); try { const unsubscribe=supabaseAuthService.onAuthStateChange((_event,session) => { if (!session) { useAuthStore.setState({session:null,user:null,profile:null,role:null,isAuthenticated:false,isAdmin:false,isLoading:false}); return } window.setTimeout(() => void useAuthStore.getState().initialize(), 0) }); window.addEventListener('beforeunload',unsubscribe,{once:true}) } catch { /* configuration error is surfaced when auth is used */ } }
+export function initializeAuth(){
+    if(initialized)return
+    initialized=true
+    void useAuthStore.getState().initialize()
+    try{
+        const unsubscribe=supabaseAuthService.onAuthStateChange((_event,session)=>{
+            useAuthStore.getState().invalidate(Boolean(session))
+            if(session)window.setTimeout(()=>void useAuthStore.getState().initialize(),0)
+        })
+        window.addEventListener('beforeunload',unsubscribe,{once:true})
+    }catch{useAuthStore.getState().invalidate()}
+}
