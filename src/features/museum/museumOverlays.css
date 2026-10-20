@@ -1,0 +1,33 @@
+.museum-modal{position:fixed;inset-inline:0;top:var(--museum-modal-top,0);height:var(--museum-modal-height,100dvh);z-index:100;pointer-events:auto;display:flex;align-items:center;justify-content:center;padding:max(16px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(16px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));background:#05080def;backdrop-filter:blur(10px);color:var(--color-ink)}
+.museum-modal-panel{border:1px solid #4b5358;background:#101419;max-height:100%;min-height:0;display:flex;flex-direction:column;pointer-events:auto;box-shadow:0 24px 80px #0008}
+.museum-modal-panel button,.museum-modal-panel input{pointer-events:auto}
+.museum-modal-panel button{cursor:pointer;min-height:44px;flex-shrink:0}
+.museum-modal-panel button:disabled{opacity:.4;cursor:default}
+.museum-modal-panel button:focus-visible,.museum-modal-panel input:focus-visible{outline:2px solid var(--color-orange);outline-offset:2px}
+.museum-dialog-header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 16px;border-bottom:1px solid var(--color-border);flex-shrink:0}
+.museum-dialog-header>button{min-width:44px}
+.museum-dialog-header h2{font-size:18px}
+.museum-modal-gallery{width:min(1100px,100%);height:min(760px,100%)}
+.museum-gallery-stage{position:relative;flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:16px 60px;overflow:hidden;background:#080a0e}
+.museum-gallery-stage img{display:block;width:100%;height:100%;object-fit:contain;min-height:0}
+.museum-gallery-stage>button{position:absolute;top:calc(50% - 22px);width:44px;border:1px solid #424b52;background:#101419df}
+.museum-gallery-stage>button:first-of-type{inset-inline-start:8px}.museum-gallery-stage>button:last-of-type{inset-inline-end:8px}
+.museum-gallery-status{position:absolute;inset:24px 60px;display:grid;place-items:center;font-size:14px;text-align:center;background:#080a0e}
+.museum-gallery-caption{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:12px 16px;font-size:12px;line-height:1.7;max-height:24%;overflow-y:auto;border-top:1px solid var(--color-border);flex-shrink:0}
+.museum-gallery-caption span{flex-shrink:0;color:var(--color-orange);font-family:'IBM Plex Mono',monospace;font-size:11px}
+.museum-modal-ai{width:min(460px,100%)}
+.museum-ai-body{min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:16px;line-height:1.8;font-size:13px}
+.museum-ai-modes{display:flex;gap:6px;margin:12px 0}
+.museum-ai-modes button{flex:1;border:1px solid #4b5358;font-size:11px;padding:4px}
+.museum-ai-modes button[aria-pressed=true]{color:var(--color-orange);border-color:var(--color-orange)}
+.museum-ai-answer{margin-top:12px;padding-inline-start:12px;border-inline-start:2px solid var(--color-orange);white-space:pre-wrap}
+.museum-ai-form{display:flex;gap:8px;flex-shrink:0;padding:12px 16px;border-top:1px solid #4b5358;background:#101419}
+.museum-ai-form input{width:100%;min-width:0;flex:1;min-height:46px;background:#090c10;border:1px solid #4b5358;padding:8px 10px;color:var(--color-ink);font-size:16px}
+.museum-ai-form button{min-width:46px;color:var(--color-orange);border:1px solid var(--color-orange)}
+.museum-ai-disclaimer{font-size:11px;line-height:1.7;color:var(--color-muted);padding:10px 16px;flex-shrink:0}
+[data-museum-overlay=gallery] .museum-navigation,[data-museum-overlay=ai] .museum-navigation,[data-museum-overlay=gallery] .cpu-inspect-entry,[data-museum-overlay=ai] .cpu-inspect-entry{visibility:hidden;pointer-events:none}
+.museum-exhibit-notice{font-size:12px;line-height:1.7;margin-top:12px;color:var(--color-orange)}
+@media(max-width:767px),(max-height:539px){.museum-modal{padding:8px}.museum-dialog-header{padding:6px 12px}.museum-modal-gallery{height:100%}.museum-gallery-stage{padding:8px 48px}.museum-gallery-caption{padding:8px 12px}.museum-ai-body{padding:10px 12px}.museum-ai-form{padding:8px 12px}.museum-ai-disclaimer{padding:6px 12px;font-size:10px}.museum-modal-ai{max-height:100%}}
+.museum-association-badge{display:block;margin-top:8px;font-size:11px;line-height:1.5;color:var(--color-orange)}
+.museum-exhibit-body>.museum-exhibit-notice{margin-top:0;margin-bottom:12px}
+@media(min-width:768px) and (min-height:540px){.cpu-inspect-entry{inset-inline-start:auto;inset-inline-end:24px;top:112px}}

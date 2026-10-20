@@ -22,6 +22,9 @@ import {AssetPicker} from './AssetPicker';
 import {useContentAccess} from '@/hooks/useContentAccess';
 import {PermissionDenied} from '@/components/common/PermissionDenied';
 import {ITEM_STATUS, type MuseumItem, type LocalizedText} from '@/types/museum';
+import {readCmsDraft,writeCmsDraft,removeCmsDraft} from '@/features/cms/draftStorage';
+import {DraftRecovery} from '@/features/cms/DraftRecovery';
+import {invalidateMuseumCatalog} from '@/features/museum/catalogInvalidation';
 
 export function AdminLoginPage() {
     const {t} = useTranslation(['admin', 'auth']);
@@ -117,6 +120,7 @@ const blankItem: MuseumItem = {
     status: ITEM_STATUS.draft
 }
 
+const localizedDraft=(value:unknown):value is LocalizedText=>Boolean(value&&typeof value==='object'&&typeof (value as LocalizedText).en==='string'&&typeof (value as LocalizedText).fa==='string');
 function FormSection({number, icon: Icon, title, hint, children}: {
     number: string;
     icon: typeof Box;
@@ -147,14 +151,27 @@ function ItemFormContent() {
     const location = useLocation();
     const navigate = useNavigate();
     const editId = location.pathname.includes('/edit') ? location.pathname.split('/').at(-2) : undefined;
+    const draftOwner=useAuthStore(state=>state.user?.id)??'';
+    const resource=`items:${editId??'new'}`;
+    type Draft={item:MuseumItem;galleryCaptions:LocalizedText[];galleryFiles?:File[];thumbnailFile?:File;modelFile?:File;hasFiles:boolean;saveMode:'create'|'update';retryBlocked:boolean};
+    const [recovery,setRecovery]=useState(()=>readCmsDraft<Draft>(draftOwner,resource,value=>{
+        const d=value as Draft|undefined,i=d?.item;
+        return Boolean(i&&typeof i.id==='string'&&(!editId||i.id===editId)&&typeof i.slug==='string'&&localizedDraft(i.title)&&localizedDraft(i.description)&&localizedDraft(i.shortDescription)
+            &&Array.isArray(i.specifications)&&i.specifications.every(s=>s&&localizedDraft(s.label)&&typeof s.value==='string')
+            &&Array.isArray(i.galleryImages)&&i.galleryImages.every(g=>g&&typeof g.id==='string'&&typeof g.url==='string'&&localizedDraft(g.caption))
+            &&['draft','published'].includes(i.status)&&Array.isArray(d?.galleryCaptions)&&d.galleryCaptions.every(localizedDraft)&&['create','update'].includes(d?.saveMode??'')&&typeof d?.retryBlocked==='boolean');
+    }));
+    const live=recovery?.live?recovery.value:undefined;
+    const [filesNeedReselect]=useState(Boolean(recovery&&!recovery.live&&recovery.value.hasFiles));
+    const hydrated=useRef(Boolean(live)),cleared=useRef(false),hydrationSkip=useRef(false);
     const {data:existing,loading,error:loadError,refresh} = useExhibit(editId);
     const taxonomy=useCmsTaxonomy();
     const {role,canWrite}=useContentAccess();
-    const [item, setItem] = useState<MuseumItem>(existing ?? {...blankItem, id: crypto.randomUUID()});
-    const [galleryFiles,setGalleryFiles] = useState<File[]>([]); const [thumbnailFile,setThumbnailFile] = useState<File>(); const [modelFile,setModelFile] = useState<File>(); const [saving,setSaving] = useState(false); const [error,setError] = useState('');
-    const [galleryCaptions,setGalleryCaptions]=useState<LocalizedText[]>([]);
-    const [saveMode, setSaveMode] = useState<'create' | 'update'>(editId ? 'update' : 'create');
-    const [retryBlocked, setRetryBlocked] = useState(false);
+    const [item, setItem] = useState<MuseumItem>(live?.item ?? existing ?? {...blankItem, id: crypto.randomUUID()});
+    const [galleryFiles,setGalleryFiles] = useState<File[]>(live?.galleryFiles??[]); const [thumbnailFile,setThumbnailFile] = useState<File|undefined>(live?.thumbnailFile); const [modelFile,setModelFile] = useState<File|undefined>(live?.modelFile); const [saving,setSaving] = useState(false); const [error,setError] = useState('');
+    const [galleryCaptions,setGalleryCaptions]=useState<LocalizedText[]>(live?.galleryCaptions??[]);
+    const [saveMode, setSaveMode] = useState<'create' | 'update'>(live?.saveMode??(editId ? 'update' : 'create'));
+    const [retryBlocked, setRetryBlocked] = useState(live?.retryBlocked??false);
     const [stage, setStage] = useState<SaveStage>('validating');
     const [assetBlocked, setAssetBlocked] = useState({thumbnail: false, gallery: false, model: false});
     const selectionBlocked = Object.values(assetBlocked).some(Boolean);
@@ -168,8 +185,18 @@ function ItemFormContent() {
     const sections=taxonomy.data?.sections??[];
     const categoryId=item.categoryId??categories.find(c=>c.slug===item.category)?.id??'';
     const sectionId=item.sectionId??sections.find(s=>s.slug===item.museumSection)?.id??'';
-    // Async loading supplies the existing row; route keys reset all state between targets.
-    useEffect(() => { if (existing) { setItem(existing) } }, [existing]);
+    // A refetch or locale rerender must never replace dirty input.
+    useEffect(() => { if (existing&&!hydrated.current) {hydrated.current=true;hydrationSkip.current=true;setItem(existing)} }, [existing]);
+    useEffect(()=>{
+        if(hydrationSkip.current){hydrationSkip.current=false;return}
+        if(cleared.current||!draftOwner||(editId&&!hydrated.current)||recovery&&!recovery.live)return;
+        if(editId&&item.id!==editId)return;
+        const hasFiles=Boolean(modelFile||thumbnailFile||galleryFiles.length);
+        if(!hasFiles&&JSON.stringify(item)===JSON.stringify(existing??{...blankItem,id:item.id}))return;
+        const value:Draft={item,galleryCaptions,galleryFiles,thumbnailFile,modelFile,hasFiles,saveMode,retryBlocked};
+        writeCmsDraft(draftOwner,resource,value,{item,galleryCaptions,hasFiles,saveMode,retryBlocked});
+    },[draftOwner,resource,editId,existing,item,galleryCaptions,galleryFiles,thumbnailFile,modelFile,saveMode,retryBlocked,recovery]);
+    const discardDraft=()=>{removeCmsDraft(draftOwner,resource);setRecovery(null)};
     const set = <K extends keyof MuseumItem>(key: K, value: MuseumItem[K]) => setItem(current => ({
         ...current,
         [key]: value
@@ -197,6 +224,7 @@ function ItemFormContent() {
                 onStage: value => {operation.stage = value; setStage(value)}});
             if(useAuthStore.getState().user?.role!==role||useAuthStore.getState().user?.id!==owner)return;
             navigate('/admin/items', {state: {integrityWarning: result.cleanupFailed, saveConfirmed: true}});
+            cleared.current=true;removeCmsDraft(draftOwner,resource);invalidateMuseumCatalog();
         } catch (error) {
             if(useAuthStore.getState().user?.role!==role||useAuthStore.getState().user?.id!==owner)return;
             const validation=error instanceof ExhibitValidationError?error:error instanceof Error&&error.cause instanceof ExhibitValidationError?error.cause:undefined;
@@ -226,6 +254,9 @@ function ItemFormContent() {
     if(editId && !existing)return <div className="p-8"><p role="alert">{t('cms.notFound',{ns:'admin'})}</p><Link to="/admin/items">{t('cancel')}</Link></div>;
     return <div className="p-5 md:p-8">
         <AdminHeading eyebrow="CORE / ARCHIVE / ITEM" title={editId ? t('editItem') : t('newItem')}/>
+        {filesNeedReselect&&!recovery&&<p role="status" className="mb-4 text-sm text-muted">{t('drafts.files',{ns:'admin'})}</p>}
+        {recovery&&!recovery.live&&<DraftRecovery stale={Boolean(existing&&recovery.value.item.updatedAt!==existing.updatedAt)} files={recovery.value.hasFiles} discard={discardDraft} restore={()=>{const d=recovery.value;if(!d?.item?.title||!Array.isArray(d.item.specifications)){discardDraft();return}hydrated.current=true;setItem(d.item);setGalleryCaptions(d.galleryCaptions??[]);setSaveMode(d.saveMode);setRetryBlocked(d.retryBlocked);setRecovery(null)}}/>}
+        {hydrated.current&&existing&&item.updatedAt!==existing.updatedAt&&<p role="status" className="mb-4 text-amber">{t('drafts.stale',{ns:'admin'})}</p>}
         {role==='editor' && !canWrite && <p role="status" className="mb-5 text-sm text-amber">{t('rbac.writeGate',{ns:'admin'})}</p>}
         {taxonomy.loading&&<p role="status">{t('loading')}</p>}
         {Boolean(taxonomy.error)&&<p role="alert">{t('cms.taxonomyError',{ns:'admin'})}<button type="button" onClick={()=>void taxonomy.refresh()} className="ms-3 text-orange">{t('cms.retry',{ns:'admin'})}</button></p>}
@@ -269,13 +300,13 @@ function ItemFormContent() {
                 </div>)}</div><button type="button" disabled={item.specifications.length>=100} className="mt-4 text-sm text-orange" onClick={()=>set('specifications',[...item.specifications,{label:{en:'',fa:''},value:''}])}>{t('cms.addSpec',{ns:'admin'})}</button>
             </FormSection>
             <FormSection number="04" icon={Box} title={t('threeDModel')} hint={t('modelUploadHint', {ns: 'phase2'})}>
-                <AssetPicker kind="model" disabled={saving || !canWrite} existingModel={{name: item.modelOriginalFilename, bytes: item.modelFileSize}}
+                <AssetPicker kind="model" pendingFiles={modelFile?[modelFile]:[]} disabled={saving || !canWrite} existingModel={{name: item.modelOriginalFilename, bytes: item.modelFileSize}}
                     onChange={files => setModelFile(files[0])} onValidity={blocked => setAssetBlocked(current => ({...current, model: blocked}))}/>
             </FormSection>
             <FormSection number="05" icon={ImagePlus} title={t('gallerySection')} hint={t('galleryHint')}>
-                <AssetPicker kind="thumbnail" disabled={saving || !canWrite} existingImage={existing?.thumbnail}
+                <AssetPicker kind="thumbnail" pendingFiles={thumbnailFile?[thumbnailFile]:[]} disabled={saving || !canWrite} existingImage={existing?.thumbnail}
                     onChange={files => setThumbnailFile(files[0])} onValidity={blocked => setAssetBlocked(current => ({...current, thumbnail: blocked}))}/>
-                <AssetPicker kind="gallery" disabled={saving || !canWrite} onChange={files=>{setGalleryFiles(files);setGalleryCaptions(files.map(()=>({en:'',fa:''})))}}
+                <AssetPicker kind="gallery" pendingFiles={galleryFiles} disabled={saving || !canWrite} onChange={files=>{setGalleryFiles(files);setGalleryCaptions(files.map(()=>({en:'',fa:''})))}}
                     onValidity={blocked => setAssetBlocked(current => ({...current, gallery: blocked}))}/>
                 {galleryFiles.map((file,index)=><div key={`${index}:${file.name}`} className="my-3 grid gap-3 border border-orange/30 p-3 md:grid-cols-2"><p dir="auto" className="text-sm md:col-span-2">{file.name}</p>{(['en','fa'] as const).map(locale=><Input key={locale} dir={locale==='fa'?'rtl':'ltr'} label={`${t('cms.pendingCaption',{ns:'admin',index:index+1})} / ${t(locale==='en'?'english':'persian')}`} value={galleryCaptions[index]?.[locale]??''} onChange={e=>setGalleryCaptions(current=>current.map((caption,i)=>i===index?{...caption,[locale]:e.target.value}:caption))}/>)}<div className="flex gap-4 md:col-span-2"><button type="button" disabled={index===0} aria-label={t('cms.movePendingUp',{ns:'admin',index:index+1})} onClick={()=>{setGalleryFiles(moveEntry(galleryFiles,index,-1));setGalleryCaptions(moveEntry(galleryCaptions,index,-1))}}>↑</button><button type="button" disabled={index===galleryFiles.length-1} aria-label={t('cms.movePendingDown',{ns:'admin',index:index+1})} onClick={()=>{setGalleryFiles(moveEntry(galleryFiles,index,1));setGalleryCaptions(moveEntry(galleryCaptions,index,1))}}>↓</button></div></div>)}
                 {item.galleryImages.map((image,index)=><div key={image.id} className="mt-3 grid gap-2 border border-border p-3 md:grid-cols-[96px_1fr_auto]"><img src={image.url} alt="" className="h-16 w-24 object-cover"/><div className="grid gap-2 md:grid-cols-2"><Input label={`${t('caption')} / ${t('english')}`} value={image.caption.en} onChange={e=>setItem(current=>({...current,galleryImages:current.galleryImages.map(g=>g.id===image.id ? {...g,caption:{...g.caption,en:e.target.value}} : g)}))}/><Input label={`${t('caption')} / ${t('persian')}`} value={image.caption.fa} dir="rtl" onChange={e=>setItem(current=>({...current,galleryImages:current.galleryImages.map(g=>g.id===image.id ? {...g,caption:{...g.caption,fa:e.target.value}} : g)}))}/></div><div className="flex items-center gap-2"><button type="button" className="text-xs text-muted" disabled={index===0} aria-label={t('cms.moveGalleryUp',{ns:'admin',index:index+1})} onClick={()=>moveGallery(index,-1)}>↑</button><button type="button" className="text-xs text-muted" disabled={index===item.galleryImages.length-1} aria-label={t('cms.moveGalleryDown',{ns:'admin',index:index+1})} onClick={()=>moveGallery(index,1)}>↓</button><button type="button" className="text-xs text-red" onClick={()=>setItem(current=>({...current,galleryImages:current.galleryImages.filter(g=>g.id!==image.id)}))}>{t('delete')}</button></div></div>)}
@@ -309,7 +340,7 @@ function ItemFormContent() {
             </FormSection>
             {saving && <p role="status" className="text-xs text-muted">{t(`saveStage.${stage}`, {ns: 'phase2'})}</p>}
             {error && <div className="text-xs text-red" role="alert" id="exhibit-validation" tabIndex={-1} ref={feedback}><p>{error}</p>{issues.length>0&&<ul className="mt-2 list-inside list-disc">{issues.map((issue,index)=><li key={index}>{issueLabel(issue.field)}: {t(`cms.validation.${issue.key}`,{ns:'admin'})}</li>)}</ul>}</div>}
-            {conflict&&<Button type="button" variant="ghost" onClick={()=>{if(window.confirm(t('cms.discardReload',{ns:'admin'}))){setError('');setIssues([]);setConflict(false);setThumbnailFile(undefined);setModelFile(undefined);setGalleryFiles([]);setGalleryCaptions([]);void refresh()}}}>{t('cms.reloadItem',{ns:'admin'})}</Button>}
+            {conflict&&<Button type="button" variant="ghost" onClick={()=>{if(window.confirm(t('cms.discardReload',{ns:'admin'}))){discardDraft();hydrated.current=false;setError('');setIssues([]);setConflict(false);setThumbnailFile(undefined);setModelFile(undefined);setGalleryFiles([]);setGalleryCaptions([]);void refresh()}}}>{t('cms.reloadItem',{ns:'admin'})}</Button>}
             {retryBlocked&&<Link className="block text-sm text-orange" to="/admin/items">{t('cms.inspectBeforeRetry',{ns:'admin'})}</Link>}
             <div className="flex flex-wrap gap-3 pt-2"><Button type="submit" disabled={!canWrite || saving || retryBlocked || selectionBlocked || taxonomy.loading || Boolean(taxonomy.error) || Boolean(editId && !existing)}><Save size={15}/>{saving ? t('loading') : t('saveItem')}
             </Button><Button type="button" variant="ghost"
@@ -318,18 +349,4 @@ function ItemFormContent() {
     </div>
 }
 
-export function PlaceholderAdminPage({section}: { section: 'categories' | 'sections' }) {
-    const {t} = useTranslation(['common', 'admin']);
-    const titles = {
-        categories: t('categoriesTitle', {ns: 'admin'}),
-        sections: t('sectionsTitle', {ns: 'admin'}),
-    };
-    const [rows,setRows] = useState<Array<Record<string, unknown>>>([]); const [error,setError] = useState(''); const [slug,setSlug]=useState(''); const [nameEn,setNameEn]=useState(''); const [nameFa,setNameFa]=useState(''); const [sortOrder,setSortOrder]=useState(0); const [active,setActive]=useState(true); const [editingId,setEditingId]=useState<string>();
-    useEffect(() => { const request = supabaseAdminService.taxonomy(section); void request.then(data => setRows(data as Array<Record<string, unknown>>)).catch(() => setError(t('dataError'))) }, [section,t]);
-    const save = async (event: React.FormEvent) => { event.preventDefault(); const kind=section as 'categories'|'sections'; try { await supabaseAdminService.saveTaxonomy(kind,{id:editingId,slug,sort_order:sortOrder,active,...(kind === 'categories' ? {name_en:nameEn,name_fa:nameFa} : {title_en:nameEn,title_fa:nameFa,description_en:'',description_fa:''})}); const data=await supabaseAdminService.taxonomy(kind); setRows(data as Array<Record<string, unknown>>); setSlug('');setNameEn('');setNameFa('');setEditingId(undefined) } catch { setError(t('dataError')) } };
-    return <div className="p-5 md:p-8"><AdminHeading eyebrow={`CORE / ${section.toUpperCase()}`} title={titles[section]}/>{error && <p className="mb-4 text-xs text-red">{error}</p>}{<form onSubmit={save} className="mb-5 grid gap-3 border border-border bg-surface p-4 md:grid-cols-5"><Input label={t('slug')} value={slug} onChange={e=>setSlug(e.target.value)}/><Input label={`${t('title')} / ${t('english')}`} value={nameEn} onChange={e=>setNameEn(e.target.value)}/><Input label={`${t('title')} / ${t('persian')}`} value={nameFa} onChange={e=>setNameFa(e.target.value)}/><Input label={t('sortOrder')} type="number" value={sortOrder} onChange={e=>setSortOrder(Number(e.target.value))}/><div className="flex items-end gap-3"><label className="mb-3 flex gap-2 text-xs"><input type="checkbox" checked={active} onChange={e=>setActive(e.target.checked)}/>{t('online')}</label><Button type="submit">{t('save')}</Button></div></form>}<div className="overflow-x-auto border border-border bg-surface"><table className="w-full text-sm"><tbody>{rows.map(row=><tr key={String(row.id)} className="border-b border-border/60"><td className="p-3 font-mono text-xs">{String(row.slug ?? row.email ?? '')}</td><td className="p-3">{String(row.name_en ?? row.title_en ?? row.full_name ?? '')}</td><td className="p-3">{<><button type="button" className="me-3 text-xs text-orange" onClick={()=>{setEditingId(String(row.id));setSlug(String(row.slug??''));setNameEn(String(row.name_en??row.title_en??''));setNameFa(String(row.name_fa??row.title_fa??''));setSortOrder(Number(row.sort_order??0));setActive(Boolean(row.active))}}>{t('edit')}</button><button type="button" className="text-xs text-red" onClick={()=>{if(window.confirm(t('deleteConfirm'))) void supabaseAdminService.deleteTaxonomy(section as 'categories'|'sections',String(row.id)).then(()=>setRows(rows.filter(r=>r.id!==row.id))).catch(()=>setError(t('dataError')))}}>{t('delete')}</button></>}</td></tr>)}</tbody></table>{!rows.length && <p className="p-10 text-center text-sm text-muted">{t('empty')}</p>}</div></div>
-}
-
-
-
-
+export {TaxonomyForm as PlaceholderAdminPage} from './TaxonomyForm';

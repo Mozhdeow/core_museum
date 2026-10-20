@@ -3,6 +3,7 @@ import {useAuthStore} from '@/features/auth/authStore'
 import {supabaseAdminService} from '@/lib/services'
 
 export function useContentAccess(){
+    const loading=useAuthStore(state=>state.isLoading)
     const user=useAuthStore(state=>state.user),owner=`${user?.id}:${user?.role}`
     const [verified,setVerified]=useState<{owner:string;allowed:boolean}>()
     useEffect(()=>{
@@ -13,5 +14,5 @@ export function useContentAccess(){
         }).catch(()=>{if(!cancelled)setVerified({owner,allowed:false})})
         return ()=>{cancelled=true}
     },[owner,user?.role])
-    return {role:user?.role,canWrite:user?.role==='admin' || (user?.role==='editor' && verified?.owner===owner && verified.allowed)}
+    return {role:user?.role,canWrite:!loading && (user?.role==='admin' || (user?.role==='editor' && verified?.owner===owner && verified.allowed))}
 }

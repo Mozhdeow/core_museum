@@ -1,3 +1,4 @@
+import {invalidateMuseumCatalog} from '@/features/museum/catalogInvalidation'
 import {useState} from 'react'
 import {Link,useLocation,useNavigate} from 'react-router-dom'
 import {Plus} from 'lucide-react'
@@ -32,7 +33,7 @@ export function ItemsPage(){
         const currentActor=()=>useAuthStore.getState().user?.id===actorId&&useAuthStore.getState().user?.role==='admin'
         if(!actorId||!currentActor())return
         setRemoving(true);setMessage('')
-        try{const outcome=await museumItemsService.remove(id);if(!currentActor())return;if(outcome.cleanupFailed)setMessage(t('cleanupWarning',{ns:'phase2'}));await result.refresh()}
+        try{const outcome=await museumItemsService.remove(id);if(!currentActor())return;invalidateMuseumCatalog();if(outcome.cleanupFailed)setMessage(t('cleanupWarning',{ns:'phase2'}));await result.refresh()}
         catch(error){if(!currentActor())return;setMessage(`${errorMessage(error)} ${t('cms.inspectBeforeRetry',{ns:'admin'})}`);setDeleteBlocked(true)}
         finally{setRemoving(false)}
     }

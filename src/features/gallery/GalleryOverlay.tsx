@@ -1,22 +1,23 @@
-import {useCallback, useEffect, useState} from 'react';
-import {ArrowLeft, ArrowRight, X} from 'lucide-react';
-import {useTranslation} from 'react-i18next';
-import type {GalleryImage, Locale} from '@/types/museum';
-
-export function GalleryOverlay({images, locale, onClose}: { images: GalleryImage[]; locale: Locale; onClose: () => void }) {
-    const {t} = useTranslation('common');
-    const [index, setIndex] = useState(0);
-    const image = images[index];
-    const go = useCallback((direction: number) => setIndex(current => (current + direction + images.length) % images.length), [images.length]);
-    useEffect(() => {
-        const handleKeyDown = (event: KeyboardEvent) => { if (event.key === 'Escape') onClose(); if (event.key === 'ArrowLeft') go(-1); if (event.key === 'ArrowRight') go(1) };
-        window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [go, onClose]);
-    if (!image) return null;
-    return <div className="fixed inset-0 z-50 flex flex-col bg-void/95 p-4 backdrop-blur-xl md:p-8" role="dialog" aria-modal="true" aria-label={t('gallery')} dir={locale === 'fa' ? 'rtl' : 'ltr'}>
-        <header className="mx-auto flex w-full max-w-6xl items-center justify-between border-b border-border pb-4"><div><span className="eyebrow">CORE / {t('gallery')}</span><p className="mt-1 font-mono text-[9px] uppercase tracking-widest text-muted">{t('archive')}</p></div><button type="button" className="icon-button" onClick={onClose} aria-label={t('close')}><X size={17}/><span className="hidden font-mono text-[9px] uppercase tracking-widest md:inline">{t('close')}</span></button></header>
-        <main className="mx-auto flex min-h-0 w-full max-w-6xl flex-1 items-center justify-center py-6"><div className="w-full"><div className="relative overflow-hidden border border-border bg-surface shadow-2xl shadow-black/60"><img className="aspect-[16/9] max-h-[68dvh] w-full object-cover" src={image.url} alt={image.caption[locale]} /><button type="button" className="icon-button absolute start-3 top-1/2 -translate-y-1/2 bg-void/80 md:start-5" onClick={() => go(-1)} aria-label={t('previous')}><ArrowLeft className="rtl:rotate-180" size={17}/></button><button type="button" className="icon-button absolute end-3 top-1/2 -translate-y-1/2 bg-void/80 md:end-5" onClick={() => go(1)} aria-label={t('next')}><ArrowRight className="rtl:rotate-180" size={17}/></button></div><div className="flex items-start justify-between gap-5 border-x border-b border-border bg-surface px-4 py-3"><p className="max-w-2xl text-xs leading-5 text-muted" dir="auto">{image.caption[locale]}</p><span className="shrink-0 font-mono text-xs tabular-nums text-orange">{String(index + 1).padStart(2, '0')} / {String(images.length).padStart(2, '0')}</span></div></div></main>
-        <footer className="mx-auto flex w-full max-w-6xl justify-between font-mono text-[9px] uppercase tracking-[.16em] text-muted"><span>← / → {t('navigate')}</span><span>{t('museumGallery')}</span></footer>
-    </div>
+import {useCallback,useState} from 'react'
+import {ArrowLeft,ArrowRight,X} from 'lucide-react'
+import {useTranslation} from 'react-i18next'
+import type {GalleryImage,Locale} from '@/types/museum'
+import {MuseumOverlay} from '@/features/museum/MuseumOverlay'
+function GalleryMedia({image,locale}: {image:GalleryImage;locale:Locale}){
+ const {t}=useTranslation('museum'),[status,setStatus]=useState<'loading'|'ready'|'error'>('loading')
+ return <><img src={image.url} alt={image.caption[locale]} onLoad={()=>setStatus('ready')} onError={()=>setStatus('error')} style={{visibility:status==='ready'?'visible':'hidden'}}/>
+  {status!=='ready'&&<p className="museum-gallery-status" role="status">{t(status==='error'?'galleryImageError':'galleryImageLoading')}</p>}</>
+}
+export function GalleryOverlay({images,locale,onClose}: {images:GalleryImage[];locale:Locale;onClose():void}){
+ const {t}=useTranslation('common'),[index,setIndex]=useState(0)
+ const go=useCallback((direction:-1|1)=>setIndex(i=>(i+direction+images.length)%images.length),[images.length])
+ const image=images[index];if(!image)return null
+ return <MuseumOverlay label={t('gallery')} kind="gallery" onClose={onClose} onArrow={images.length>1?go:undefined}>
+  <header className="museum-dialog-header"><div><span className="eyebrow">CORE / {t('gallery')}</span><h2>{t('archive')}</h2></div><button data-close aria-label={t('close')} onClick={onClose}><X size={20}/></button></header>
+  <div className="museum-gallery-stage" dir={locale==='fa'?'rtl':'ltr'}>
+   <GalleryMedia key={image.id} image={image} locale={locale}/>
+   {images.length>1&&<><button aria-label={t('previous')} onClick={()=>go(-1)}><ArrowLeft className="rtl:rotate-180" size={20}/></button><button aria-label={t('next')} onClick={()=>go(1)}><ArrowRight className="rtl:rotate-180" size={20}/></button></>}
+  </div>
+  <div className="museum-gallery-caption" dir={locale==='fa'?'rtl':'ltr'}><p dir="auto">{image.caption[locale]}</p><span>{index+1} / {images.length}</span></div>
+ </MuseumOverlay>
 }

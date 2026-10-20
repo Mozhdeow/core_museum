@@ -19,8 +19,11 @@ function savedOperation(key: string): Pending | null {
 }
 function UserDialog({title, busy, close, children}: {title:string; busy:boolean; close:()=>void; children:ReactNode}) {
     const dialog = useRef<HTMLDialogElement>(null)
-    useEffect(()=>{const node=dialog.current; node?.showModal(); return ()=>node?.close()},[])
-    return <dialog ref={dialog} aria-labelledby="user-dialog-title" onCancel={event=>{event.preventDefault();if(!busy)close()}}
+    const validating=useAuthStore(state=>state.isLoading)
+    // Native modal dialogs escape ancestor inertness. Close the top layer during
+    // revalidation while preserving its in-memory input, never persisting account edits.
+    useEffect(()=>{const node=dialog.current;if(!validating)node?.showModal();else node?.close();return()=>node?.close()},[validating])
+    return <dialog ref={dialog} inert={validating||undefined} aria-labelledby="user-dialog-title" onCancel={event=>{event.preventDefault();if(!busy)close()}}
         className="m-auto max-h-[85vh] w-[min(94vw,40rem)] overflow-y-auto border border-border bg-surface p-5 text-ink backdrop:bg-black/70 md:p-7">
         <h2 id="user-dialog-title" className="mb-6 font-display text-2xl">{title}</h2>{children}
     </dialog>

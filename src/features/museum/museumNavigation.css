@@ -1,0 +1,584 @@
+/* Uses the landing's @theme tokens; the scene reads the same colors through museumPalette. */
+.museum-location {
+    position: fixed;
+    inset-inline-start: 32px;
+    top: 112px;
+    z-index: 15;
+    pointer-events: none;
+    color: var(--color-ink)
+}
+
+.museum-location > span {
+    font: 9px 'IBM Plex Mono', monospace;
+    letter-spacing: .22em;
+    color: var(--color-orange)
+}
+
+.museum-location h1 {
+    font: 500 clamp(24px, 3vw, 40px) 'Space Grotesk', 'Vazirmatn', sans-serif;
+    letter-spacing: -.035em;
+    margin: 8px 0
+}
+
+.museum-location p {
+    max-width: 225px;
+    font-size: 11px;
+    line-height: 1.8;
+    color: #acb1b5
+}
+
+.museum-navigation {
+    position: fixed;
+    inset-inline-end: max(24px, env(safe-area-inset-right));
+    bottom: max(24px, env(safe-area-inset-bottom));
+    width: 330px;
+    z-index: 40;
+    background: #0c1015ed;
+    border: 1px solid #41474d;
+    border-top-color: var(--color-orange);
+    backdrop-filter: blur(18px);
+    color: var(--color-ink);
+    box-shadow: 0 12px 50px #0005
+}
+
+.museum-navigation-bar {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 5px
+}
+
+.museum-navigation button {
+    cursor: pointer;
+    transition: background-color 150ms ease, color 150ms ease;
+    min-height: 44px;
+    font-family: inherit
+}
+
+.museum-navigation-bar > button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 42px;
+    flex-shrink: 0;
+    color: #b6bec4
+}
+
+.museum-navigation-bar .museum-controls-toggle {
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
+    font-size: 12px;
+    color: var(--color-ink)
+}
+
+.museum-controls-toggle span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap
+}
+
+.museum-navigation-bar .museum-play-compact {
+    display: none
+}
+
+.museum-controls-body {
+    padding: 8px 16px 16px;
+    max-height: calc(70dvh - 72px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin
+}
+
+.museum-controls-body[hidden] {
+    display: none
+}
+
+.museum-route {
+    display: flex;
+    justify-content: space-between;
+    gap: 6px
+}
+
+.museum-route button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: #a2adb4;
+    min-width: 0
+}
+
+.museum-route button[aria-current] {
+    color: var(--color-orange)
+}
+
+.museum-route-dot {
+    font: 9px 'IBM Plex Mono', monospace;
+    display: grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+    border: 1px solid #4c5559;
+    border-radius: 50%
+}
+
+.museum-route button[aria-current] .museum-route-dot {
+    border-color: var(--color-orange);
+    background: color-mix(in srgb, var(--color-orange) 12%, transparent)
+}
+
+.museum-tour-progress {
+    height: 2px;
+    background: #30383e;
+    overflow: hidden
+}
+
+.museum-tour-progress span {
+    display: block;
+    height: 100%;
+    background: var(--color-orange);
+    transform-origin: left;
+    transition: transform 180ms linear
+}
+
+.museum-mode-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px
+}
+
+.museum-mode-actions button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    flex: 1;
+    padding: 0 8px;
+    border: 1px solid #465057;
+    font-size: 11px
+}
+
+.museum-mode-actions button[aria-pressed=true] {
+    color: var(--color-orange);
+    border-color: var(--color-orange);
+    background: color-mix(in srgb, var(--color-orange) 8%, transparent)
+}
+
+.museum-movement-hint {
+    font-size: 10px;
+    line-height: 1.7;
+    color: #a2adb4;
+    margin-top: 12px
+}
+
+.museum-navigation button:focus-visible, .museum-exhibit-card summary:focus-visible {
+    outline: 2px solid var(--color-orange);
+    outline-offset: 2px
+}
+
+.museum-navigation button:disabled {
+    opacity: .35;
+    cursor: default
+}
+
+.museum-environment-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 4px
+}
+
+.museum-environment-actions button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #a2adb4;
+    font-size: 10px
+}
+
+.museum-environment-actions button[aria-pressed=true] {
+    color: var(--color-orange)
+}
+
+.museum-shortcuts {
+    font: 9px 'IBM Plex Mono', monospace;
+    color: #a2adb4;
+    white-space: nowrap
+}
+
+.museum-assisted {
+    display: flex;
+    gap: 10px;
+    margin-top: 6px
+}
+
+.museum-assisted button {
+    touch-action: none;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 50%;
+    border: 1px solid #47535a;
+    font-size: 11px
+}
+
+[data-museum-scene] canvas {
+    touch-action: none
+}
+
+.museum-collection {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 12px
+}
+
+.museum-collection select {
+    min-width: 0;
+    flex: 1;
+    font-size: 12px;
+    padding: 8px;
+    min-height: 44px
+}
+
+.museum-collection .icon-button {
+    width: 32px;
+    min-width: 32px;
+    height: 44px
+}
+
+.museum-collection-error {
+    margin-top: 12px;
+    font-size: 11px;
+    line-height: 1.6;
+    color: var(--color-amber)
+}
+
+.museum-collection-error button {
+    margin-top: 6px;
+    padding: 6px 10px;
+    border: 1px solid var(--color-orange)
+}
+
+.museum-exhibit-card, .museum-empty-card {
+    position: fixed;
+    inset-inline-start: 32px;
+    bottom: 24px;
+    width: min(300px, calc(100vw - 48px));
+    background: #0c1015e8;
+    border: 1px solid #41474d;
+    backdrop-filter: blur(14px);
+    color: var(--color-ink);
+    z-index: 30
+}
+
+.museum-exhibit-card summary {
+    padding: 14px 16px;
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px
+}
+
+.museum-exhibit-card summary::-webkit-details-marker {
+    display: none
+}
+
+.museum-exhibit-card summary::after {
+    content: '+';
+    font-size: 22px;
+    color: var(--color-orange)
+}
+
+.museum-exhibit-card[open] summary::after {
+    content: '−'
+}
+
+.museum-exhibit-card h2 {
+    font-size: 20px;
+    line-height: 1.2;
+    margin-top: 4px
+}
+
+.museum-exhibit-body {
+    max-height: min(42dvh, 350px);
+    overflow-y: auto;
+    padding: 0 16px 16px;
+    overscroll-behavior: contain
+}
+
+.museum-empty-card {
+    padding: 12px 16px;
+    font-size: 11px;
+    line-height: 1.6
+}
+
+.museum-empty-card > p {
+    margin-top: 6px
+}
+
+.museum-empty-card .button {
+    margin-top: 8px;
+    min-height: 36px;
+    padding: 7px 10px;
+    font-size: 10px
+}
+
+.museum-preview-label {
+    color: var(--color-orange);
+    font-size: 11px
+}
+
+.museum-header {
+    padding-top: max(20px, env(safe-area-inset-top))
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .museum-navigation button:not(:disabled):hover {
+        color: var(--color-orange);
+        background-color: color-mix(in srgb, var(--color-orange) 8%, transparent)
+    }
+}
+
+@media (max-width: 767px),(max-height: 539px) {
+    .museum-header {
+        padding: max(12px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) 12px max(16px, env(safe-area-inset-left))
+    }
+
+    .museum-location {
+        top: 78px;
+        inset-inline-start: max(16px, env(safe-area-inset-left))
+    }
+
+    .museum-location > span {
+        font-size: 8px;
+        letter-spacing: .12em
+    }
+
+    .museum-location h1 {
+        font-size: 23px;
+        margin: 5px 0
+    }
+
+    .museum-location p {
+        display: none
+    }
+
+    .museum-navigation {
+        inset-inline: max(12px, env(safe-area-inset-left)) max(12px, env(safe-area-inset-right));
+        bottom: max(12px, env(safe-area-inset-bottom));
+        width: auto;
+        max-width: 430px;
+        margin-inline: auto
+    }
+
+    .museum-navigation-bar .museum-play-compact {
+        display: flex
+    }
+
+    .museum-controls-body {
+        max-height: 45dvh;
+        padding: 6px 14px 12px
+    }
+
+    .museum-route button {
+        font-size: 11px
+    }
+
+    .museum-mode-actions .museum-play-expanded {
+        display: none
+    }
+
+    .museum-mode-actions button {
+        flex: 1
+    }
+
+    .museum-shortcuts {
+        display: none
+    }
+
+    .museum-exhibit-card, .museum-empty-card {
+        inset-inline-start: auto;
+        inset-inline-end: max(16px, env(safe-area-inset-right));
+        bottom: auto;
+        top: 136px;
+        width: min(275px, calc(100vw - 32px))
+    }
+
+    .museum-exhibit-card summary {
+        padding: 9px 12px
+    }
+
+    .museum-exhibit-card h2 {
+        font-size: 17px
+    }
+
+    .museum-exhibit-body {
+        max-height: 28dvh;
+        padding: 0 12px 12px
+    }
+
+    .museum-empty-card {
+        padding: 9px 12px;
+        font-size: 10px
+    }
+
+    .museum-empty-card .eyebrow {
+        font-size: 8px
+    }
+}
+
+@media (max-height: 539px) and (min-width: 540px) {
+    .museum-location {
+        top: 70px
+    }
+
+    .museum-location h1 {
+        font-size: 20px
+    }
+
+    .museum-navigation {
+        inset-inline-start: auto;
+        width: 330px;
+        max-width: 46vw;
+        bottom: max(8px, env(safe-area-inset-bottom))
+    }
+
+    .museum-controls-body {
+        max-height: 48dvh
+    }
+
+    .museum-exhibit-card, .museum-empty-card {
+        inset-inline-start: 16px;
+        inset-inline-end: auto;
+        top: auto;
+        bottom: 12px;
+        width: 260px;
+        max-width: 40vw
+    }
+
+    .museum-exhibit-body {
+        max-height: 32dvh
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .museum-tour-progress span, .museum-navigation button {
+        transition: none
+    }
+}
+
+.museum-empty-card {
+    padding: 0
+}
+
+.museum-empty-card summary {
+    cursor: pointer;
+    list-style: none;
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px
+}
+
+.museum-empty-card summary::-webkit-details-marker {
+    display: none
+}
+
+.museum-empty-card summary::after {
+    content: '+';
+    position: absolute;
+    inset-inline-end: 10px;
+    top: 10px;
+    color: var(--color-orange);
+    font-size: 16px
+}
+
+.museum-empty-card[open] summary::after {
+    content: '−'
+}
+
+.museum-empty-card .museum-preview-label {
+    padding-inline-end: 12px
+}
+
+.museum-empty-body {
+    padding: 0 16px 12px;
+    max-height: 24dvh;
+    overflow: auto
+}
+
+.museum-empty-body p + p {
+    margin-top: 6px
+}
+
+.museum-empty-card summary:focus-visible {
+    outline: 2px solid var(--color-orange);
+    outline-offset: 2px
+}
+
+.museum-data-alert {
+    position: fixed;
+    inset-inline-start: 32px;
+    bottom: 24px;
+    max-width: 285px;
+    z-index: 35;
+    padding: 14px;
+    background: #0c1015ed;
+    border: 1px solid var(--color-orange)
+}
+
+@media (max-width: 767px),(max-height: 539px) {
+    .museum-empty-card {
+        padding: 0
+    }
+
+    .museum-empty-card summary {
+        padding: 9px 12px
+    }
+
+    .museum-data-alert {
+        inset-inline-start: 16px;
+        bottom: 82px;
+        width: calc(100vw - 32px)
+    }
+}
+
+@media (max-width: 767px) and (min-height: 540px) {
+    .museum-exhibit-card, .museum-empty-card {
+        top: 154px
+    }
+}
+
+.museum-exhibit-card h2 {
+    overflow-wrap: anywhere
+}
+
+.museum-collection{flex-wrap:wrap}
+.museum-collection-label{flex-basis:100%;font-size:9px;color:var(--color-muted);letter-spacing:.08em;text-transform:uppercase}
+.museum-collection select{flex-basis:60%}
+.museum-location p{display:none}
+.museum-taxonomy{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}
+.museum-taxonomy label{display:grid;gap:4px;font-size:10px;color:var(--color-muted);min-width:0}
+.museum-taxonomy select{width:100%;min-width:0;background:#101419;color:var(--color-ink);border:1px solid var(--color-border);padding:8px 5px;font-size:12px}
+.museum-catalog-actions{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px;margin-top:8px;font-size:11px}
+.museum-catalog-actions button{padding:5px 0;color:var(--color-orange)}
+.museum-selected-section,.museum-catalog-empty{font-size:10px;color:var(--color-muted);overflow-wrap:anywhere;margin:5px 0}
+@media (max-width:767px),(max-height:539px){
+    /* Keep touch movement reachable when taxonomy makes the collection panel scroll. */
+    .museum-controls-body{display:flex;flex-direction:column}
+    .museum-assisted{order:-1;flex-shrink:0}
+}
+.museum-section-directory{margin-top:10px;font-size:11px;color:var(--color-muted)}
+.museum-section-directory summary{cursor:pointer;padding:8px 0;color:var(--color-ink)}
+.museum-section-directory ul{display:grid;gap:8px;padding-top:4px}
+.museum-section-directory li{display:flex;flex-direction:column;gap:4px;border-top:1px solid var(--color-border);padding-top:8px;overflow-wrap:anywhere}
+.museum-section-directory small{font-size:10px;line-height:1.6}
+.museum-section-directory button{color:var(--color-orange);text-align:start}

@@ -225,3 +225,16 @@ test('administrator can select editor for invitations and profile updates withou
     await expect(page.getByRole('cell',{name:'person1@example.test',exact:true})).toBeVisible()
     expect((await page.evaluate(()=>window.usersTest.mutations)).map(request=>'role' in request?request.role:null)).toEqual(['editor','editor'])
 })
+
+test('account editor stays in memory across validation, closes its modal layer, and persists no mutation fields',async({page})=>{
+ await openUsers(page);await page.getByRole('button',{name:'Add user',exact:true}).click()
+ const dialog=page.getByRole('dialog');await dialog.getByLabel('Email',{exact:true}).fill('unsaved@example.test')
+ await dialog.getByLabel('Full name',{exact:true}).fill('Unsaved account editor')
+ await page.evaluate(async()=>{const p='/src/features/auth/authStore.ts';(await import(p)).useAuthStore.setState({isLoading:true})})
+ await expect(page.locator('dialog')).not.toHaveAttribute('open','')
+ await page.evaluate(async()=>{const p='/src/features/auth/authStore.ts';(await import(p)).useAuthStore.setState({isLoading:false})})
+ await expect(dialog.getByLabel('Email',{exact:true})).toHaveValue('unsaved@example.test')
+ await expect(dialog.getByLabel('Full name',{exact:true})).toHaveValue('Unsaved account editor')
+ expect(await page.evaluate(()=>JSON.stringify({...localStorage,...sessionStorage}).includes('Unsaved account editor'))).toBe(false)
+ expect(await page.evaluate(()=>window.usersTest.mutations.length)).toBe(0)
+})

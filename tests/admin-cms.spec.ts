@@ -1,10 +1,11 @@
 import {test,expect,type Page} from '@playwright/test'
+import {makeGlb} from './asset-fixtures'
 
 type Row=Record<string,unknown>
 const id='11111111-1111-4111-8111-111111111111',category='22222222-2222-4222-8222-222222222222',section='33333333-3333-4333-8333-333333333333',inactive='44444444-4444-4444-8444-444444444444'
 const version='2026-10-15T00:00:00.000001Z'
 const row=(index:number):Row=>({id:index===0?id:`10000000-0000-4000-8000-${String(index).padStart(12,'0')}`,slug:`item-${index}`,title_en:`Exhibit ${String(index).padStart(2,'0')}`,title_fa:`اثر ${index}`,brand:'CORE',release_year:1971,category_id:category,section_id:section,status:'published',sort_order:index,featured:false,updated_at:version,thumbnail_path:null,model_path:null,enable_gallery:true,enable_ai_curator:false,enable_exploded_view:false,source_url:'https://example.test/source',license:'museum-owned'})
-async function cms(page:Page,options:{count?:number;path?:string;inactiveCurrent?:boolean;missing?:boolean;taxonomyFailure?:boolean}={}){
+async function cms(page:Page,options:{count?:number;path?:string;inactiveCurrent?:boolean;missing?:boolean;taxonomyFailure?:boolean;session?:boolean}={}){
     const state={items:Array.from({length:options.count??1},(_,i)=>row(i)),specs:[{id:'spec-a',item_id:id,label_en:'Clock',label_fa:'فرکانس',value:'1MHz',sort_order:0}],gallery:[{id:'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',item_id:id,storage_path:`items/${id}/gallery/a.png`,caption_en:'Front',caption_fa:'جلو',sort_order:0},{id:'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',item_id:id,storage_path:`items/${id}/gallery/b.png`,caption_en:'Back',caption_fa:'پشت',sort_order:1}],calls:[] as Array<{method:string;url:URL;body:Row}>,failure:'',taxonomyFailure:options.taxonomyFailure??false}
     if(options.inactiveCurrent)state.items[0].category_id=inactive
     if(options.missing)state.items=[]
@@ -27,6 +28,7 @@ async function cms(page:Page,options:{count?:number;path?:string;inactiveCurrent
             state.gallery=body.gallery.map((image:Row,index:number)=>({...image,item_id:previous.id,sort_order:index}))
             return reply(previous.id)
         }
+        if(name==='profiles')return reply({id:'fixture-admin',email:'fixture@example.invalid',full_name:'Admin',role:'admin',preferred_locale:'en',created_at:version,updated_at:version})
         if(name==='museum_items'&&method==='POST'){
             if(state.items.some(item=>item.id===body.id||item.slug===body.slug))return reply({code:'23505'},409)
             const created={...body,updated_at:version};state.items.push(created);return reply(created)
@@ -52,6 +54,7 @@ async function cms(page:Page,options:{count?:number;path?:string;inactiveCurrent
         return reply(data.slice(from,from+limit),200,count)
     })
     await page.addInitScript(()=>{localStorage.setItem('core-locale','en');localStorage.setItem('core_intro_last_seen_at',String(Date.now()));localStorage.setItem('core_intro_last_full_seen_at',String(Date.now()))})
+    if(options.session)await page.addInitScript(()=>{const payload=btoa(JSON.stringify({sub:'fixture-admin',exp:Math.floor(Date.now()/1000)+3600,role:'authenticated'}));localStorage.setItem('sb-core-navigation-auth-token',JSON.stringify({access_token:`eyJhbGciOiJIUzI1NiJ9.${payload}.fixture`,refresh_token:'fixture',expires_at:Math.floor(Date.now()/1000)+3600,expires_in:3600,token_type:'bearer',user:{id:'fixture-admin',email:'fixture@example.invalid',aud:'authenticated',role:'authenticated',app_metadata:{},user_metadata:{},created_at:'2026-10-01T00:00:00Z'}}))})
     await page.goto('/')
     await page.waitForFunction(async()=>{const path='/src/features/auth/authStore.ts';return !(await import(path)).useAuthStore.getState().isLoading})
     await page.evaluate(async target=>{
@@ -250,4 +253,127 @@ test('missing exhibit and failed list display explicit errors instead of an edit
     await navigate(page,'/admin/items')
     await expect(page.getByRole('alert')).toBeVisible();await expect(page.locator('tbody tr')).toHaveCount(0)
     await expect(page.getByText('No items found',{exact:true})).toHaveCount(0)
+})
+
+test('ordinary profile revalidation and route transitions retain item input and unsaved file state',async({page})=>{
+    await cms(page,{session:true})
+    await page.getByLabel('Title / English',{exact:true}).fill('Unsaved stable title')
+    await page.getByLabel('Choose GLB model',{exact:true}).setInputFiles({name:'queued-hardware.glb',mimeType:'model/gltf-binary',buffer:makeGlb()})
+    await expect(page.getByText('queued-hardware.glb · 0.00 MiB',{exact:true})).toBeVisible()
+    await page.evaluate(async()=>{const p='/src/features/auth/authStore.ts';await (await import(p)).useAuthStore.getState().revalidate()})
+    await expect(page.getByLabel('Title / English',{exact:true})).toHaveValue('Unsaved stable title')
+    const other=await page.context().newPage();await other.goto('about:blank');await other.bringToFront();await page.bringToFront();await other.close()
+    await page.evaluate(()=>{window.dispatchEvent(new Event('blur'));document.dispatchEvent(new Event('visibilitychange'))})
+    await expect(page.getByLabel('Title / English',{exact:true})).toHaveValue('Unsaved stable title')
+    await navigate(page,'/admin/items');await navigate(page,`/admin/items/${id}/edit`)
+    await expect(page.getByText('queued-hardware.glb · 0.00 MiB',{exact:true})).toBeVisible()
+    await expect(page.getByLabel('Title / English',{exact:true})).toHaveValue('Unsaved stable title')
+})
+test('document reload offers Restore/Discard and preserves the old version for conflict detection',async({page})=>{
+    const state=await cms(page,{session:true})
+    await page.getByLabel('Slug',{exact:true}).fill('draft-to-recover')
+    await expect.poll(()=>page.evaluate(()=>localStorage.getItem('core-cms-draft:v1:fixture-admin:items:11111111-1111-4111-8111-111111111111'))).toContain('draft-to-recover')
+    state.items[0].slug='new-server';state.items[0].updated_at='2026-10-20T03:00:00Z'
+    await page.reload()
+    await expect(page.getByRole('button',{name:'Restore draft',exact:true})).toBeVisible()
+    await expect(page.getByLabel('Slug',{exact:true})).toHaveValue('new-server')
+    await page.getByRole('button',{name:'Restore draft',exact:true}).click()
+    await expect(page.getByLabel('Slug',{exact:true})).toHaveValue('draft-to-recover')
+    await save(page).click();await expect(page.getByRole('alert')).toContainText('This record changed')
+    expect(state.items[0].slug).toBe('new-server')
+})
+test('new-item and taxonomy drafts survive route transitions, with explicit discard on reload',async({page})=>{
+    await cms(page,{session:true,path:'/admin/items/new'})
+    await page.getByLabel('Slug',{exact:true}).fill('unsaved-new')
+    await navigate(page,'/admin/categories');await page.getByLabel('Slug',{exact:true}).fill('unsaved-category')
+    await navigate(page,'/admin/sections');await page.getByLabel('Slug',{exact:true}).fill('unsaved-section')
+    await navigate(page,'/admin/categories');await expect(page.getByLabel('Slug',{exact:true})).toHaveValue('unsaved-category')
+    await navigate(page,'/admin/items/new');await expect(page.getByLabel('Slug',{exact:true})).toHaveValue('unsaved-new')
+    await navigate(page,'/admin/sections');await expect(page.getByLabel('Slug',{exact:true})).toHaveValue('unsaved-section')
+    await page.reload();await expect(page.getByRole('button',{name:'Restore draft',exact:true})).toBeVisible()
+    await page.getByRole('button',{name:'Restore draft',exact:true}).click();await expect(page.getByLabel('Slug',{exact:true})).toHaveValue('unsaved-section')
+    await page.getByRole('button',{name:'Discard draft',exact:true}).click();await expect(page.getByLabel('Slug',{exact:true})).toHaveValue('')
+})
+test('section edits send both existing descriptions and version predicate; confirmed save clears the draft',async({page})=>{
+    const state=await cms(page,{session:true,path:'/admin/sections'})
+    const sectionRow={id:section,slug:'custom-room',title_en:'Custom room',title_fa:'تالار',description_en:'Keep English description',description_fa:'توضیح فارسی',sort_order:0,active:true,updated_at:version}
+    await page.route('**/rest/v1/museum_sections?**',route=>{
+        if(route.request().method()==='PATCH'){
+            const body=route.request().postDataJSON();state.calls.push({method:'PATCH',url:new URL(route.request().url()),body});Object.assign(sectionRow,body,{updated_at:'2026-10-20T00:00:00Z'})
+            return route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(sectionRow)})
+        }
+        return route.fulfill({status:200,contentType:'application/json',body:JSON.stringify([sectionRow])})
+    })
+    await navigate(page,'/admin/items');await navigate(page,'/admin/sections')
+    await page.getByRole('button',{name:'Edit',exact:true}).click()
+    await expect(page.getByRole('textbox',{name:'Description / English',exact:true})).toHaveValue('Keep English description')
+    await page.getByLabel('Title / English',{exact:true}).fill('Renamed room')
+    await page.getByRole('button',{name:'Save changes',exact:true}).click()
+    await expect.poll(()=>state.calls.filter(c=>c.method==='PATCH').length).toBe(1)
+    const call=state.calls.find(c=>c.method==='PATCH')!
+    expect(call.body.description_en).toBe('Keep English description');expect(call.body.description_fa).toBe('توضیح فارسی')
+    expect(call.url.searchParams.get('updated_at')).toBe(`eq.${version}`)
+    await expect(page.getByLabel('Slug',{exact:true})).toHaveValue('')
+    expect(await page.evaluate(()=>localStorage.getItem('core-cms-draft:v1:fixture-admin:taxonomy:sections'))).toBeNull()
+})
+
+test('confirmed CMS edits refresh a cached catalog on the next museum visit without a manual reload',async({page})=>{
+ await cms(page,{session:true})
+ await page.evaluate(async()=>{const p='/src/features/museum/museumStore.ts';await (await import(p)).useMuseumStore.getState().load('fixture-admin',true)})
+ await page.getByLabel('Title / English',{exact:true}).fill('Freshly saved record')
+ await save(page).click();await expect(page).toHaveURL(/\/admin\/items$/)
+ await navigate(page,'/museum')
+ await expect(page.getByRole('heading',{name:'Freshly saved record',exact:true})).toBeVisible({timeout:15000})
+})
+test('confirmed save and explicit sign-out clear drafts; account switching cannot expose the previous draft',async({page})=>{
+ await cms(page,{session:true})
+ await page.getByLabel('Title / English',{exact:true}).fill('Confirmed title')
+ await save(page).click();await expect(page).toHaveURL(/\/admin\/items$/)
+ const keys=()=>page.evaluate(()=>Object.keys(localStorage).filter(k=>k.startsWith('core-cms-draft:')))
+ expect(await keys()).toEqual([])
+ await navigate(page,'/admin/items/new');await page.getByLabel('Slug',{exact:true}).fill('Draft owned by first admin')
+ await expect.poll(keys).not.toEqual([])
+ await page.evaluate(async()=>{const p='/src/features/auth/authStore.ts';const a=(await import(p)).useAuthStore;a.setState({user:{...a.getState().user,id:'second-admin'}})})
+ await expect(page.getByLabel('Slug',{exact:true})).toHaveValue('');expect(await keys()).toEqual([])
+ await page.getByLabel('Slug',{exact:true}).fill('Second admin draft')
+ await page.evaluate(async()=>{const p='/src/features/auth/authStore.ts';await (await import(p)).useAuthStore.getState().signOut()})
+ expect(await keys()).toEqual([])
+})
+test('opening an untouched edit form does not create a blank recovery draft',async({page})=>{
+ await cms(page,{session:true});await expect(page.getByLabel('Slug',{exact:true})).toHaveValue('item-0')
+ await page.reload();await expect(page.getByLabel('Slug',{exact:true})).toHaveValue('item-0')
+ await expect(page.getByRole('button',{name:'Restore draft',exact:true})).toHaveCount(0)
+})
+
+test('valid queued model files survive route changes in memory, while full reload requires reselection',async({page})=>{
+ await cms(page,{session:true})
+ await page.locator('input[type=file]').first().setInputFiles({name:'queued-board.glb',mimeType:'model/gltf-binary',buffer:makeGlb()})
+ await expect(page.getByText(/queued-board.glb/)).toBeVisible()
+ await navigate(page,'/admin/items');await navigate(page,`/admin/items/${id}/edit`)
+ await expect(page.getByText(/queued-board.glb/)).toBeVisible()
+ const payload=await page.evaluate(()=>JSON.parse(localStorage.getItem('core-cms-draft:v1:fixture-admin:items:11111111-1111-4111-8111-111111111111')!))
+ expect(payload.value.hasFiles).toBe(true);expect(payload.value.modelFile).toBeUndefined()
+ await page.reload();await page.getByRole('button',{name:'Restore draft',exact:true}).click()
+ await expect(page.getByText('After a full reload, select upload files again. File contents are not stored.',{exact:true})).toBeVisible()
+ await expect(page.getByText(/queued-board.glb/)).toHaveCount(0)
+})
+test('profile input survives same-account revalidation without persisting account operations',async({page})=>{
+ await cms(page,{session:true,path:'/profile'})
+ await page.getByLabel('Name',{exact:true}).fill('Unsaved profile name')
+ await page.evaluate(async()=>{const p='/src/features/auth/authStore.ts';await (await import(p)).useAuthStore.getState().revalidate()})
+ await expect(page.getByLabel('Name',{exact:true})).toHaveValue('Unsaved profile name')
+ expect(await page.evaluate(()=>Object.keys(localStorage).some(k=>k.startsWith('core-cms-draft:')))).toBe(false)
+})
+
+test('same-session SIGNED_IN focus events recheck permissions without replacing the mounted form',async({page})=>{
+ await cms(page,{session:true});await page.getByLabel('Slug',{exact:true}).fill('Focus-safe draft')
+ await page.getByLabel('Slug',{exact:true}).evaluate(el=>Object.assign(window,{cmsMountedField:el}))
+ let release!:()=>void;const gate=new Promise<void>(resolve=>{release=resolve})
+ await page.route('**/rest/v1/profiles?**',async route=>{await gate;await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({id:'fixture-admin',email:'fixture@example.invalid',full_name:'Admin',role:'admin',preferred_locale:'en',created_at:version,updated_at:version})})})
+ await page.evaluate(async()=>{const a='/src/features/auth/authStore.ts',c='/src/lib/supabase/client.ts',state=(await import(a)).useAuthStore.getState();await (await import(c)).requireSupabase().auth._notifyAllSubscribers('SIGNED_IN',state.session,false)})
+ await expect.poll(()=>page.evaluate(async()=>{const p='/src/features/auth/authStore.ts';return (await import(p)).useAuthStore.getState().isLoading})).toBe(true)
+ expect(await page.evaluate(()=>(window as unknown as {cmsMountedField:HTMLElement}).cmsMountedField.isConnected)).toBe(true)
+ await expect(page.locator('form fieldset').first()).toHaveAttribute('disabled','');await expect(page.getByLabel('Slug',{exact:true})).toBeDisabled()
+ release();await expect(page.getByLabel('Slug',{exact:true})).toHaveValue('Focus-safe draft')
+ expect(await page.getByLabel('Slug',{exact:true}).evaluate(el=>el===(window as unknown as {cmsMountedField:HTMLElement}).cmsMountedField)).toBe(true)
 })

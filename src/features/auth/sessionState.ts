@@ -9,7 +9,7 @@ export type SessionResult={session:Session|null;profile:AuthProfile|null;user:Au
 type Gateway={getSession():Promise<SessionResult>;signIn(input:Credentials):Promise<unknown>;register(input:Credentials&{name:string}):Promise<unknown>;signOut():Promise<void>;updateProfile(id:string,patch:{full_name?:string;preferred_locale?:Locale}):Promise<AuthProfile>}
 export interface AuthState extends SessionResult {
     role:DatabaseRole|null;isAuthenticated:boolean;isAdmin:boolean;isLoading:boolean;error:string|null
-    initialize():Promise<void>;invalidate(loading?:boolean):void
+    initialize():Promise<void>;revalidate():Promise<void>;invalidate(loading?:boolean):void
     signIn(input:Credentials,role?:UserRole):Promise<void>;register(input:Credentials&{name:string}):Promise<void>;signOut(role?:UserRole):Promise<void>
     updateProfile(patch:{full_name?:string;preferred_locale?:Locale}):Promise<void>
 }
@@ -36,6 +36,9 @@ export function createAuthState(gateway:Gateway,onLocale:(profile:AuthProfile)=>
             ...empty(),isLoading:true,
             invalidate(loading=false){generation++;set({...empty(),isLoading:loading})},
             async initialize(){const request=++generation;set({...empty(),isLoading:true});try{await restore(request)}catch(error){if(request===generation)set(fail(error))}},
+            // Keep the mounted workspace identity while guards hide/inert it. Authorization
+            // still closes immediately and a failed/current-profile check clears all access.
+            async revalidate(){const request=++generation;set({isLoading:true});try{await restore(request)}catch(error){if(request===generation)set(fail(error))}},
             async signIn(input){const request=++generation;set({...empty(),isLoading:true});try{await gateway.signIn(input);await restore(request)}catch(error){if(request===generation)set(fail(error));throw error}},
             async register(input){const request=++generation;set({...empty(),isLoading:true});try{await gateway.register({name:input.name,email:input.email,password:input.password});await restore(request)}catch(error){if(request===generation)set(fail(error));throw error}},
             async signOut(){generation++;set({...empty(),isLoading:false});await gateway.signOut()},

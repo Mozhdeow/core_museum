@@ -138,5 +138,13 @@
     "movePendingUp": "Move pending image {{index}} up",
     "movePendingDown": "Move pending image {{index}} down",
     "firstPage": "First page"
+  },
+  "drafts": {
+    "available": "Unsaved CMS draft found. Restore it or discard it.",
+    "stale": "The server record has changed. Recovered edits keep their original version; review or reload before saving.",
+    "files": "After a full reload, select upload files again. File contents are not stored.",
+    "restore": "Restore draft",
+    "discard": "Discard draft",
+    "replace": "Discard current unsaved edits and open another record?"
   }
 }

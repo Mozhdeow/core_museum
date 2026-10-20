@@ -47,6 +47,7 @@ export const EXPLANATION_MODES = ['simple', 'technical', 'compare'] as const
 export type ExplanationMode = typeof EXPLANATION_MODES[number]
 
 export interface CuratorRequest {
+    exhibitContext?:Pick<MuseumItem,'id'|'title'|'description'|'shortDescription'|'specifications'|'brand'|'releaseYear'|'status'>;
     currentItemId: string;
     currentSection: SectionId;
     locale: Locale;

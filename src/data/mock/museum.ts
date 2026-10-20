@@ -12,7 +12,10 @@ export const mockSections: MuseumSectionData[] = SECTION_IDS.map((id, index) => 
 export const mockItems: MuseumItem[] = [{
     id: 'rtx-5090', title: {en: 'GeForce RTX 5090', fa: 'GeForce RTX 5090'},
     slug: 'nvidia-geforce-rtx-5090', brand: 'NVIDIA', category: 'gpu', releaseYear: 2025,
-    shortDescription: {en: 'A new dimension of visual computing.', fa: 'Ø¨ÙØ¹Ø¯ÛŒ ØªØ§Ø²Ù‡ Ø¯Ø± Ù¾Ø±Ø¯Ø§Ø²Ø´ ØªØµÙˆÛŒØ±.'},
+    shortDescription: {
+        en: 'A new dimension of visual computing.',
+        fa: 'Ø¨ÙØ¹Ø¯ÛŒ ØªØ§Ø²Ù‡ Ø¯Ø± Ù¾Ø±Ø¯Ø§Ø²Ø´ ØªØµÙˆÛŒØ±.'
+    },
     description: {
         en: 'Billions of tiny switches. An extraordinary new perspective. Explore how parallel processing transforms data into the worlds we see, create, and imagine.',
         fa: 'Ù…ÛŒÙ„ÛŒØ§Ø±Ø¯Ù‡Ø§ Ú©Ù„ÛŒØ¯ Ú©ÙˆÚ†Ú©ØŒ Ù†Ú¯Ø§Ù‡ÛŒ ØªØ§Ø²Ù‡ Ø¨Ù‡ Ø¬Ù‡Ø§Ù†. Ú©Ø´Ù Ú©Ù†ÛŒØ¯ Ú©Ù‡ Ù¾Ø±Ø¯Ø§Ø²Ø´ Ù…ÙˆØ§Ø²ÛŒ Ú†Ú¯ÙˆÙ†Ù‡ Ø¯Ø§Ø¯Ù‡â€ŒÙ‡Ø§ Ø±Ø§ Ø¨Ù‡ Ø¯Ù†ÛŒØ§Ù‡Ø§ÛŒÛŒ ØªØ¨Ø¯ÛŒÙ„ Ù…ÛŒâ€ŒÚ©Ù†Ø¯ Ú©Ù‡ Ù…ÛŒâ€ŒØ¨ÛŒÙ†ÛŒÙ…ØŒ Ù…ÛŒâ€ŒØ³Ø§Ø²ÛŒÙ… Ùˆ ØªØµÙˆØ± Ù…ÛŒâ€ŒÚ©Ù†ÛŒÙ….',
@@ -28,7 +31,10 @@ export const mockItems: MuseumItem[] = [{
         {
             id: 'study-01',
             url: '/images/landing/studies/gpu-study.svg',
-            caption: {en: '01 â€” Form study / abstract GPU placeholder', fa: '01 â€” Ù…Ø·Ø§Ù„Ø¹Ù‡ ÙØ±Ù… / Ø·Ø±Ø­ Ø§Ù†ØªØ²Ø§Ø¹ÛŒ Ú©Ø§Ø±Øª Ú¯Ø±Ø§ÙÛŒÚ©'}
+            caption: {
+                en: '01 â€” Form study / abstract GPU placeholder',
+                fa: '01 â€” Ù…Ø·Ø§Ù„Ø¹Ù‡ ÙØ±Ù… / Ø·Ø±Ø­ Ø§Ù†ØªØ²Ø§Ø¹ÛŒ Ú©Ø§Ø±Øª Ú¯Ø±Ø§ÙÛŒÚ©'
+            }
         },
         {
             id: 'study-02',
@@ -41,7 +47,10 @@ export const mockItems: MuseumItem[] = [{
         {
             id: 'study-03',
             url: '/images/landing/studies/board-study.svg',
-            caption: {en: '03 â€” Circuit study / abstract board placeholder', fa: '03 â€” Ù…Ø·Ø§Ù„Ø¹Ù‡ Ù…Ø¯Ø§Ø± / Ø·Ø±Ø­ Ø§Ù†ØªØ²Ø§Ø¹ÛŒ Ø¨Ø±Ø¯'}
+            caption: {
+                en: '03 â€” Circuit study / abstract board placeholder',
+                fa: '03 â€” Ù…Ø·Ø§Ù„Ø¹Ù‡ Ù…Ø¯Ø§Ø± / Ø·Ø±Ø­ Ø§Ù†ØªØ²Ø§Ø¹ÛŒ Ø¨Ø±Ø¯'
+            }
         },
     ],
 }]

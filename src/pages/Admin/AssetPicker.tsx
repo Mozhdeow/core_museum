@@ -16,13 +16,14 @@ function PendingImage({file, label}: {file: File; label: string}) {
 }
 
 // Preview bitmaps only. Model inspection never mounts another WebGL context or GLTF cache.
-export function AssetPicker({kind, disabled, existingImage, existingModel, onChange, onValidity}: {
+export function AssetPicker({kind, disabled, existingImage, existingModel,pendingFiles, onChange, onValidity}: {
     kind: 'thumbnail' | 'gallery' | 'model'; disabled: boolean; existingImage?: string
     existingModel?: {name?: string | null; bytes?: number | null}
+    pendingFiles?:File[]
     onChange: (files: File[]) => void; onValidity: (blocked: boolean) => void
 }) {
     const {t} = useTranslation(['phase2','common'])
-    const [files, setFiles] = useState<File[]>([])
+    const [files, setFiles] = useState<File[]>(pendingFiles??[])
     const [reports, setReports] = useState<AssetReport[]>([])
     const [error, setError] = useState('')
     const [busy, setBusy] = useState(false)
@@ -65,9 +66,9 @@ export function AssetPicker({kind, disabled, existingImage, existingModel, onCha
         {files.map((file,index) => <div key={`${index}:${file.name}`} className="border border-border bg-surface p-3 text-xs">
             {kind !== 'model' && <PendingImage file={file} label={t('pendingPreview')}/>}
             <p dir="auto" className="mt-2 break-all">{file.name} · {(file.size / 1024 / 1024).toFixed(2)} MiB</p>
-            <p className="mt-1 text-muted">{kind === 'model'
+            {reports[index]&&<p className="mt-1 text-muted">{kind === 'model'
                 ? t('modelSummary', {triangles: reports[index]?.triangles, materials: reports[index]?.materials, textures: reports[index]?.textures, animations: reports[index]?.animations, memory: ((reports[index]?.bufferBytes ?? 0)/1024/1024).toFixed(2)})
-                : `${reports[index]?.width} × ${reports[index]?.height}`}</p>
+                : `${reports[index]?.width} × ${reports[index]?.height}`}</p>}
             {Boolean(reports[index]?.inspectedTextures) && <p className="mt-1 text-muted">{t('textureSummary', {count: reports[index].inspectedTextures,
                 dimension: reports[index].maxTextureDimension, memory: ((reports[index].textureBytesEstimate ?? 0)/1024/1024).toFixed(2)})}</p>}
             {reports[index]?.warnings.map(warning => <p key={warning} className="mt-2 text-amber">{t(warning)}</p>)}

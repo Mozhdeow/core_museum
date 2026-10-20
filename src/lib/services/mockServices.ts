@@ -1,6 +1,7 @@
 import {mockItems, mockSections} from '@/data/mock/museum'
 import type {AuthService, CuratorService, MuseumItemsService} from '@/types/services'
 import type {MuseumItem} from '@/types/museum'
+import {curatorDemo} from '@/features/museum/curatorDemo'
 
 // PHASE 1 ONLY. No identity verification, password storage, or security boundary.
 // Replace this adapter with Supabase Auth and enforce roles on the server in Phase 2.
@@ -41,20 +42,8 @@ export const mockMuseumItemsService: MuseumItemsService = {
         return structuredClone(mockSections)
     },
 }
-export const mockCuratorService: CuratorService = {
-    async ask({locale, explanationMode}) {
-        const answers = {
-            en: {
-                simple: 'Think of a GPU as a workshop with thousands of people working together. Each handles a small part of an image, so the whole picture can appear incredibly quickly.',
-                technical: 'A GPU distributes parallel workloads across many processing units. Graphics rendering, matrix operations, and similar workloads benefit from this high-throughput design.',
-                compare: 'A CPU is designed for flexible, sequential tasks. A GPU excels at running many similar operations simultaneously. They work together, each handling different parts of a workload.',
-            },
-            fa: {
-                simple: 'پردازنده گرافیکی مانند کارگاهی با هزاران نفر است که با هم کار می‌کنند. هر نفر بخش کوچکی از تصویر را می‌سازد تا تصویر کامل با سرعت زیادی آماده شود.',
-                technical: 'پردازنده گرافیکی بارهای کاری موازی را میان واحدهای پردازشی فراوان توزیع می‌کند. رندر گرافیکی و عملیات ماتریسی از این طراحی با توان عملیاتی بالا بهره می‌برند.',
-                compare: 'پردازنده مرکزی برای کارهای انعطاف‌پذیر و ترتیبی طراحی شده است. پردازنده گرافیکی در اجرای هم‌زمان عملیات مشابه توانمند است. این دو بخش‌های متفاوت کار را انجام می‌دهند.',
-            },
-        }
-        return {answer: answers[locale][explanationMode], isMock: true}
-    },
+export const mockCuratorService:CuratorService={
+ async ask({currentItemId,locale,explanationMode,question,exhibitContext}){
+  return {answer:curatorDemo(currentItemId,locale,explanationMode,question,exhibitContext),isMock:true}
+ }
 }
