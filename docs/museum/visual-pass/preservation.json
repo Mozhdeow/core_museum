@@ -1,0 +1,21 @@
+{
+  "protectedFilesChecked": 77,
+  "protectedChanged": [],
+  "changedExistingSourceFiles": [
+    "src/experience/architectureResources.ts",
+    "src/experience/EntranceArtifacts.tsx",
+    "src/experience/EntranceGallery.tsx",
+    "src/experience/EntrancePanels.tsx",
+    "src/experience/hardwarePreviewGeometry.ts",
+    "src/experience/MuseumArchitecture.tsx",
+    "src/experience/MuseumCanvas.tsx",
+    "src/experience/museumPalette.ts",
+    "src/experience/MuseumPrimitives.tsx",
+    "src/experience/MuseumResources.tsx",
+    "src/experience/MuseumScene.tsx",
+    "src/features/museum/museumNavigation.css",
+    "src/features/museum/MuseumNavigationControls.tsx",
+    "src/i18n/locales/en/museum.json",
+    "src/i18n/locales/fa/museum.json"
+  ]
+}

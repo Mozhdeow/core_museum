@@ -1,6 +1,6 @@
 import {test} from 'node:test'
 import assert from 'node:assert/strict'
-import {createAdminUsersHandler,AuthAdminRejection,type AdminBackend} from '../supabase/functions/admin-users/handler.ts'
+import {createAdminUsersHandler,discoverAdminRoles,AuthAdminRejection,type AdminBackend} from '../supabase/functions/admin-users/handler.ts'
 import {validateUserRequest,UserManagementError,type AdminUser,type UserQuery,type OperationResult} from '../supabase/functions/_shared/adminUsers.ts'
 import {createAdminUsersClient} from '../src/lib/services/supabase/adminUsersClient.ts'
 
@@ -84,7 +84,9 @@ class Backend implements AdminBackend {
     }
 }
 function fixture(overrides:Partial<{writesEnabled:boolean;guardsVerified:boolean;redirect:string}>={}){
-    const backend=new Backend(), handler=createAdminUsersHandler(backend,{origins:[origin],redirect:`${origin}/reset-password`,writesEnabled:true,guardsVerified:true,...overrides})
+    // Explicitly exercise the retained historical deletion protocol only in this mock.
+    // The deployment entrypoint always leaves deletion disabled.
+    const backend=new Backend(), handler=createAdminUsersHandler(backend,{origins:[origin],redirect:`${origin}/reset-password`,writesEnabled:true,guardsVerified:true,deletionEnabled:true,...overrides})
     const call=async(body:unknown,token='A',requestOrigin=origin)=>{
         const response=await handler(new Request(`${origin}/admin-users`,{method:'POST',headers:{origin:requestOrigin,authorization:`Bearer ${token}`,'content-type':'application/json'},body:JSON.stringify(body)}))
         return {status:response.status,body:await response.json() as {ok:boolean;data:OperationResult & {users:AdminUser[];total:number;canDelete:boolean;canChangeRoles:boolean};error:string;uncertain:boolean}}
@@ -107,6 +109,8 @@ test('verified identity and trusted database role reject visitor/forged metadata
     const {call,backend}=fixture()
     for(const token of ['U','forged-admin-metadata'])assert.equal((await call(invite(),token)).status,403)
     assert.equal((await call(invite(),'expired')).status,401)
+    backend.users.get(U)!.role='editor'
+    assert.equal((await call(invite(),'U')).status,403)
     assert.equal(backend.invites,0)
 })
 test('CORS, preflight, methods and oversized bodies fail closed',async()=>{
@@ -282,4 +286,42 @@ test('an editor cannot administer users even when invitation metadata claims adm
     assert.equal((await call({action:'list',...query},'U')).status,403)
     assert.equal((await call({...invite(),role:'admin'},'forged-admin-metadata')).status,403)
     assert.equal(backend.invites,0)
+})
+
+
+test('capability role discovery verifies the installed command contract and fails closed on deployment errors',async()=>{
+    const {backend,call}=fixture()
+    const response=await call({action:'capabilities'})
+    const caps=response.body.data as unknown as {supportedRoles:string[];inviteUnavailableReason:string|null}
+    assert.deepEqual(caps.supportedRoles,['user','editor','admin'])
+    assert.equal(caps.inviteUnavailableReason,null)
+    const legacy={...backend,command:async()=>{throw new UserManagementError('invalidInput')}} as unknown as AdminBackend
+    assert.deepEqual(await discoverAdminRoles(legacy,A),['user','admin'])
+    for(const code of ['forbidden','serviceUnavailable'] as const){
+        await assert.rejects(discoverAdminRoles({...legacy,command:async()=>{throw new UserManagementError(code)}},A),{code})
+    }
+    const disabled=await fixture({writesEnabled:false}).call({action:'capabilities'})
+    assert.equal((disabled.body.data as unknown as {inviteUnavailableReason:string}).inviteUnavailableReason,'writesDisabled')
+    const misconfigured=await fixture({redirect:'https://evil.test/reset-password'}).call({action:'capabilities'})
+    assert.equal((misconfigured.body.data as unknown as {inviteUnavailableReason:string}).inviteUnavailableReason,'inviteConfiguration')
+    const request=invite();await call(request)
+    assert.equal((await call({...invite(),email:request.email})).body.error,'duplicateAccount')
+    assert.equal(backend.invites,1)
+    const client=(supportedRoles:unknown)=>createAdminUsersClient(()=>({auth:{getSession:async()=>({data:{session:{access_token:'mock'}},error:null})},functions:{invoke:async()=>({data:{ok:true,data:{canInvite:true,canEdit:true,canChangeRoles:true,canDelete:false,supportedRoles}},error:null})}}))
+    assert.deepEqual((await client(['user','editor','admin']).capabilities()).supportedRoles,['user','editor','admin'])
+    for(const invalid of [['owner'],['user','user'],[],null])await assert.rejects(client(invalid).capabilities(),{code:'serviceUnavailable'})
+})
+
+
+test('ordinary and privileged local activation never enables deletion by default',async()=>{
+    const backend=new Backend()
+    const handler=createAdminUsersHandler(backend,{origins:[origin],redirect:`${origin}/reset-password`,writesEnabled:true,guardsVerified:true})
+    const request=async(body:unknown)=>{
+        const response=await handler(new Request(origin,{method:'POST',headers:{origin,authorization:'Bearer A','content-type':'application/json'},body:JSON.stringify(body)}))
+        return {status:response.status,data:await response.json()}
+    }
+    const capabilities=await request({action:'capabilities'})
+    assert.equal(capabilities.data.data.canInvite,true);assert.equal(capabilities.data.data.canChangeRoles,true);assert.equal(capabilities.data.data.canDelete,false)
+    assert.equal((await request(remove())).status,403)
+    assert.equal(backend.deletes,0);assert.equal(backend.operations.size,0)
 })

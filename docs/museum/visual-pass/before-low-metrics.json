@@ -1,0 +1,118 @@
+{
+  "entrance": {
+    "calls": 261,
+    "triangles": 15820,
+    "memory": {
+      "geometries": 56,
+      "textures": 14
+    },
+    "lights": {
+      "AmbientLight": 1,
+      "HemisphereLight": 1,
+      "DirectionalLight": 1,
+      "PointLight": 8,
+      "SpotLight": 7
+    },
+    "materials": {
+      "MeshStandardMaterial": 267,
+      "MeshBasicMaterial": 125,
+      "LineBasicMaterial": 2
+    },
+    "dpr": 1,
+    "samples": [
+      {
+        "calls": 261,
+        "triangles": 15820
+      },
+      {
+        "calls": 261,
+        "triangles": 15820
+      },
+      {
+        "calls": 261,
+        "triangles": 15820
+      },
+      {
+        "calls": 261,
+        "triangles": 15820
+      },
+      {
+        "calls": 261,
+        "triangles": 15820
+      },
+      {
+        "calls": 261,
+        "triangles": 15820
+      },
+      {
+        "calls": 261,
+        "triangles": 15820
+      },
+      {
+        "calls": 261,
+        "triangles": 15820
+      }
+    ],
+    "tier": "legacy",
+    "environment": false,
+    "exposure": 1
+  },
+  "passage": {
+    "calls": 165,
+    "triangles": 5316,
+    "memory": {
+      "geometries": 56,
+      "textures": 14
+    },
+    "lights": {
+      "AmbientLight": 1,
+      "HemisphereLight": 1,
+      "DirectionalLight": 1,
+      "PointLight": 8,
+      "SpotLight": 7
+    },
+    "materials": {
+      "MeshStandardMaterial": 267,
+      "MeshBasicMaterial": 125,
+      "LineBasicMaterial": 2
+    },
+    "dpr": 1,
+    "samples": [
+      {
+        "calls": 165,
+        "triangles": 5316
+      },
+      {
+        "calls": 165,
+        "triangles": 5316
+      },
+      {
+        "calls": 165,
+        "triangles": 5316
+      },
+      {
+        "calls": 165,
+        "triangles": 5316
+      },
+      {
+        "calls": 165,
+        "triangles": 5316
+      },
+      {
+        "calls": 165,
+        "triangles": 5316
+      },
+      {
+        "calls": 165,
+        "triangles": 5316
+      },
+      {
+        "calls": 165,
+        "triangles": 5316
+      }
+    ],
+    "tier": "legacy",
+    "environment": false,
+    "exposure": 1
+  }
+}

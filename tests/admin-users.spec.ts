@@ -3,7 +3,7 @@ import type {AdminUser,UserQuery,UserMutation,UserCapabilities,OperationResult} 
 const A='11111111-1111-4111-8111-111111111111',B='22222222-2222-4222-8222-222222222222',version='2026-10-15T00:00:00.001Z'
 type State={queries:UserQuery[];mutations:UserMutation[];reconciles:number;mode:'success'|'duplicate'|'conflict'|'lost'|'deleteFailure'|'lastAdmin'|'forbidden';failList:boolean;receipts:Record<string,OperationResult>}
 declare global{interface Window{usersTest:State}}
-async function openUsers(page:Page,options:{locale?:'en'|'fa';guarded?:boolean;serverPending?:string;visitor?:boolean}={}){
+async function openUsers(page:Page,options:{locale?:'en'|'fa';guarded?:boolean;serverPending?:string;visitor?:boolean;editor?:boolean;legacy?:boolean;writes?:boolean;roles?:('user'|'editor'|'admin')[]}={}){
     await page.route('**/*.supabase.co/**',route=>route.fulfill({status:403,contentType:'application/json',body:'{}'}))
     await page.addInitScript(locale=>{localStorage.setItem('core-locale',locale);localStorage.setItem('core_intro_last_seen_at',String(Date.now()));localStorage.setItem('core_intro_last_full_seen_at',String(Date.now()))},options.locale ?? 'en')
     await page.goto('/');await page.waitForTimeout(500)
@@ -24,7 +24,7 @@ async function openUsers(page:Page,options:{locale?:'en'|'fa';guarded?:boolean;s
             return {users:filtered.slice((query.page-1)*query.perPage,query.page*query.perPage),total:filtered.length,page:query.page,perPage:query.perPage,
                 pendingOperation:serverPending?{operationId:serverPending,action:'invite' as const}:null}
         }
-        services.supabaseAdminService.userCapabilities=async():Promise<UserCapabilities>=>({canInvite:true,canEdit:true,canChangeRoles:options.guarded!==false,canDelete:options.guarded!==false})
+        services.supabaseAdminService.userCapabilities=async():Promise<UserCapabilities>=>({canInvite:options.writes!==false,canEdit:options.writes!==false,canChangeRoles:options.guarded!==false,canDelete:options.guarded!==false,supportedRoles:options.legacy?undefined:options.roles ?? ['user','editor','admin'],inviteUnavailableReason:options.writes===false?'writesDisabled':null})
         services.supabaseAdminService.manageUser=async(request:UserMutation)=>{
             window.usersTest.mutations.push(structuredClone(request))
             if(window.usersTest.mode==='duplicate')throw new UserManagementError('duplicateAccount')
@@ -43,10 +43,10 @@ async function openUsers(page:Page,options:{locale?:'en'|'fa';guarded?:boolean;s
             window.usersTest.reconciles++;serverPending=undefined
             return window.usersTest.receipts[id] ?? {operationId:id,state:'cancelled'}
         }
-        useAuthStore.setState({user:{id:A,name:'Admin',email:'admin@example.test',role:options.visitor?'visitor':'admin'},isAuthenticated:true,isAdmin:!options.visitor,isLoading:false})
+        useAuthStore.setState({user:{id:A,name:'Admin',email:'admin@example.test',role:options.visitor?'visitor':options.editor?'editor':'admin'},isAuthenticated:true,isAdmin:!options.visitor&&!options.editor,isLoading:false})
         await router.navigate('/admin/users')
     },{A,B,version,options})
-    if(!options.visitor)await expect(page.getByRole('table')).toBeVisible()
+    if(!options.visitor&&!options.editor)await expect(page.getByRole('table')).toBeVisible()
 }
 test('listing sends bounded pagination, search and filters to the service',async({page})=>{
     await openUsers(page)
@@ -102,33 +102,24 @@ test('self controls and unverified guards disable privileged UI actions',async({
     await openUsers(page,{guarded:false})
     await expect(page.getByRole('button',{name:'Delete admin@example.test',exact:true})).toBeDisabled()
     await expect(page.getByRole('button',{name:'Delete second@example.test',exact:true})).toBeDisabled()
-    await expect(page.getByText('Role changes and account deletion are disabled', {exact:false})).toBeVisible()
+    await expect(page.getByText('Role changes and privileged invitations are disabled', {exact:false})).toBeVisible()
     await page.getByRole('button',{name:'Edit admin@example.test',exact:true}).click()
     await expect(page.getByRole('dialog').getByRole('combobox',{name:'Role',exact:true})).toBeDisabled()
     await page.keyboard.press('Escape');await expect(page.getByRole('dialog')).toHaveCount(0)
 })
-test('deletion requires the email confirmation and reports confirmed completion',async({page})=>{
-    await openUsers(page);await page.getByRole('button',{name:'Delete second@example.test',exact:true}).click()
-    const dialog=page.getByRole('dialog');await expect(dialog.getByRole('button',{name:'Delete account',exact:true})).toBeDisabled()
-    await dialog.getByLabel('Type the account email to confirm').fill('wrong@example.test')
-    await expect(dialog.getByRole('button',{name:'Delete account',exact:true})).toBeDisabled()
-    await dialog.getByLabel('Type the account email to confirm').fill('second@example.test')
-    await dialog.getByRole('button',{name:'Delete account',exact:true}).click()
-    await expect(page.getByRole('status')).toContainText('Account deletion confirmed')
-    await expect(page.getByRole('button',{name:'Delete second@example.test',exact:true})).toHaveCount(0)
-    expect((await page.evaluate(()=>window.usersTest.mutations[0]))).toMatchObject({action:'delete',id:B,confirmation:'second@example.test',expectedUpdatedAt:version})
+test('deletion remains unavailable even when an older backend advertises it',async({page})=>{
+    await openUsers(page)
+    await expect(page.getByRole('button',{name:'Delete second@example.test',exact:true})).toBeDisabled()
+    await expect(page.getByText('Account deletion is unavailable in this workspace.',{exact:true})).toBeVisible()
+    expect(await page.evaluate(()=>window.usersTest.mutations.length)).toBe(0)
 })
-test('failed deletion and last-admin rejections do not claim success',async({page})=>{
-    await openUsers(page);await page.evaluate(()=>{window.usersTest.mode='deleteFailure'})
-    await page.getByRole('button',{name:'Delete second@example.test',exact:true}).click()
-    const dialog=page.getByRole('dialog');await dialog.getByLabel('Type the account email to confirm').fill('second@example.test')
-    await dialog.getByRole('button',{name:'Delete account',exact:true}).click()
-    await expect(dialog.getByRole('alert')).toContainText('operation was rejected')
-    await page.evaluate(()=>{window.usersTest.mode='lastAdmin'})
-    await dialog.getByRole('button',{name:'Delete account',exact:true}).click()
-    await expect(dialog.getByRole('alert')).toContainText('last active administrator')
-    await dialog.getByRole('button',{name:'Close',exact:true}).click()
-    await expect(page.getByRole('button',{name:'Delete second@example.test',exact:true})).toBeVisible()
+test('legacy Edge contracts permit listing but fail closed on account changes',async({page})=>{
+    await openUsers(page,{legacy:true})
+    await expect(page.getByRole('table')).toBeVisible()
+    await expect(page.getByRole('button',{name:'Add user',exact:true})).toBeDisabled()
+    await expect(page.getByRole('button',{name:'Edit second@example.test',exact:true})).toBeDisabled()
+    await expect(page.getByText('The deployed Edge Function does not report supported roles.',{exact:false})).toBeVisible()
+    expect(await page.evaluate(()=>window.usersTest.mutations.length)).toBe(0)
 })
 test('uncertain writes retain receipts across route remount and reconcile without resubmission',async({page})=>{
     await openUsers(page);await page.evaluate(()=>{window.usersTest.mode='lost'})
@@ -175,6 +166,7 @@ test('Persian mobile view stays contained and supports keyboard-accessible editi
     await dialog.getByLabel('نام کامل',{exact:true}).fill('کاربر جدید')
     await dialog.getByRole('button',{name:'ارسال دعوت‌نامه',exact:true}).click()
     await expect(page.getByRole('status')).toContainText('تحویل ایمیل تأیید نشده')
+    await page.screenshot({path:'.tmp/admin-users-completion/users-fa-mobile.png',fullPage:true})
 })
 test('visitor sessions remain outside the existing admin guard',async({page})=>{
     await openUsers(page,{visitor:true})
@@ -237,4 +229,58 @@ test('account editor stays in memory across validation, closes its modal layer, 
  await expect(dialog.getByLabel('Full name',{exact:true})).toHaveValue('Unsaved account editor')
  expect(await page.evaluate(()=>JSON.stringify({...localStorage,...sessionStorage}).includes('Unsaved account editor'))).toBe(false)
  expect(await page.evaluate(()=>window.usersTest.mutations.length)).toBe(0)
+})
+
+
+test('server role discovery, gates and staff authorization control real UI choices',async({page})=>{
+    await openUsers(page,{roles:['user','admin'],guarded:false})
+    expect(await page.getByRole('combobox',{name:'Role',exact:true}).locator('option').evaluateAll(nodes=>nodes.map(node=>(node as HTMLOptionElement).value))).toEqual(['all','user','admin'])
+    await expect(page.getByRole('button',{name:'Delete second@example.test',exact:true})).toBeDisabled()
+    await page.getByRole('button',{name:'Add user',exact:true}).click()
+    const dialog=page.getByRole('dialog')
+    await expect(dialog.getByRole('combobox',{name:'Role',exact:true})).toBeDisabled()
+    expect(await dialog.getByRole('combobox',{name:'Role',exact:true}).locator('option').evaluateAll(nodes=>nodes.map(node=>(node as HTMLOptionElement).value))).toEqual(['user','admin'])
+    await expect(dialog.getByText('Administrator and Editor assignment requires verified server guards.',{exact:false})).toBeVisible()
+    await dialog.getByRole('button',{name:'Close',exact:true}).click()
+    await page.evaluate(async()=>{
+        const p='/src/lib/services/index.ts';const services=await import(p)
+        services.supabaseAdminService.userCapabilities=async()=>({canInvite:false,canEdit:false,canChangeRoles:false,canDelete:false,supportedRoles:['user','editor','admin'],inviteUnavailableReason:'writesDisabled'})
+    })
+    await page.getByRole('button',{name:'Reload users',exact:true}).click()
+    await expect(page.getByRole('button',{name:'Add user',exact:true})).toBeDisabled()
+    await expect(page.getByText('Account changes are disabled on the server.',{exact:true})).toBeVisible()
+    for(const role of ['editor','visitor'] as const){
+        await page.evaluate(async role=>{const p='/src/features/auth/authStore.ts';const {useAuthStore}=await import(p);useAuthStore.setState({user:{id:'11111111-1111-4111-8111-111111111111',name:'Denied',email:'denied@example.test',role},isAdmin:false})},role)
+        await expect(page.getByRole('heading',{name:'Permission denied',exact:true})).toBeVisible()
+    }
+    expect(await page.evaluate(()=>window.usersTest.mutations.length)).toBe(0)
+})
+
+test('unsaved profile survives validation and tab switching; conflicts require explicit discard',async({page,context})=>{
+    await openUsers(page)
+    await page.getByRole('button',{name:'Edit person1@example.test',exact:true}).click()
+    const dialog=page.getByRole('dialog')
+    await dialog.getByLabel('Full name',{exact:true}).fill('Unsaved admin profile')
+    await dialog.getByLabel('Preferred language').selectOption('fa')
+    await page.evaluate(async()=>{const p='/src/features/auth/authStore.ts';(await import(p)).useAuthStore.setState({isLoading:true})})
+    await expect(page.locator('dialog')).not.toHaveAttribute('open','')
+    await page.evaluate(async()=>{const p='/src/features/auth/authStore.ts';(await import(p)).useAuthStore.setState({isLoading:false})})
+    await expect(dialog.getByLabel('Full name',{exact:true})).toHaveValue('Unsaved admin profile')
+    const other=await context.newPage();await other.goto('about:blank');await page.bringToFront();await other.close()
+    await expect(dialog.getByLabel('Preferred language')).toHaveValue('fa')
+    expect(await page.evaluate(()=>JSON.stringify({...localStorage,...sessionStorage}).includes('Unsaved admin profile'))).toBe(false)
+    await page.evaluate(()=>{window.usersTest.mode='conflict'})
+    const queriesBefore=await page.evaluate(()=>window.usersTest.queries.length)
+    await dialog.getByRole('button',{name:'Save changes',exact:true}).click()
+    await expect(dialog.getByRole('alert')).toContainText('Your edits are retained')
+    await expect(dialog.getByLabel('Full name',{exact:true})).toHaveValue('Unsaved admin profile')
+    expect(await page.evaluate(()=>window.usersTest.queries.length)).toBe(queriesBefore)
+    await dialog.getByRole('button',{name:'Discard edits and reload current profile',exact:true}).click()
+    await expect(dialog.getByLabel('Full name',{exact:true})).toHaveValue('Visitor 1')
+    await page.evaluate(()=>{window.usersTest.mode='success'})
+    await dialog.getByLabel('Full name',{exact:true}).fill('Explicitly saved')
+    await dialog.getByRole('button',{name:'Save changes',exact:true}).click()
+    await expect(page.getByText('User profile saved.',{exact:true})).toBeVisible()
+    expect((await page.evaluate(()=>window.usersTest.mutations)).every(request=>request.action==='update'&&request.id==='00000000-0000-4000-8000-000000000001'&&request.expectedUpdatedAt==='2026-10-15T00:00:00.001Z')).toBe(true)
+    await page.screenshot({path:'.tmp/admin-users-completion/users-desktop.png',fullPage:true})
 })

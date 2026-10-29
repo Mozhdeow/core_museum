@@ -84,7 +84,7 @@ export function CPUSchematic({reduced,visible}: {reduced:boolean;visible:boolean
  const outline=(component:CPUComponent,size:[number,number,number])=><mesh visible={inspecting&&activeComponent===component} scale={1.06}><boxGeometry args={size}/><meshBasicMaterial color={palette.orange} wireframe transparent opacity={.8} toneMapped={false}/></mesh>
  return <group name="cpu-educational-schematic" ref={root} visible={visible} position={[0,2.25,-27]} rotation={[.46,.55,0]}>
   <group name="cpu-layer:substrate" ref={g=>{layers.current.substrate=g}} onClick={select('substrate')}>
-   <Block at={[0,0,0]} size={[2.7,.2,2.7]} color="#182d2b" roughness={.56}/>{outline('substrate',[2.7,.2,2.7])}
+   <Block at={[0,0,0]} size={[2.7,.2,2.7]} color="#292b2d" roughness={.62}/>{outline('substrate',[2.7,.2,2.7])}
    {[-1,1].map(side=><group key={side}>
     <Inlay at={[side*1.18,.105,0]} size={[.015,.01,2.3]}/>
     <Inlay at={[0,.105,side*1.18]} size={[2.3,.01,.015]}/>
@@ -96,15 +96,15 @@ export function CPUSchematic({reduced,visible}: {reduced:boolean;visible:boolean
   </group>
   <group name="cpu-layer:die" ref={g=>{layers.current.die=g}} onClick={select('die')}>
    <Block at={[0,0,0]} size={[1.4,.12,1.4]} color="#454d5b" roughness={.2}/>
-   <mesh position={[0,.065,0]} rotation={[-Math.PI/2,0,0]}><planeGeometry args={[1.32,1.32]}/><meshStandardMaterial color={palette.amber} emissive={palette.orange} emissiveIntensity={.5} metalness={.7} roughness={.3}/></mesh>
+   <mesh position={[0,.065,0]} rotation={[-Math.PI/2,0,0]}><planeGeometry args={[1.32,1.32]}/><meshStandardMaterial color={palette.amber} emissive={palette.orange} emissiveIntensity={.12} metalness={.7} roughness={.5}/></mesh>
    {[-.45,-.15,.15,.45].map(x=><Block key={x} at={[x,.072,0]} size={[.012,.008,1.3]} color={palette.dark}/>)}{outline('die',[1.4,.14,1.4])}
   </group>
   <group name="cpu-layer:interface" ref={g=>{layers.current.interface=g}} onClick={select('interface')}>
    <Block at={[0,0,0]} size={[1.43,.03,1.43]} color="#a4a4a0" metal={.3} roughness={.65}/>{outline('interface',[1.43,.04,1.43])}
   </group>
   <group name="cpu-layer:spreader" ref={g=>{layers.current.spreader=g}} onClick={select('spreader')}>
-   <RoundedBox args={[2.12,.19,2.12]} radius={.07} smoothness={2}><meshStandardMaterial color={palette.steel} metalness={.8} roughness={.3}/></RoundedBox>
-   <mesh position={[0,.101,0]} rotation={[-Math.PI/2,0,0]}><planeGeometry args={[1.92,1.92]}/><meshStandardMaterial map={surface} metalness={.65} roughness={.38}/></mesh>
+   <RoundedBox args={[2.12,.19,2.12]} radius={.07} smoothness={2}><meshStandardMaterial color={palette.steel} metalness={.8} roughness={.5}/></RoundedBox>
+   <mesh position={[0,.101,0]} rotation={[-Math.PI/2,0,0]}><planeGeometry args={[1.92,1.92]}/><meshStandardMaterial map={surface} metalness={.25} roughness={.72}/></mesh>
    <Inlay at={[0,-.1,1.03]} size={[1.9,.015,.02]}/>{outline('spreader',[2.12,.2,2.12])}
   </group>
   <group ref={heat} name="cpu-heat-illustration" visible={false}>

@@ -1,0 +1,298 @@
+{
+  "terminal": {
+    "en": {
+      "title": "Personal computing",
+      "labels": [
+        "Screen and keyboard",
+        "Tools for individual work"
+      ],
+      "caption": [
+        "A keyboard enters information.",
+        "A screen displays the result."
+      ]
+    },
+    "fa": {
+      "title": "رایانش شخصی",
+      "labels": [
+        "نمایشگر و صفحه‌کلید",
+        "ابزارهایی برای کار فردی"
+      ],
+      "caption": [
+        "صفحه‌کلید اطلاعات را وارد می‌کند.",
+        "نمایشگر نتیجه را نشان می‌دهد."
+      ]
+    }
+  },
+  "cycle": {
+    "en": {
+      "title": "The instruction cycle",
+      "labels": [
+        "01 / Fetch",
+        "02 / Decode",
+        "03 / Execute",
+        "Registers",
+        "ALU",
+        "Cache"
+      ],
+      "caption": [
+        "Fetch, decode, execute, repeat.",
+        "A conceptual processor cycle."
+      ]
+    },
+    "fa": {
+      "title": "چرخهٔ اجرای دستور",
+      "labels": [
+        "۰۱ / واکشی",
+        "۰۲ / رمزگشایی",
+        "۰۳ / اجرا",
+        "ثبات‌ها",
+        "واحد حساب و منطق",
+        "حافظهٔ نهان"
+      ],
+      "caption": [
+        "واکشی، رمزگشایی، اجرا و تکرار.",
+        "چرخه‌ای مفهومی از کار پردازنده."
+      ]
+    }
+  },
+  "gpu": {
+    "en": {
+      "title": "Work in parallel",
+      "labels": [
+        "01 / CPU cores",
+        "02 / GPU cores",
+        "03 / Parallel work"
+      ],
+      "caption": [
+        "Many cores share independent work.",
+        "Conceptual layout; counts vary."
+      ]
+    },
+    "fa": {
+      "title": "پردازش موازی",
+      "labels": [
+        "۰۱ / هسته‌های CPU",
+        "۰۲ / هسته‌های GPU",
+        "۰۳ / کار موازی"
+      ],
+      "caption": [
+        "هسته‌ها کارهای مستقل را تقسیم می‌کنند.",
+        "نمای مفهومی؛ شمار هسته‌ها متفاوت است."
+      ]
+    }
+  },
+  "memory": {
+    "en": {
+      "title": "Addressing a bit",
+      "labels": [
+        "01 / Rows",
+        "02 / Columns",
+        "03 / Transistor + capacitor",
+        "04 / Data path"
+      ],
+      "caption": [
+        "A DRAM cell stores charge.",
+        "Stored charge needs refreshing."
+      ]
+    },
+    "fa": {
+      "title": "نشانی یک بیت",
+      "labels": [
+        "۰۱ / سطرها",
+        "۰۲ / ستون‌ها",
+        "۰۳ / ترانزیستور و خازن",
+        "۰۴ / مسیر داده"
+      ],
+      "caption": [
+        "سلول DRAM بار الکتریکی نگه می‌دارد.",
+        "این بار به بازآوری نیاز دارد."
+      ]
+    }
+  },
+  "motherboard": {
+    "en": {
+      "title": "Paths through a system",
+      "labels": [
+        "01 / Socket",
+        "02 / Memory",
+        "03 / Expansion",
+        "04 / Storage",
+        "05 / Power"
+      ],
+      "caption": [
+        "Buses carry data between parts.",
+        "Power follows its own paths."
+      ]
+    },
+    "fa": {
+      "title": "مسیرهای یک سامانه",
+      "labels": [
+        "۰۱ / سوکت",
+        "۰۲ / حافظه",
+        "۰۳ / توسعه",
+        "۰۴ / ذخیره‌سازی",
+        "۰۵ / توان"
+      ],
+      "caption": [
+        "گذرگاه‌ها داده را میان اجزا جابه‌جا می‌کنند.",
+        "توان الکتریکی مسیرهای خود را دارد."
+      ]
+    }
+  },
+  "storageTimeline": {
+    "en": {
+      "title": "Keeping information",
+      "labels": [],
+      "caption": [
+        "From magnetic media to flash.",
+        "Different ways to retain data."
+      ],
+      "milestones": [
+        {
+          "anchor": "1956",
+          "title": "IBM RAMAC",
+          "detail": "Random-access disk storage"
+        },
+        {
+          "anchor": "1971",
+          "title": "Floppy disk drives",
+          "detail": "IBM begins selling drives"
+        },
+        {
+          "anchor": "Later",
+          "title": "Flash-based SSDs",
+          "detail": "NAND cells; no moving parts"
+        }
+      ]
+    },
+    "fa": {
+      "title": "ماندگاری اطلاعات",
+      "labels": [],
+      "caption": [
+        "از رسانهٔ مغناطیسی تا فلش.",
+        "راه‌های گوناگون حفظ داده."
+      ],
+      "milestones": [
+        {
+          "anchor": "۱۹۵۶",
+          "title": "IBM RAMAC",
+          "detail": "دیسک با دسترسی تصادفی"
+        },
+        {
+          "anchor": "۱۹۷۱",
+          "title": "درایو دیسک نرم",
+          "detail": "آغاز فروش درایوها در IBM"
+        },
+        {
+          "anchor": "بعدتر",
+          "title": "SSD مبتنی بر فلش",
+          "detail": "سلول‌های NAND؛ بدون قطعهٔ متحرک"
+        }
+      ]
+    }
+  },
+  "memoryTimeline": {
+    "en": {
+      "title": "Memory changes form",
+      "labels": [],
+      "caption": [
+        "Three approaches to working memory.",
+        "A timeline of ideas, not to scale."
+      ],
+      "milestones": [
+        {
+          "anchor": "01",
+          "title": "Magnetic core",
+          "detail": "Bits as magnetic states"
+        },
+        {
+          "anchor": "02",
+          "title": "DRAM",
+          "detail": "Charge in memory cells"
+        },
+        {
+          "anchor": "03",
+          "title": "SDRAM",
+          "detail": "Transfers follow a clock"
+        }
+      ]
+    },
+    "fa": {
+      "title": "حافظه تغییر شکل می‌دهد",
+      "labels": [],
+      "caption": [
+        "سه رویکرد به حافظهٔ کاری.",
+        "خط زمانی ایده‌ها؛ بدون مقیاس زمانی."
+      ],
+      "milestones": [
+        {
+          "anchor": "۰۱",
+          "title": "حافظهٔ هستهٔ مغناطیسی",
+          "detail": "بیت‌ها به‌شکل حالت مغناطیسی"
+        },
+        {
+          "anchor": "۰۲",
+          "title": "DRAM",
+          "detail": "بار الکتریکی در سلول‌ها"
+        },
+        {
+          "anchor": "۰۳",
+          "title": "SDRAM",
+          "detail": "انتقال هماهنگ با کلاک"
+        }
+      ]
+    }
+  },
+  "cpuTimeline": {
+    "en": {
+      "title": "Instructions find a home",
+      "labels": [],
+      "caption": [
+        "Three processor milestones.",
+        "Programmable work, on a chip."
+      ],
+      "milestones": [
+        {
+          "anchor": "1971",
+          "title": "Intel 4004",
+          "detail": "A programmable microprocessor"
+        },
+        {
+          "anchor": "1978",
+          "title": "Intel 8086",
+          "detail": "The x86 family begins"
+        },
+        {
+          "anchor": "1989",
+          "title": "Intel486",
+          "detail": "Cache joins the processor"
+        }
+      ]
+    },
+    "fa": {
+      "title": "خانه‌ای برای دستورها",
+      "labels": [],
+      "caption": [
+        "سه نقطه در تاریخ پردازنده‌ها.",
+        "پردازش برنامه‌پذیر روی تراشه."
+      ],
+      "milestones": [
+        {
+          "anchor": "۱۹۷۱",
+          "title": "Intel 4004",
+          "detail": "ریزپردازنده‌ای برنامه‌پذیر"
+        },
+        {
+          "anchor": "۱۹۷۸",
+          "title": "Intel 8086",
+          "detail": "آغاز خانوادهٔ x86"
+        },
+        {
+          "anchor": "۱۹۸۹",
+          "title": "Intel486",
+          "detail": "حافظهٔ نهان در پردازنده"
+        }
+      ]
+    }
+  }
+}

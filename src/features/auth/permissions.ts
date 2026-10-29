@@ -1,8 +1,7 @@
 import type {UserRole} from '../../types/services.ts'
+import {databaseRole, type DatabaseRole} from '../../../supabase/functions/_shared/roles.ts'
+export {databaseRole, displayRole, type DatabaseRole} from '../../../supabase/functions/_shared/roles.ts'
 
-export type DatabaseRole = 'user' | 'editor' | 'admin'
-export const databaseRole = (value: unknown): DatabaseRole | null => value==='user' || value==='editor' || value==='admin' ? value : null
-export const displayRole = (role: DatabaseRole): UserRole => role==='user' ? 'visitor' : role
 export const canUseContentWorkspace = (role: UserRole | undefined) => role==='editor' || role==='admin'
 export function canEditExhibit(role: UserRole | undefined, status: 'draft' | 'published', editorWritesVerified=false) {
     return role==='admin' || (role==='editor' && status==='draft' && editorWritesVerified)

@@ -1,7 +1,10 @@
 import type {CSSProperties, PropsWithChildren} from 'react'
 import type {ScreenRect} from '../config/monitorGeometry'
 
-export function MonitorViewport({geometry, className = '', children}: PropsWithChildren<{geometry: ScreenRect; className?: string}>) {
+export function MonitorViewport({geometry, className = '', children}: PropsWithChildren<{
+    geometry: ScreenRect;
+    className?: string
+}>) {
     return <div className={`monitor-viewport ${className}`.trim()} style={{
         '--screen-left': `${geometry.left}%`,
         '--screen-top': `${geometry.top}%`,

@@ -1,0 +1,258 @@
+{
+  "entrance": {
+    "at": "2026-10-26T17:37:16.438Z",
+    "tier": "high",
+    "reason": "Sustained cost: DPR first",
+    "dpr": 0.94,
+    "calls": 201,
+    "triangles": 24026,
+    "geometries": 124,
+    "textures": 40,
+    "programs": 38,
+    "lights": 2,
+    "gpu": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A7A8) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+    "postprocessing": false,
+    "reflector": "baked",
+    "reflectionCaptures": 1,
+    "hall": "entrance",
+    "position": [
+      0,
+      1.72,
+      15.5
+    ],
+    "timeOrigin": 1793036220679.7,
+    "fps": 46.00788706666769,
+    "avg": 21.735403726559987,
+    "p95": 27.30000001192093,
+    "p99": 34.799999952316284,
+    "over33": 2,
+    "over50": 1,
+    "samples": 161,
+    "hitches": [
+      {
+        "at": 14554.399999976158,
+        "ms": 76.79999995231628,
+        "hall": "entrance",
+        "position": [
+          0,
+          1.72,
+          15.5
+        ]
+      }
+    ],
+    "changes": [
+      {
+        "at": 4644.399999976158,
+        "tier": "high",
+        "reason": "URL override",
+        "dpr": 1
+      },
+      {
+        "at": 14741.199999988079,
+        "tier": "high",
+        "reason": "Sustained cost: DPR first",
+        "dpr": 0.94
+      }
+    ],
+    "average": 21.735403726559987
+  },
+  "passage": {
+    "at": "2026-10-26T17:37:21.543Z",
+    "tier": "high",
+    "reason": "Sustained cost: DPR first",
+    "dpr": 0.94,
+    "calls": 104,
+    "triangles": 8574,
+    "geometries": 124,
+    "textures": 40,
+    "programs": 38,
+    "lights": 2,
+    "gpu": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A7A8) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+    "postprocessing": false,
+    "reflector": "baked",
+    "reflectionCaptures": 1,
+    "hall": "corridor",
+    "position": [
+      0,
+      1.72,
+      1
+    ],
+    "timeOrigin": 1793036220679.7,
+    "fps": 52.02442886294976,
+    "avg": 19.22173913017563,
+    "p95": 27.100000023841858,
+    "p99": 43.90000003576279,
+    "over33": 2,
+    "over50": 0,
+    "samples": 184,
+    "hitches": [],
+    "changes": [
+      {
+        "at": 4644.399999976158,
+        "tier": "high",
+        "reason": "URL override",
+        "dpr": 1
+      },
+      {
+        "at": 14741.199999988079,
+        "tier": "high",
+        "reason": "Sustained cost: DPR first",
+        "dpr": 0.94
+      }
+    ],
+    "average": 19.22173913017563
+  },
+  "cpu": {
+    "at": "2026-10-26T17:37:26.151Z",
+    "tier": "high",
+    "reason": "Sustained cost: DPR first",
+    "dpr": 0.94,
+    "calls": 54,
+    "triangles": 4728,
+    "geometries": 124,
+    "textures": 40,
+    "programs": 38,
+    "lights": 2,
+    "gpu": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A7A8) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+    "postprocessing": false,
+    "reflector": "baked",
+    "reflectionCaptures": 1,
+    "hall": "cpu",
+    "position": [
+      0,
+      1.72,
+      -22.5
+    ],
+    "timeOrigin": 1793036220679.7,
+    "fps": 60.48157023870849,
+    "avg": 16.53396226409471,
+    "p95": 22.69999998807907,
+    "p99": 26.099999964237213,
+    "over33": 1,
+    "over50": 1,
+    "samples": 212,
+    "hitches": [
+      {
+        "at": 25180.599999964237,
+        "ms": 50.90000003576279,
+        "hall": "cpu",
+        "position": [
+          0,
+          1.72,
+          -22.5
+        ]
+      }
+    ],
+    "changes": [
+      {
+        "at": 4644.399999976158,
+        "tier": "high",
+        "reason": "URL override",
+        "dpr": 1
+      },
+      {
+        "at": 14741.199999988079,
+        "tier": "high",
+        "reason": "Sustained cost: DPR first",
+        "dpr": 0.94
+      }
+    ],
+    "average": 16.53396226409471
+  },
+  "walk": {
+    "at": "2026-10-26T17:37:57.710Z",
+    "tier": "high",
+    "reason": "Sustained headroom: DPR recovery",
+    "dpr": 0.94,
+    "calls": 54,
+    "triangles": 4728,
+    "geometries": 124,
+    "textures": 40,
+    "programs": 38,
+    "lights": 2,
+    "gpu": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A7A8) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+    "postprocessing": false,
+    "reflector": "baked",
+    "reflectionCaptures": 1,
+    "hall": "cpu",
+    "position": [
+      0,
+      1.72,
+      -22.73743999996186
+    ],
+    "timeOrigin": 1793036220679.7,
+    "fps": 61.32756132800089,
+    "avg": 16.305882352824305,
+    "p95": 23.100000023841858,
+    "p99": 26.19999998807907,
+    "over33": 6,
+    "over50": 3,
+    "samples": 306,
+    "hitches": [
+      {
+        "at": 31291.69999998808,
+        "ms": 81.30000001192093,
+        "hall": "entrance",
+        "position": [
+          0,
+          1.72,
+          2.5588799999236995
+        ]
+      },
+      {
+        "at": 45802,
+        "ms": 67.39999997615814,
+        "hall": "cpu",
+        "position": [
+          0,
+          1.72,
+          -22.73743999996186
+        ]
+      },
+      {
+        "at": 53914.89999997616,
+        "ms": 65.80000001192093,
+        "hall": "cpu",
+        "position": [
+          0,
+          1.72,
+          -22.73743999996186
+        ]
+      }
+    ],
+    "changes": [
+      {
+        "at": 4644.399999976158,
+        "tier": "high",
+        "reason": "URL override",
+        "dpr": 1
+      },
+      {
+        "at": 14741.199999988079,
+        "tier": "high",
+        "reason": "Sustained cost: DPR first",
+        "dpr": 0.94
+      },
+      {
+        "at": 31607.599999964237,
+        "tier": "high",
+        "reason": "Sustained cost: DPR first",
+        "dpr": 0.8799999999999999
+      },
+      {
+        "at": 45835.69999998808,
+        "tier": "high",
+        "reason": "Sustained headroom: DPR recovery",
+        "dpr": 0.9099999999999999
+      },
+      {
+        "at": 53964.09999996424,
+        "tier": "high",
+        "reason": "Sustained headroom: DPR recovery",
+        "dpr": 0.94
+      }
+    ],
+    "average": 16.512706270607392
+  },
+  "hudRenders": 4
+}

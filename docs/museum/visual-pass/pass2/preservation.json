@@ -1,0 +1,18 @@
+{
+  "Compared": 173,
+  "Unchanged": 161,
+  "Changed": [
+    "src/experience/EntranceGallery.tsx",
+    "src/experience/EntrancePanels.tsx",
+    "src/experience/EntranceStudy.tsx",
+    "src/experience/MuseumAtmosphere.tsx",
+    "src/experience/MuseumVisualResources.ts",
+    "src/experience/CPUHall.tsx",
+    "src/experience/MuseumArchitecture.tsx",
+    "src/experience/MuseumScene.tsx",
+    "src/features/museum/MuseumNavigationControls.tsx",
+    "src/features/museum/museumNavigation.css",
+    "src/i18n/locales/en/museum.json",
+    "src/i18n/locales/fa/museum.json"
+  ]
+}

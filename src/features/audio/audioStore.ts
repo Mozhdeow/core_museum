@@ -4,7 +4,6 @@ import {Howl, Howler} from 'howler'
 
 export type AudioChannel = 'music' | 'ambient' | 'interaction'
 const channels = new Map<AudioChannel, Howl>()
-// No audio is bundled. Register licensed/local sources in Phase 2.
 export const audioEngine = {
     register(channel: AudioChannel, src: string, loop = channel !== 'interaction') {
         channels.get(channel)?.unload()

@@ -23,7 +23,8 @@ export function markIntroSeen(mode: Exclude<IntroMode, 'skip'>, now = Date.now()
     try {
         localStorage.setItem(INTRO_STORAGE_KEY, String(now))
         if (mode === 'full') localStorage.setItem(INTRO_FULL_STORAGE_KEY, String(now))
-    } catch { /* storage may be unavailable */ }
+    } catch {
+    }
 }
 
 export function useIntroState(): IntroMode {

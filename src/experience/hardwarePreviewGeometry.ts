@@ -1,5 +1,6 @@
 import {BoxGeometry,CylinderGeometry,TorusGeometry,Matrix4,Euler,Quaternion,Vector3,type BufferGeometry} from 'three'
 import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js'
+import {RoundedBoxGeometry} from 'three/addons/geometries/RoundedBoxGeometry.js'
 
 type Triple=[number,number,number]
 export function hardwarePreviewKind(category:string,title=''){
@@ -12,13 +13,15 @@ export function hardwarePreviewKind(category:string,title=''){
 }
 /** Merge low-poly parts into five material batches, rather than one draw call per chip/pin.
  * These are category illustrations, never substituted GLTFs or invented published records. */
-export function hardwarePreviewGeometry(kind:ReturnType<typeof hardwarePreviewKind>){
+export function hardwarePreviewGeometry(kind:ReturnType<typeof hardwarePreviewKind>,detailed=false){
  const batches:BufferGeometry[][]=Array.from({length:5},()=>[])
  const add=(material:number,geometry:BufferGeometry,at:Triple,rotation:Triple=[0,0,0])=>{
-  geometry.applyMatrix4(new Matrix4().compose(new Vector3(...at),new Quaternion().setFromEuler(new Euler(...rotation)),new Vector3(1,1,1)))
-  batches[material].push(geometry)
+  const compatible=detailed&&geometry.index?geometry.toNonIndexed():geometry
+  if(compatible!==geometry)geometry.dispose()
+  compatible.applyMatrix4(new Matrix4().compose(new Vector3(...at),new Quaternion().setFromEuler(new Euler(...rotation)),new Vector3(1,1,1)))
+  batches[material].push(compatible)
  }
- const box=(material:number,size:Triple,at:Triple)=>add(material,new BoxGeometry(...size),at)
+ const box=(material:number,size:Triple,at:Triple)=>add(material,detailed&&Math.min(...size)>.055?new RoundedBoxGeometry(...size,1,Math.min(...size)*.14):new BoxGeometry(...size),at)
  const disk=(material:number,radius:number,depth:number,at:Triple)=>add(material,new CylinderGeometry(radius,radius,depth,16),at,[Math.PI/2,0,0])
  if(kind==='gpu'){
   box(0,[1.42,.66,.07],[0,0,-.04]);box(1,[1.3,.59,.1],[0,.03,.02])
@@ -41,6 +44,7 @@ export function hardwarePreviewGeometry(kind:ReturnType<typeof hardwarePreviewKi
   disk(3,.35,.022,[0,.13,.108]);add(2,new TorusGeometry(.27,.012,3,20),[0,.13,.127]);disk(2,.074,.035,[0,.13,.135])
   add(4,new BoxGeometry(.42,.055,.025),[.08,-.16,.145],[0,0,-.7]);disk(2,.045,.035,[.25,-.3,.14])
   box(4,[.52,.08,.035],[0,-.65,0])
+  if(detailed)for(let i=0;i<10;i++)add(2,new TorusGeometry(.12+i*.022,.0015,3,32),[0,.13,.129])
  }else{
   box(0,[1.05,1.25,.065],[0,0,0]);box(2,[.36,.36,.06],[-.16,.18,.07]);box(1,[.23,.23,.035],[-.16,.18,.12])
   for(let i=0;i<3;i++)box(1,[.075,.83,.1],[.29+i*.1,.14,.075])
@@ -48,6 +52,7 @@ export function hardwarePreviewGeometry(kind:ReturnType<typeof hardwarePreviewKi
   box(2,[.17,.59,.16],[-.55,.29,.06]);box(1,[.27,.2,.08],[.26,-.46,.07])
   for(let i=0;i<5;i++)disk(2,.035,.1,[-.4+i*.12,.47,.085])
   for(let i=0;i<5;i++)box(4,[.018,.25,.014],[-.4+i*.048,.07,.039])
+  if(detailed)for(let i=0;i<8;i++){box(2,[.075,.045,.045],[-.4+i*.075,.62,.06]);box(4,[.006,.12,.004],[-.36+i*.085,-.05,.039])}
  }
  return batches.map(parts=>{if(!parts.length)return null;const geometry=mergeGeometries(parts);parts.forEach(part=>part.dispose());return geometry})
 }

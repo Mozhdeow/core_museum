@@ -1,0 +1,42 @@
+[
+  {
+    "topic": "terminal",
+    "x": -6.775,
+    "z": 11.5
+  },
+  {
+    "topic": "cycle",
+    "x": 6.775,
+    "z": 11.5
+  },
+  {
+    "topic": "gpu",
+    "x": -6.775,
+    "z": 8.4
+  },
+  {
+    "topic": "motherboard",
+    "x": 6.775,
+    "z": 8.4
+  },
+  {
+    "topic": "memory",
+    "x": -6.775,
+    "z": 5.3
+  },
+  {
+    "topic": "storageTimeline",
+    "x": 6.775,
+    "z": 5.3
+  },
+  {
+    "topic": "memoryTimeline",
+    "x": -6.775,
+    "z": 16.5
+  },
+  {
+    "topic": "cpuTimeline",
+    "x": 6.775,
+    "z": 16.5
+  }
+]

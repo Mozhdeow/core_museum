@@ -1,0 +1,40 @@
+{
+  "at": "2026-10-26T17:44:08.087Z",
+  "tier": "high",
+  "reason": "URL override",
+  "dpr": 1,
+  "calls": 54,
+  "triangles": 4728,
+  "geometries": 124,
+  "textures": 40,
+  "programs": 38,
+  "lights": 2,
+  "gpu": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A7A8) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+  "postprocessing": false,
+  "reflector": "baked",
+  "reflectionCaptures": 1,
+  "hall": "cpu",
+  "position": [
+    -2.8366827883970573e-33,
+    1.72,
+    -21.499999999999986
+  ],
+  "timeOrigin": 1793036546814.6,
+  "fps": 117.74583691614149,
+  "avg": 8.492869269868109,
+  "p95": 14.800000011920929,
+  "p99": 18.30000001192093,
+  "over33": 0,
+  "over50": 0,
+  "samples": 589,
+  "hitches": [],
+  "changes": [
+    {
+      "at": 2113.699999988079,
+      "tier": "high",
+      "reason": "URL override",
+      "dpr": 1
+    }
+  ],
+  "average": 9.429446888749215
+}

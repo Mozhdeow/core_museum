@@ -1,0 +1,33 @@
+import {test,expect,type Locator} from '@playwright/test'
+import {mkdir,writeFile} from 'node:fs/promises'
+import {visitFixture,visitor} from './museum-visit-fixture'
+import {parts,slotPosition,referenceId,type PartId,type SlotId} from '../src/features/assembly/assemblyDefinition'
+
+const folder='docs/assembly/install-parts-correction'
+async function fullyVisible(button:Locator){await expect(button).toBeVisible();expect(await button.evaluate(node=>{const r=node.getBoundingClientRect();return r.left>=0&&r.top>=0&&r.right<=innerWidth&&r.bottom<=innerHeight&&r.height>=44&&document.elementsFromPoint(r.x+r.width/2,r.y+r.height/2).includes(node)})).toBe(true)}
+test('Parts-panel Install All Parts is reachable and animates actual hardware; EN/FA narrow layouts fit',async({page})=>{
+ await mkdir(folder,{recursive:true});const errors:string[]=[];page.on('pageerror',error=>errors.push(error.message))
+ const fixture=await visitFixture(page,{slow:true});fixture.release()
+ const installed:Partial<Record<PartId,SlotId>>={monitor:'monitor',motherboard:'motherboard',ram1:'dimmB2',ram2:'ram1',ssd:'ssd',psu:'psu',fanFront:'fanFront'}
+ await page.addInitScript(({owner,installed,reference})=>localStorage.setItem('core-assembly:'+owner,JSON.stringify({version:2,reference,owner,savedAt:Date.now(),installed,connected:['monitorAC'],mode:'free',panelOpen:true,optionalParts:[],optionalConnected:[],peripherals:{},opticalOpen:false})),{owner:visitor,installed,reference:referenceId})
+ await page.goto('/museum/assembly');await expect(page.locator('.assembly-loading')).toHaveCount(0,{timeout:35000});await expect(page.locator('canvas[data-lab-camera]')).toBeVisible()
+ const rail=page.locator('.assembly-dock-rail'),lab=page.locator('[data-assembly-lab]'),panel=page.locator('.assembly-inventory'),footer=page.locator('.assembly-footer-actions')
+ await rail.getByRole('button',{name:'Parts',exact:true}).click();const install=panel.getByRole('button',{name:'Install All Parts',exact:true});await fullyVisible(install);await expect(install).toBeEnabled();await expect(footer.locator('.assembly-auto-button')).toHaveCount(0);expect(await install.evaluate(node=>node.getBoundingClientRect().bottom<=document.querySelector('.assembly-tray-tabs')!.getBoundingClientRect().top)).toBe(true)
+ await page.screenshot({path:folder+'/01-desktop-parts-action.png'})
+ // Resolve the EXACT renderer import used by the served app, avoiding a second R3F/Three instance.
+ const root=await page.evaluateHandle(async()=>{const source=await(await fetch('/src/features/assembly/AssemblyCamera.tsx')).text(),url=[...source.matchAll(/from\s*["']([^"']+)["']/g)].map(match=>match[1]).find(url=>url.includes('fiber'));if(!url)throw new Error('Cannot resolve active app renderer');const module=await import(url),entry=module._roots.get(document.querySelector('canvas'));if(!entry)throw new Error('Active Canvas root missing');return entry.store.getState() as import('@react-three/fiber').RootState})
+ const samples=await root.evaluateHandle(root=>{const readings:Record<string,number[][]>={cpu:[],gpu:[]};let frame=0;const sample=()=>{for(const id of ['cpu','gpu']){const node=root.scene.getObjectByName('assembly-part:'+id);if(!node)throw new Error('Physical '+id+' missing');const point=node.position.toArray(),last=readings[id].at(-1);if(!last||point.some((value,index)=>Math.abs(value-last[index])>.005))readings[id].push(point)}frame=requestAnimationFrame(sample)};sample();return {readings,stop(){cancelAnimationFrame(frame)}}})
+ try{
+  await install.click();await expect(lab).toHaveAttribute('data-automating','true');await fullyVisible(panel.getByRole('button',{name:'Cancel automation',exact:true}));await expect(panel.locator('.assembly-auto-panel-feedback')).toContainText('Installing')
+  await expect.poll(()=>samples.evaluate(samples=>samples.readings.cpu.some(point=>point[1]>2&&point[0]<-1.3)),{timeout:20000}).toBe(true)
+  await expect(lab).toHaveAttribute('data-automation-status','complete',{timeout:75000});await expect(panel.locator('.assembly-auto-panel-feedback')).toContainText('Automation complete')
+  const motion=await samples.evaluate(samples=>{samples.stop();return samples.readings});for(const id of ['cpu','gpu'] as const){const from=parts[id].tray,to=slotPosition(parts[id].slot);expect(motion[id].some(point=>point.some((v,i)=>Math.abs(v-from[i])>.05)&&point.some((v,i)=>Math.abs(v-to[i])>.05))).toBe(true)}await writeFile(folder+'/motion.json',JSON.stringify(motion,null,2))
+  const final=JSON.parse((await page.locator('[data-assembly-installed]').getAttribute('data-assembly-installed'))!) as Record<PartId,SlotId>;expect(Object.keys(final)).toHaveLength(11);expect(final.ram1).toBe('dimmB2');expect(final.ram2).toBe('ram1');await expect(page.locator('[data-assembly-connected]')).toHaveAttribute('data-assembly-connected','monitorAC');await expect(lab).toHaveAttribute('data-power','off')
+  const poses=await root.evaluate(root=>Object.fromEntries(['motherboard','cpu','ram1','ram2','cooler','gpu','ssd','psu','fanFront','fanRear'].map(id=>{const node=root.scene.getObjectByName('assembly-part:'+id)!;return [id,{position:node.position.toArray(),rotation:[node.rotation.x,node.rotation.y,node.rotation.z]}]})))
+  for(const [id,pose]of Object.entries(poses)){const part=id as PartId,target=slotPosition(final[part]);pose.position.forEach((value,index)=>expect(value).toBeCloseTo(target[index],2));pose.rotation.forEach((value,index)=>expect(value).toBeCloseTo(parts[part].rotation[index],2))}
+  // Same mounted app/state, both locales and widths, without another assembly run.
+  for(const width of [390,320]){await page.setViewportSize({width,height:844});await fullyVisible(install);expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);for(const button of await footer.getByRole('button').all())await fullyVisible(button)}
+  await page.getByRole('button',{name:'FA',exact:true}).click();await expect(page.locator('html')).toHaveAttribute('dir','rtl');await fullyVisible(panel.getByRole('button',{name:'نصب همهٔ قطعات',exact:true}));expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);for(const button of await footer.getByRole('button').all())await fullyVisible(button);await page.screenshot({path:folder+'/02-fa-narrow-parts-action.png'})
+  await page.setViewportSize({width:1366,height:768});await fullyVisible(panel.getByRole('button',{name:'نصب همهٔ قطعات',exact:true}));await expect(page.locator('canvas')).toHaveCount(1);expect(errors).toEqual([])
+ }finally{await samples.evaluate(samples=>samples.stop());await samples.dispose();await root.dispose()}
+})

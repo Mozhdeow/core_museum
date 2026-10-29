@@ -1,0 +1,45 @@
+{
+  "source": [
+    "src/experience/CPUHall.tsx",
+    "src/experience/CPUSchematic.tsx",
+    "src/experience/EntranceArtifacts.tsx",
+    "src/experience/EntranceGallery.tsx",
+    "src/experience/EntrancePanels.tsx",
+    "src/experience/EntranceStoneFloor.tsx",
+    "src/experience/MuseumArchitecture.tsx",
+    "src/experience/MuseumAtmosphere.tsx",
+    "src/experience/MuseumCanvas.tsx",
+    "src/experience/MuseumDoors.tsx",
+    "src/experience/MuseumLighting.tsx",
+    "src/experience/museumPalette.ts",
+    "src/experience/MuseumPerf.tsx",
+    "src/experience/museumQuality.ts",
+    "src/experience/MuseumRenderPreparation.tsx",
+    "src/experience/MuseumResources.tsx",
+    "src/experience/MuseumScene.tsx",
+    "src/experience/museumStoryDrawing.ts",
+    "src/experience/PassageLighting.tsx",
+    "src/experience/StaticMuseumBatch.tsx",
+    "src/experience/useMuseumQuality.ts",
+    "src/features/museum/museumNavigation.css",
+    "src/features/museum/MuseumNavigationControls.tsx",
+    "src/i18n/locales/en/museum.json",
+    "src/i18n/locales/fa/museum.json",
+    "src/experience/MuseumAdaptive.tsx",
+    "src/experience/museumAdaptivePolicy.ts",
+    "src/experience/museumPerfData.ts",
+    "src/experience/MuseumPreferences.tsx",
+    "src/experience/entranceBayMap.ts",
+    "src/experience/museumOrientation.ts"
+  ],
+  "tests": [
+    "tests/visual-pass4.spec.ts",
+    "tests/visual-pass4.test.ts",
+    "tests/visual-pass4.playwright.config.ts"
+  ],
+  "documentation": [
+    "docs/museum/VISUAL_REALISM_PASS.md",
+    "docs/museum/visual-pass/pass4/"
+  ],
+  "temporary": "Ignored .tmp diagnostic scripts and command logs"
+}

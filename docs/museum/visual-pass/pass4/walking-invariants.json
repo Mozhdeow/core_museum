@@ -1,0 +1,25 @@
+{
+  "before": {
+    "memory": {
+      "geometries": 124,
+      "textures": 40
+    },
+    "programs": 38,
+    "lights": 2
+  },
+  "after": {
+    "memory": {
+      "geometries": 124,
+      "textures": 40
+    },
+    "programs": 38,
+    "lights": 2
+  },
+  "counts": [
+    "[38,2]"
+  ],
+  "hitches": [],
+  "renders": 16,
+  "over50": 0,
+  "over33": 0
+}

@@ -1,4 +1,18 @@
 {
+  "elevator": {
+    "archive": "Visual archive",
+    "index": "ARCHIVE INDEX",
+    "select": "Select an image",
+    "selection": "Archive image selection",
+    "image": "Image {{number}}",
+    "selected": "Image {{number}} of {{count}}",
+    "travelling": "Moving through the archive…",
+    "ready": "Ready to explore",
+    "stepInside": "Step inside",
+    "return": "Back to archive",
+    "retry": "Retry image",
+    "hint": "Choose a number, then step inside the image."
+  },
   "goToExhibit": "Go to exhibit",
   "educationalCPU": "Educational CPU schematic",
   "educationalNotice": "Educational illustration / not a published exhibit",
@@ -42,6 +56,7 @@
   "retry": "Reload collection",
   "dataError": "The museum collection could not be loaded.",
   "journey": {
+    "details": "Details",
     "entrance": "The Entrance",
     "corridor": "The Passage",
     "cpu": "CPU Hall",
@@ -136,5 +151,171 @@
     "error": "Model unavailable",
     "ready": "Exhibit 3D model"
   },
-  "categoryCarousel": "Category carousel"
+  "categoryCarousel": "Category carousel",
+  "storyPlates": {
+    "eyebrow": "CORE / HOW COMPUTING WORKS",
+    "cpuTimeline": {
+      "title": "Instructions find a home",
+      "labels": [],
+      "caption": [
+        "Three processor milestones.",
+        "Programmable work, on a chip."
+      ],
+      "milestones": [
+        {
+          "anchor": "1971",
+          "title": "Intel 4004",
+          "detail": "A programmable microprocessor"
+        },
+        {
+          "anchor": "1978",
+          "title": "Intel 8086",
+          "detail": "The x86 family begins"
+        },
+        {
+          "anchor": "1989",
+          "title": "Intel486",
+          "detail": "Cache joins the processor"
+        }
+      ]
+    },
+    "storageTimeline": {
+      "title": "Keeping information",
+      "labels": [],
+      "caption": [
+        "From magnetic media to flash.",
+        "Different ways to retain data."
+      ],
+      "milestones": [
+        {
+          "anchor": "1956",
+          "title": "IBM RAMAC",
+          "detail": "Random-access disk storage"
+        },
+        {
+          "anchor": "1971",
+          "title": "Floppy disk drives",
+          "detail": "IBM begins selling drives"
+        },
+        {
+          "anchor": "Later",
+          "title": "Flash-based SSDs",
+          "detail": "NAND cells; no moving parts"
+        }
+      ]
+    },
+    "memory": {
+      "title": "Addressing a bit",
+      "labels": [
+        "01 / Rows",
+        "02 / Columns",
+        "03 / Transistor + capacitor",
+        "04 / Data path"
+      ],
+      "caption": [
+        "A DRAM cell stores charge.",
+        "Stored charge needs refreshing."
+      ]
+    },
+    "gpu": {
+      "title": "Work in parallel",
+      "labels": [
+        "01 / CPU cores",
+        "02 / GPU cores",
+        "03 / Parallel work"
+      ],
+      "caption": [
+        "Many cores share independent work.",
+        "Conceptual layout; counts vary."
+      ]
+    },
+    "motherboard": {
+      "title": "Paths through a system",
+      "labels": [
+        "01 / Socket",
+        "02 / Memory",
+        "03 / Expansion",
+        "04 / Storage",
+        "05 / Power"
+      ],
+      "caption": [
+        "Buses carry data between parts.",
+        "Power follows its own paths."
+      ]
+    },
+    "cycle": {
+      "title": "The instruction cycle",
+      "labels": [
+        "01 / Fetch",
+        "02 / Decode",
+        "03 / Execute",
+        "Registers",
+        "ALU",
+        "Cache"
+      ],
+      "caption": [
+        "Fetch, decode, execute, repeat.",
+        "A conceptual processor cycle."
+      ]
+    },
+    "memoryTimeline": {
+      "title": "Memory changes form",
+      "labels": [],
+      "caption": [
+        "Three approaches to working memory.",
+        "A timeline of ideas, not to scale."
+      ],
+      "milestones": [
+        {
+          "anchor": "01",
+          "title": "Magnetic core",
+          "detail": "Bits as magnetic states"
+        },
+        {
+          "anchor": "02",
+          "title": "DRAM",
+          "detail": "Charge in memory cells"
+        },
+        {
+          "anchor": "03",
+          "title": "SDRAM",
+          "detail": "Transfers follow a clock"
+        }
+      ]
+    },
+    "terminal": {
+      "title": "Personal computing",
+      "labels": [
+        "Screen and keyboard",
+        "Tools for individual work"
+      ],
+      "caption": [
+        "A keyboard enters information.",
+        "A screen displays the result."
+      ]
+    }
+  },
+  "entrancePlates": {
+    "educational": "Educational illustration",
+    "prototype": "PROCEDURAL PROTOTYPE",
+    "hardware": {
+      "cpu": "Processor package",
+      "gpu": "Graphics card",
+      "memory": "Memory module",
+      "motherboard": "System board",
+      "hdd": "Storage drive",
+      "terminal": "Personal computer"
+    }
+  },
+  "display": {
+    "quality": "Quality",
+    "brightness": "Brightness",
+    "auto": "Auto",
+    "high": "High",
+    "medium": "Medium",
+    "low": "Low",
+    "dim": "Dim",
+    "standard": "Standard",
+    "bright": "Bright"
+  }
 }

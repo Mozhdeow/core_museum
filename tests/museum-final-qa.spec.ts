@@ -60,19 +60,19 @@ test('gallery opens real ordered media, owns pointer/keyboard and restores butto
 test('gallery empty contract does not promote a thumbnail or open an empty dialog',async({page})=>{
  await arrive(page,{thumbnail:true});await details(page)
  await expect(page.locator('[data-exhibit-id] img')).toHaveAttribute('src',/thumb\.png$/)
- await expect(page.getByRole('button',{name:'VIEW GALLERY',exact:true})).toBeDisabled()
+ await expect(page.getByRole('button',{name:'VIEW GALLERY',exact:true})).toHaveCount(0)
  await expect(page.getByText('No gallery images are available for this exhibit.',{exact:true})).toBeVisible()
  await expect(page.getByRole('dialog')).toHaveCount(0)
 })
 test('gallery honors a disabled flag even with media',async({page})=>{
  await arrive(page,{gallery:true,galleryDisabled:true});await details(page)
- await expect(page.getByRole('button',{name:'VIEW GALLERY',exact:true})).toBeDisabled()
+ await expect(page.getByRole('button',{name:'VIEW GALLERY',exact:true})).toHaveCount(0)
  await expect(page.getByText('The gallery is disabled for this exhibit.',{exact:true})).toBeVisible()
 })
 test('failed gallery images remain dismissible with useful feedback',async({page})=>{
  await arrive(page,{gallery:true,brokenImage:true});await details(page)
  await page.getByRole('button',{name:'VIEW GALLERY',exact:true}).click()
- await expect(page.getByRole('dialog').getByRole('status')).toContainText('could not be loaded')
+ await expect(page.getByRole('dialog').getByRole('status').filter({hasText:'could not be loaded'}).first()).toBeVisible()
  await page.getByRole('dialog').getByRole('button',{name:'Next',exact:true}).click()
  await page.keyboard.press('Escape');await expect(page.getByRole('dialog')).toHaveCount(0)
 })

@@ -10,6 +10,7 @@ import enAdmin from './locales/en/admin.json';
 import faAdmin from './locales/fa/admin.json'
 import enPhase2 from './locales/en/phase2.json'; import faPhase2 from './locales/fa/phase2.json'
 import enLanding from './locales/en/landing.json'; import faLanding from './locales/fa/landing.json'
+import enAssembly from './locales/en/assembly.json'; import faAssembly from './locales/fa/assembly.json'
 
 const saved = localStorage.getItem('core-locale')
 export const LOCALES = {en: {label: 'EN', dir: 'ltr'}, fa: {label: 'FA', dir: 'rtl'}} as const
@@ -23,13 +24,13 @@ export function setDocumentDirection(locale: keyof typeof LOCALES) {
 
 void i18n.use(initReactI18next).init({
     resources: {
-        en: {common: enCommon, auth: enAuth, museum: enMuseum, admin: enAdmin, phase2: enPhase2, landing: enLanding},
-        fa: {common: faCommon, auth: faAuth, museum: faMuseum, admin: faAdmin, phase2: faPhase2, landing: faLanding},
+        en: {common: enCommon, auth: enAuth, museum: enMuseum, admin: enAdmin, phase2: enPhase2, landing: enLanding,assembly:enAssembly},
+        fa: {common: faCommon, auth: faAuth, museum: faMuseum, admin: faAdmin, phase2: faPhase2, landing: faLanding,assembly:faAssembly},
     },
     lng: saved === 'fa' ? 'fa' : 'en',
     fallbackLng: 'en',
     defaultNS: 'common',
-    ns: ['common', 'auth', 'museum', 'admin', 'phase2', 'landing'],
+    ns: ['common', 'auth', 'museum', 'admin', 'phase2', 'landing','assembly'],
     interpolation: {escapeValue: false},
 })
 setDocumentDirection(i18n.language === 'fa' ? 'fa' : 'en')

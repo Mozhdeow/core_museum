@@ -1,0 +1,192 @@
+{
+  "at": "2026-10-26T18:01:20.452Z",
+  "tier": "medium",
+  "reason": "User: medium",
+  "dpr": 0.9572256077840432,
+  "calls": 201,
+  "triangles": 24014,
+  "geometries": 123,
+  "textures": 41,
+  "programs": 58,
+  "lights": 2,
+  "gpu": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A7A8) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+  "postprocessing": false,
+  "reflector": "baked",
+  "reflectionCaptures": 1,
+  "hall": "entrance",
+  "position": [
+    0,
+    1.72,
+    15.5
+  ],
+  "timeOrigin": 1793037667314.5,
+  "fps": 25.823757857043773,
+  "avg": 38.72403100802917,
+  "p95": 45.80000001192093,
+  "p99": 694.5999999642372,
+  "over33": 15,
+  "over50": 6,
+  "samples": 129,
+  "hitches": [
+    {
+      "at": 2741.099999964237,
+      "ms": 389,
+      "hall": "entrance",
+      "position": [
+        0,
+        1.72,
+        15.5
+      ]
+    },
+    {
+      "at": 3790,
+      "ms": 1048.9000000357628,
+      "hall": "entrance",
+      "position": [
+        0,
+        1.72,
+        15.5
+      ]
+    },
+    {
+      "at": 3988.899999976158,
+      "ms": 152.19999998807907,
+      "hall": "entrance",
+      "position": [
+        0,
+        1.72,
+        15.5
+      ]
+    },
+    {
+      "at": 4678.800000011921,
+      "ms": 690.2000000476837,
+      "hall": "entrance",
+      "position": [
+        0,
+        1.72,
+        15.5
+      ]
+    },
+    {
+      "at": 4813.300000011921,
+      "ms": 89.69999998807907,
+      "hall": "entrance",
+      "position": [
+        0,
+        1.72,
+        15.5
+      ]
+    },
+    {
+      "at": 4947.899999976158,
+      "ms": 134.89999997615814,
+      "hall": "entrance",
+      "position": [
+        0,
+        1.72,
+        15.5
+      ]
+    },
+    {
+      "at": 5181.099999964237,
+      "ms": 166,
+      "hall": "entrance",
+      "position": [
+        0,
+        1.72,
+        15.5
+      ]
+    },
+    {
+      "at": 5520.699999988079,
+      "ms": 61.5,
+      "hall": "entrance",
+      "position": [
+        0,
+        1.72,
+        15.5
+      ]
+    },
+    {
+      "at": 9717.599999964237,
+      "ms": 50.30000001192093,
+      "hall": "entrance",
+      "position": [
+        0,
+        1.72,
+        15.5
+      ]
+    },
+    {
+      "at": 10241.099999964237,
+      "ms": 104.79999995231628,
+      "hall": "entrance",
+      "position": [
+        0,
+        1.72,
+        15.5
+      ]
+    },
+    {
+      "at": 11678.399999976158,
+      "ms": 1437.300000011921,
+      "hall": "entrance",
+      "position": [
+        0,
+        1.72,
+        15.5
+      ]
+    },
+    {
+      "at": 11826.099999964237,
+      "ms": 127.19999998807907,
+      "hall": "entrance",
+      "position": [
+        0,
+        1.72,
+        15.5
+      ]
+    },
+    {
+      "at": 11922.699999988079,
+      "ms": 51,
+      "hall": "entrance",
+      "position": [
+        0,
+        1.72,
+        15.5
+      ]
+    },
+    {
+      "at": 12635.699999988079,
+      "ms": 694.5999999642372,
+      "hall": "entrance",
+      "position": [
+        0,
+        1.72,
+        15.5
+      ]
+    }
+  ],
+  "changes": [
+    {
+      "at": 2741.099999964237,
+      "tier": "high",
+      "reason": "URL override",
+      "dpr": 1
+    },
+    {
+      "at": 8752.300000011921,
+      "tier": "high",
+      "reason": "User: high",
+      "dpr": 1
+    },
+    {
+      "at": 11678.399999976158,
+      "tier": "medium",
+      "reason": "User: medium",
+      "dpr": 0.9572256077840432
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+.museum-modal:has(.core-ai){justify-content:flex-end;background:#05080d70;backdrop-filter:none}
+.museum-modal-panel:has(.core-ai){width:min(430px,100%);height:min(760px,100%);border-color:#947446;background:#101419f5;box-shadow:0 15px 60px #0008}
+.core-ai{min-height:0;height:100%;display:flex;flex-direction:column;color:#e8e5dc}
+.core-ai h2{font-weight:500}.core-ai-badge{font-size:11px;color:#edc287;display:block;margin-bottom:5px}
+.core-ai-context{padding:12px 16px;border-bottom:1px solid #d5b47733;flex-shrink:0}.core-ai-context small,.core-ai-message small{font-size:11px;color:#bcb5a6}.core-ai-context strong{display:block;font-size:14px;margin:5px 0}.core-ai-context p{font-size:12px;line-height:1.7;color:#bbbcb5}
+.core-ai-log{flex:1;min-height:70px;overflow:auto;overscroll-behavior:contain;padding:12px 16px;scrollbar-width:thin}.core-ai-message{font-size:13px;line-height:1.9;padding:9px 12px;margin-bottom:12px;border-inline-start:2px solid #c2a066;background:#ddbb7507;overflow-wrap:anywhere}.core-ai-message[data-role=user]{border-color:#64747c;background:#bcd4df08}.core-ai-message p{white-space:pre-wrap}.core-ai-log [role=alert]{font-size:13px;line-height:1.8;color:#f0bc9a}.core-ai-preparing{font-size:12px;color:#edc287;animation:core-prepare 1s ease-in-out infinite alternate}
+.core-ai-suggestions{display:flex;gap:6px;padding:8px 16px;flex-wrap:wrap}.core-ai-suggestions button{border:1px solid #6f624a;padding:6px 9px;font-size:12px;line-height:1.7;text-align:start}.core-ai-clear{font-size:11px;color:#b9b5aa;align-self:flex-start;padding:4px 16px}.core-ai button:focus-visible{outline-color:#e8b96e}
+@keyframes core-prepare{from{opacity:.55}to{opacity:1}}
+@media(prefers-reduced-motion:reduce){.core-ai-preparing{animation:none}}
+@media(max-width:767px){.museum-modal:has(.core-ai){align-items:flex-end;padding:8px}.museum-modal-panel:has(.core-ai){height:min(640px,100%)}.core-ai-context{padding:8px 12px}.core-ai-context p{font-size:11px}.core-ai-suggestions{padding:4px 12px}.core-ai-log{padding:8px 12px}.core-ai-suggestions button{min-height:44px}.core-ai-message{font-size:13px}}

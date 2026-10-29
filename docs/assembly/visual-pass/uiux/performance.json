@@ -1,0 +1,32 @@
+{
+  "initial": {
+    "frameloop": "always",
+    "geometries": 58,
+    "textures": 12,
+    "calls": 560,
+    "triangles": 76298,
+    "programs": 14,
+    "dpr": 1,
+    "renderer": "WebKit WebGL",
+    "avg": 6.799999997019768,
+    "p95": 10.400000005960464,
+    "over33": 0,
+    "samples": 2,
+    "fps": 147.05882359386317
+  },
+  "orbit": {
+    "frameloop": "always",
+    "geometries": 58,
+    "textures": 12,
+    "calls": 560,
+    "triangles": 76298,
+    "programs": 14,
+    "dpr": 1,
+    "renderer": "WebKit WebGL",
+    "avg": 1057.75,
+    "p95": 1065.5,
+    "over33": 2,
+    "samples": 2,
+    "fps": 0.9454029780193808
+  }
+}

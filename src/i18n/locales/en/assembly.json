@@ -1,0 +1,446 @@
+{
+  "title": "PC Assembly Lab",
+  "heading": "Build it. Understand it.",
+  "return": "Return to museum",
+  "reference": "REFERENCE 01 · mATX / AM4 / DDR4 / PCIe GPU / SATA SSD / ATX PSU",
+  "inventory": "Hardware tray",
+  "connections": "Cable connections",
+  "guide": "Assembly guidance",
+  "guided": "Guided assembly",
+  "free": "Free assembly",
+  "recommended": "RECOMMENDED NEXT",
+  "selected": "COMPONENT DETAILS",
+  "ready": "Ready for power",
+  "readyHint": "Every component and connection is in place. Run the power-on check.",
+  "tray": "ON TRAY",
+  "installed": "INSTALLED",
+  "installAt": "INSTALL AT",
+  "focus": "Focus component",
+  "remove": "Remove part",
+  "twoEnds": "Connect both labelled endpoints. Physical overlap does not make an electrical connection.",
+  "disconnect": "Disconnect cable",
+  "showNext": "Show recommended part",
+  "interactionHint": "Drag hardware onto its highlighted mount, or select a part and choose its target.",
+  "restored": "Your saved build has been restored. Power remains off until you run the checks.",
+  "diagnostics": "Power-on diagnostics",
+  "missingPart": "Install",
+  "missingCable": "Connect",
+  "progress": "Assembly progress",
+  "panelRemoved": "Panel removed",
+  "panelAttached": "Panel attached",
+  "restart": "Restart",
+  "powerOn": "Power on",
+  "powerOff": "Power off",
+  "starting": "Starting…",
+  "welcome": "Welcome to CORE",
+  "success": "Assembly Completed Successfully",
+  "runningHint": "Explore your running build. Turn it off before changing hardware.",
+  "simulation": "Educational hardware simulation · not an electrical or firmware emulator",
+  "noSignal": "No signal",
+  "preparing": "Preparing the workstation…",
+  "camera": "Workstation camera",
+  "orbitLeft": "Orbit left",
+  "orbitRight": "Orbit right",
+  "top": "Top",
+  "back": "Back",
+  "zoomIn": "Zoom in",
+  "zoomOut": "Zoom out",
+  "resetCamera": "Reset camera",
+  "returnView": "Return view",
+  "issues": {
+    "wrongTarget": "This part does not fit that mount. Choose its amber target.",
+    "occupied": "This slot is already occupied. Remove its module first.",
+    "dependency": "Complete or remove the indicated dependency first.",
+    "coolerBlocks": "Remove the cooler before accessing the CPU socket.",
+    "disconnectFirst": "Unplug the indicated cable before removing the component.",
+    "powerOff": "Turn off the simulated PC before changing hardware.",
+    "panelClosed": "Remove the side panel before installing internal parts.",
+    "missingPart": "Power-on check failed: a required part is missing.",
+    "missingCable": "Power-on check failed: a required connection is missing.",
+    "wrongPort": "Connector mismatch. Use the two endpoints labelled for this cable.",
+    "pickPart": "Select a cable before choosing its endpoints.",
+    "peripheralsFirst": "Unplug peripherals before changing the required hardware or cables.",
+    "fixedPart": "The display is fixed. Connect its power and display cables.",
+    "exploreOnly": "Switch to Assemble to modify the build."
+  },
+  "slots": {
+    "motherboard": "mATX standoffs",
+    "cpu": "AM4 CPU socket",
+    "cooler": "CPU cooler mounting points",
+    "ram1": "DIMM A2",
+    "dimmB2": "DIMM B2",
+    "gpu": "PCIe x16 slot",
+    "ssd": "2.5-inch drive tray",
+    "psu": "ATX PSU bay",
+    "fanFront": "Front intake mount",
+    "fanRear": "Rear exhaust mount",
+    "monitor": "Monitor station"
+  },
+  "parts": {
+    "motherboard": {
+      "name": "Motherboard",
+      "about": "The mATX board links the processor, memory, storage and expansion hardware.",
+      "hint": "Seat it on the case standoffs with the rear I/O toward the back."
+    },
+    "cpu": {
+      "name": "AM4 CPU",
+      "about": "The reference processor uses an AM4 socket and compatible DDR4 memory.",
+      "hint": "Match the gold corner with the socket key. Install before the cooler."
+    },
+    "cooler": {
+      "name": "CPU cooler",
+      "about": "The cooler transfers heat from the processor into its fins and airflow.",
+      "hint": "Seat the contact plate over the CPU, then connect CPU_FAN."
+    },
+    "ram1": {
+      "name": "DDR4 module 1",
+      "about": "Working memory holds data used by the running system.",
+      "hint": "Align the keyed contact edge with A2 or B2. Each slot holds one module."
+    },
+    "ram2": {
+      "name": "DDR4 module 2",
+      "about": "A matching second DDR4 module completes the reference memory pair.",
+      "hint": "Use the other highlighted DIMM slot; occupied slots cannot be reused."
+    },
+    "gpu": {
+      "name": "Graphics card",
+      "about": "A discrete PCIe graphics card supplies the monitor signal in this reference build.",
+      "hint": "Seat the edge connector in PCIe x16, align rear outputs, and connect auxiliary power."
+    },
+    "ssd": {
+      "name": "SATA SSD",
+      "about": "This 2.5-inch SSD uses separate SATA data and SATA power connections.",
+      "hint": "Mount it on the drive tray above the PSU shroud. Connect both cables."
+    },
+    "psu": {
+      "name": "ATX power supply",
+      "about": "The ATX supply distributes power to the motherboard, GPU and drive.",
+      "hint": "Fit it in the lower rear bay. AC power is separate from internal DC cables."
+    },
+    "fanFront": {
+      "name": "Front intake fan",
+      "about": "The front fan brings air into the case.",
+      "hint": "Fit the front mount, then connect its motherboard fan header."
+    },
+    "fanRear": {
+      "name": "Rear exhaust fan",
+      "about": "The rear fan carries warmed air out of the case.",
+      "hint": "Fit the upper rear mount and connect its own fan header."
+    },
+    "monitor": {
+      "name": "Monitor",
+      "about": "The external display needs both power and a signal from the graphics card.",
+      "hint": "The display stays at its station. Connect GPU output and monitor power, then run the power-on check."
+    }
+  },
+  "cables": {
+    "atx": {
+      "name": "24-pin ATX",
+      "about": "Main motherboard power: PSU ATX output to the board's 24-pin connector."
+    },
+    "eps": {
+      "name": "8-pin CPU EPS",
+      "about": "Dedicated CPU power. EPS is distinct from the GPU power connector."
+    },
+    "pcie": {
+      "name": "GPU auxiliary power",
+      "about": "Connect the PSU PCIe lead to the graphics card. Do not substitute CPU EPS."
+    },
+    "sataData": {
+      "name": "SATA data",
+      "about": "A data path from the motherboard SATA port to the SSD."
+    },
+    "sataPower": {
+      "name": "SATA power",
+      "about": "A separate PSU lead powers the SATA SSD."
+    },
+    "display": {
+      "name": "Display cable",
+      "about": "Connect the graphics card output to the monitor input."
+    },
+    "psuAC": {
+      "name": "PSU AC power",
+      "about": "Connect the external power inlet to the workstation's simulated outlet."
+    },
+    "monitorAC": {
+      "name": "Monitor power",
+      "about": "The monitor has its own external power connection."
+    },
+    "frontFan": {
+      "name": "Front fan lead",
+      "about": "Connect the intake fan to SYS_FAN 1."
+    },
+    "rearFan": {
+      "name": "Rear fan lead",
+      "about": "Connect the exhaust fan to SYS_FAN 2."
+    },
+    "coolerFan": {
+      "name": "CPU fan lead",
+      "about": "Connect the cooler fan to CPU_FAN, separate from CPU EPS power."
+    }
+  },
+  "ports": {
+    "psu": {
+      "atx": "PSU · ATX output",
+      "eps": "PSU · CPU EPS output",
+      "pcie": "PSU · PCIe output",
+      "sata": "PSU · SATA output",
+      "ac": "PSU · AC inlet"
+    },
+    "board": {
+      "atx": "Board · 24-pin ATX",
+      "eps": "Board · 8-pin EPS",
+      "sata": "Board · SATA data",
+      "fan1": "Board · SYS_FAN 1",
+      "fan2": "Board · SYS_FAN 2",
+      "cpuFan": "Board · CPU_FAN"
+    },
+    "gpu": {
+      "power": "GPU · auxiliary power",
+      "display": "GPU · display output"
+    },
+    "ssd": {
+      "data": "SSD · SATA data",
+      "power": "SSD · SATA power"
+    },
+    "monitor": {
+      "display": "Monitor · display input",
+      "ac": "Monitor · power inlet"
+    },
+    "wall": {
+      "psu": "Outlet · PC power",
+      "monitor": "Outlet · monitor power"
+    },
+    "fanFront": {
+      "lead": "Intake fan · lead"
+    },
+    "fanRear": {
+      "lead": "Exhaust fan · lead"
+    },
+    "cooler": {
+      "lead": "Cooler · fan lead"
+    }
+  },
+  "front": "Front",
+  "sideLeft": "Left",
+  "sideRight": "Right",
+  "iso": "Iso",
+  "io": "Front I/O",
+  "staging": "Parts mat",
+  "closePanel": "Close side panel",
+  "openPanel": "Open side panel",
+  "optical": "CD / DVD drive",
+  "optionalGroup": "Front panel & optical drive",
+  "optionalHint": "Optional additions are separate from the required build. Front ports need their internal leads. Devices respond only after a complete, running base build.",
+  "optionalProgress": "{{count}} / {{total}} optional leads",
+  "opticalHint": "Fit the optional drive in the upper 5.25-inch front bay. Connect its separate SATA data and power leads. Open the tray to insert a disc.",
+  "installOptical": "Install in optical bay",
+  "openTray": "Open optical tray",
+  "closeTray": "Close optical tray",
+  "peripheralsTitle": "Peripherals · simulation",
+  "trayTabs": "Hardware groups",
+  "choosePort": "Choose a port",
+  "connectedTo": "Connected to",
+  "unplug": "Unplug device",
+  "notConnected": "Not connected: attach this front port’s internal lead first.",
+  "portReady": "Port available. Compatible devices respond when the completed PC is running.",
+  "frontPanelPower": "Front panel power / reset",
+  "typeTest": "Simulated keyboard input",
+  "cursorX": "Simulated cursor · horizontal",
+  "cursorY": "Simulated cursor · vertical",
+  "simulatedMeter": "Microphone level · simulated",
+  "legend": "Connector legend",
+  "legendHint": "Colors are an educational convention. Match connector shape and labelled endpoints, never color alone.",
+  "legendPower": "Power · ATX 24, EPS 4+4, PCIe 6+2, SATA L, IEC",
+  "legendData": "Data · SATA L, display, USB headers",
+  "legendAudio": "Signal · fan headers, HD Audio, F_PANEL",
+  "tabs": {
+    "parts": "Required",
+    "optional": "Optional",
+    "peripherals": "Devices"
+  },
+  "optionalCables": {
+    "frontPanel": "F_PANEL · switches & LEDs",
+    "frontUsb": "Front USB-A · USB 3.x header",
+    "frontUsbC": "Front USB-C · Type-E header",
+    "frontAudio": "Front HD Audio",
+    "opticalData": "Optical SATA data",
+    "opticalPower": "Optical SATA power"
+  },
+  "devices": {
+    "keyboard": "USB keyboard",
+    "mouse": "USB mouse",
+    "flash": "USB-A storage",
+    "flashC": "USB-C storage",
+    "headphones": "Headphones · 3.5 mm",
+    "microphone": "Microphone · 3.5 mm",
+    "disc": "CD / DVD disc"
+  },
+  "plugKinds": {
+    "usbA": "USB-A",
+    "usbC": "USB-C",
+    "headphones": "3.5 mm · output",
+    "microphone": "3.5 mm · input",
+    "disc": "Optical disc"
+  },
+  "plugHints": {
+    "usbA": "Use a USB-A socket. Front USB-A needs its internal USB header lead.",
+    "usbC": "Use USB-C only. The front USB-C header lead must be attached.",
+    "headphones": "Use the headphone / green line-out jack, not the microphone input.",
+    "microphone": "This is a microphone plug; use the pink microphone jack.",
+    "disc": "Use the open optical tray with its SATA data and power attached."
+  },
+  "devicePorts": {
+    "frontUsb1": "Front · USB-A 1",
+    "frontUsb2": "Front · USB-A 2",
+    "frontUsbC": "Front · USB-C",
+    "frontHeadphones": "Front · headphones",
+    "frontMic": "Front · microphone",
+    "rearUsb1": "Rear · USB-A 1",
+    "rearUsb2": "Rear · USB-A 2",
+    "rearLineOut": "Rear · green line out",
+    "rearLineIn": "Rear · blue line in",
+    "rearMic": "Rear · pink microphone",
+    "ethernet": "Rear · Ethernet",
+    "opticalTray": "Optical drive · tray"
+  },
+  "extensionIssues": {
+    "completeFirst": "Complete the required 22/22 build first. Optional parts never change that requirement.",
+    "powerFirst": "Power on the completed PC to use peripherals.",
+    "portMismatch": "This plug does not fit this port. Follow the compatible connector hint.",
+    "portBusy": "This port is occupied. Unplug its device first.",
+    "leadMissing": "Front port not connected. Attach the corresponding internal lead first.",
+    "opticalMissing": "Install the optical drive first.",
+    "trayClosed": "Open the optical tray before inserting a disc.",
+    "driveUnwired": "Connect optical SATA data and SATA power first.",
+    "panelClosed": "Open the side panel before changing internal hardware.",
+    "powerOff": "Turn off the simulated PC before changing internal hardware.",
+    "dependency": "Install the motherboard / optical drive and PSU required by this lead.",
+    "disconnectFirst": "Unplug the drive cables and remove its disc first.",
+    "wrongPort": "Use the two labelled endpoints for this optional lead."
+  },
+  "response": {
+    "keyboard": "Keyboard connected",
+    "mouse": "Cursor control ready",
+    "flash": "USB storage detected",
+    "flashC": "USB-C storage detected",
+    "headphones": "Audio output connected · simulated",
+    "microphone": "Microphone input · simulated",
+    "disc": "Disc detected"
+  },
+  "optionalPorts": {
+    "front": {
+      "panel": "Case · switches and LEDs",
+      "usb": "Case · USB-A lead",
+      "usbC": "Case · USB-C lead",
+      "audio": "Case · HD Audio lead"
+    },
+    "board": {
+      "panel": "Board · F_PANEL",
+      "usb": "Board · USB 3.x header",
+      "usbC": "Board · Type-E USB-C",
+      "audio": "Board · front audio",
+      "optical": "Board · spare SATA"
+    },
+    "optical": {
+      "data": "Drive · SATA data",
+      "power": "Drive · SATA power"
+    },
+    "psu": {
+      "optical": "PSU · spare SATA power"
+    }
+  },
+  "fixedMonitor": "Display station · fixed",
+  "collapseTray": "Collapse hardware tray",
+  "expandTray": "Expand hardware tray",
+  "collapseGuide": "Collapse guidance",
+  "expandGuide": "Expand guidance",
+  "displayHint": "Connect GPU output and power on the assembled PC.",
+  "learning": {
+    "label": "Learning mode",
+    "explore": "Explore",
+    "assemble": "Assemble",
+    "troubleshoot": "Troubleshoot",
+    "exploreHint": "Select hardware to inspect it and learn its role. Switch to Assemble to change the build."
+  },
+  "trouble": {
+    "simulated": "SIMULATED FAULTS",
+    "choose": "Find the cause. Test the repair.",
+    "problem": "Choose a problem",
+    "copyNotice": "Faults run in a separate copy. Your assembly, optional devices and saved progress are kept for your return.",
+    "introduce": "Introduce fault into my completed build",
+    "incomplete": "Complete the assembly first, or use a separate reference practice system.",
+    "practice": "Use a reference practice system",
+    "practiceCopy": "Reference practice copy · original build preserved",
+    "yourCopy": "Copy of your completed build · original preserved",
+    "checklist": "Diagnostic progress",
+    "steps": {
+      "observe": "Observe",
+      "answer": "Question",
+      "inspect": "Inspect",
+      "test": "Restart"
+    },
+    "observed": "I observed the symptom",
+    "yes": "Yes",
+    "no": "No",
+    "correctObservation": "That matches the simulated state at the time of your check.",
+    "checkAgain": "That differs from the simulated state. Inspect the highlighted path and try again.",
+    "inspectRepair": "Inspect and open repair controls",
+    "hint": "Show a diagnostic hint",
+    "test": "Test system",
+    "success": "Repair verified — startup successful",
+    "failed": "Startup check failed",
+    "powerOffRepair": "Switch simulated power off before changing parts or connections.",
+    "repairThenTest": "Use the repair controls, then test the system again.",
+    "notTested": "Run the test to observe the simulated failure.",
+    "reset": "Reset this scenario",
+    "return": "Return to my assembly",
+    "faultSignal": "Simulated failure",
+    "screens": {
+      "post": "POST check incomplete",
+      "thermal": "CPU_FAN check failed",
+      "storage": "Storage path unavailable"
+    }
+  },
+  "desktop": {
+    "label": "Simulated desktop",
+    "boot": "Starting the operating system",
+    "files": "Files",
+    "browser": "Browser",
+    "notes": "Notepad",
+    "search": "Search",
+    "notice": "Educational desktop simulation",
+    "notepadInput": "Monitor notepad",
+    "typeHint": "Click the monitor and type here. Escape releases keyboard focus.",
+    "openNotepad": "Focus monitor notepad",
+    "pointerHint": "Move your pointer over the monitor to control its cursor."
+  },
+  "monitorView": "Monitor",
+  "ui": {
+    "dock": "Lab tools",
+    "parts": "Parts",
+    "cables": "Cables",
+    "devices": "Peripherals",
+    "closeDock": "Collapse lab dock",
+    "more": "More details",
+    "viewMenu": "Open camera controls",
+    "closeViews": "Close camera controls",
+    "views": "View",
+    "focus": "Focus",
+    "sheetSize": "Change sheet height: peek, half, full"
+  },
+  "auto": {
+    "assemble": "Auto Assemble",
+    "cables": "Auto Connect Cables",
+    "cancel": "Cancel automation",
+    "running": "Installing",
+    "complete": "Automation complete",
+    "cancelled": "Cancelled · completed steps kept",
+    "blocked": "Cannot continue",
+    "notReady": "Wait for the workbench to be ready, then try again.",
+    "installAllParts": "Install All Parts",
+    "assembleMode": "Choose Assemble mode to install hardware. Guided and Free assembly are both supported.",
+    "finishDrag": "Finish moving the current part before starting.",
+    "progress": "Automatic installation progress"
+  }
+}

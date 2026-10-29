@@ -10,6 +10,8 @@ major_version = 17
 enabled = true
 
 [auth]
+site_url = "http://127.0.0.1:5191"
+additional_redirect_urls = ["https://127.0.0.1:3000", "http://127.0.0.1:5191/reset-password"]
 secret_key = "env(CORE_LOCAL_AUTH_SECRET_KEY)"
 jwt_secret = "env(CORE_LOCAL_AUTH_JWT_SECRET)"
 anon_key = "env(CORE_LOCAL_AUTH_ANON_KEY)"
@@ -20,3 +22,8 @@ enabled = true
 enabled = true
 verify_jwt = true
 entrypoint = "./functions/admin-users/index.ts"
+
+[functions.core-ai]
+enabled = true
+verify_jwt = true
+entrypoint = "./functions/core-ai/index.ts"

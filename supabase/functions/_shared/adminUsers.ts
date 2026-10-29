@@ -1,4 +1,5 @@
-export type AdminRole = 'user' | 'editor' | 'admin'
+import {databaseRole, type DatabaseRole} from './roles.ts'
+export type AdminRole = DatabaseRole
 export type UserStatus = 'active' | 'invited' | 'unconfirmed' | 'banned' | 'deleting'
 export interface AdminUser {
     id: string; email: string | null; fullName: string | null; role: AdminRole
@@ -7,7 +8,12 @@ export interface AdminUser {
 }
 export interface UserQuery {page: number; perPage: number; search: string; role: 'all' | AdminRole; status: 'all' | UserStatus}
 export interface UserPage {users: AdminUser[]; total: number; page: number; perPage: number; pendingOperation?: {operationId:string;action:'invite'|'delete'} | null}
-export interface UserCapabilities {canInvite: boolean; canEdit: boolean; canChangeRoles: boolean; canDelete: boolean}
+export interface UserCapabilities {
+    canInvite: boolean; canEdit: boolean; canChangeRoles: boolean; canDelete: boolean
+    // Missing on an older deployed Edge contract: reads work, mutation controls fail closed.
+    supportedRoles?: AdminRole[]
+    inviteUnavailableReason?: 'writesDisabled' | 'inviteConfiguration' | null
+}
 export interface UserFields {fullName: string; preferredLocale: 'en' | 'fa'; role: AdminRole}
 export type UserRequest = {action: 'capabilities'} | ({action: 'list'} & UserQuery)
     | ({action: 'invite'; operationId: string; email: string} & UserFields)
@@ -36,7 +42,7 @@ export function validateUserRequest(value: unknown): UserRequest {
     if (action === 'capabilities') return {action}
     if (action === 'list') {
         if (!Number.isInteger(data.page) || Number(data.page) < 1 || Number(data.page) > 100000 || !Number.isInteger(data.perPage) || ![10,25,50].includes(Number(data.perPage))) return fail()
-        if (!['all','user','editor','admin'].includes(String(data.role)) || !['all','active','invited','unconfirmed','banned','deleting'].includes(String(data.status))) return fail()
+        if ((data.role !== 'all' && !databaseRole(data.role)) || !['all','active','invited','unconfirmed','banned','deleting'].includes(String(data.status))) return fail()
         return {action, page: Number(data.page), perPage: Number(data.perPage), search: text('search',200), role: data.role as UserQuery['role'], status: data.status as UserQuery['status']}
     }
     if (!userUuid(data.operationId)) return fail()
@@ -51,7 +57,7 @@ export function validateUserRequest(value: unknown): UserRequest {
     }
     if (action !== 'invite' && action !== 'update') return fail()
     const fullName = text('fullName',200)
-    if (!['user','editor','admin'].includes(String(data.role)) || !['en','fa'].includes(String(data.preferredLocale))) return fail()
+    if (!databaseRole(data.role) || !['en','fa'].includes(String(data.preferredLocale))) return fail()
     const fields = {fullName, preferredLocale: data.preferredLocale as 'en' | 'fa', role: data.role as AdminRole}
     if (action === 'invite') {
         const email = text('email',254).toLowerCase()

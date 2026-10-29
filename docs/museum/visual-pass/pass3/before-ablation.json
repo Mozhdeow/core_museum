@@ -1,0 +1,24 @@
+{
+  "foundFX": true,
+  "foundReflection": true,
+  "full": {
+    "average": 65.93770491744648,
+    "p95": 76.59999999999854,
+    "frames": 61
+  },
+  "noFX": {
+    "average": 37.07685185174146,
+    "p95": 55.5,
+    "frames": 108
+  },
+  "noFXOrReflection": {
+    "average": 27.404109588877784,
+    "p95": 41.799999999995634,
+    "frames": 146
+  },
+  "noReflection": {
+    "average": 57.531428571258274,
+    "p95": 69.40000000000146,
+    "frames": 70
+  }
+}

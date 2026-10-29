@@ -1,0 +1,128 @@
+{
+  "entrance": {
+    "calls": 395,
+    "triangles": 43679,
+    "frameMs": 48.51249999552965,
+    "memory": {
+      "geometries": 131,
+      "textures": 56
+    },
+    "lights": {
+      "AmbientLight": 1,
+      "HemisphereLight": 1,
+      "DirectionalLight": 1,
+      "SpotLight": 5,
+      "PointLight": 6,
+      "RectAreaLight": 2
+    },
+    "materials": {
+      "MeshStandardMaterial": 288,
+      "MeshBasicMaterial": 140,
+      "ShaderMaterial": 1,
+      "PointsMaterial": 1,
+      "LineBasicMaterial": 2
+    },
+    "shaderDiagnostics": [],
+    "dpr": 1,
+    "samples": [
+      {
+        "calls": 395,
+        "triangles": 43679
+      },
+      {
+        "calls": 395,
+        "triangles": 43679
+      },
+      {
+        "calls": 395,
+        "triangles": 43679
+      },
+      {
+        "calls": 395,
+        "triangles": 43679
+      },
+      {
+        "calls": 395,
+        "triangles": 43679
+      },
+      {
+        "calls": 395,
+        "triangles": 43679
+      },
+      {
+        "calls": 395,
+        "triangles": 43679
+      },
+      {
+        "calls": 395,
+        "triangles": 43679
+      }
+    ],
+    "tier": "high",
+    "environment": true,
+    "exposure": 0.95
+  },
+  "passage": {
+    "calls": 93,
+    "triangles": 6256,
+    "frameMs": 45.337500005960464,
+    "memory": {
+      "geometries": 98,
+      "textures": 33
+    },
+    "lights": {
+      "AmbientLight": 1,
+      "HemisphereLight": 1,
+      "DirectionalLight": 1,
+      "SpotLight": 5,
+      "PointLight": 6,
+      "RectAreaLight": 2
+    },
+    "materials": {
+      "MeshStandardMaterial": 288,
+      "MeshBasicMaterial": 144,
+      "ShaderMaterial": 1,
+      "PointsMaterial": 1,
+      "LineBasicMaterial": 2
+    },
+    "shaderDiagnostics": [],
+    "dpr": 1,
+    "samples": [
+      {
+        "calls": 93,
+        "triangles": 6256
+      },
+      {
+        "calls": 93,
+        "triangles": 6256
+      },
+      {
+        "calls": 93,
+        "triangles": 6256
+      },
+      {
+        "calls": 93,
+        "triangles": 6256
+      },
+      {
+        "calls": 93,
+        "triangles": 6256
+      },
+      {
+        "calls": 93,
+        "triangles": 6256
+      },
+      {
+        "calls": 93,
+        "triangles": 6256
+      },
+      {
+        "calls": 93,
+        "triangles": 6256
+      }
+    ],
+    "tier": "high",
+    "environment": true,
+    "exposure": 0.95
+  }
+}

@@ -4,11 +4,14 @@ import {Scan, X, RotateCcw, ZoomIn, ZoomOut, Play, Pause, Layers, ChevronDown} f
 import {useMuseumNavigation} from './navigationState'
 import {useCPUExperience} from './cpuExperienceState'
 import {cpuHotspots} from './cpuEducation'
+import {useMuseumStore} from './museumStore'
+import {coreAICopy} from '@/features/coreAI/coreAICopy'
 import './cpuExperience.css'
 
 export function CPUExperienceControls({available,sourceId,realReady,educational=true}: {available:boolean;sourceId:string|null;realReady:boolean;educational?:boolean}) {
  const {t,i18n}=useTranslation('museum',{keyPrefix:'cpuExperience'}),locale=i18n.language==='fa'?'fa':'en'
  const phase=useMuseumNavigation(s=>s.inspection),location=useMuseumNavigation(s=>s.location)
+ const canAsk=useMuseumStore(s=>s.items.some(item=>item.id===sourceId&&item.status==='published'&&item.enableAiCurator!==false))
  const exp=useCPUExperience(),[expanded,setExpanded]=useState(true),exitButton=useRef<HTMLButtonElement>(null)
  const previousFocus=useRef<HTMLElement|null>(null)
  const explanation=useRef<HTMLElement>(null)
@@ -54,6 +57,7 @@ export function CPUExperienceControls({available,sourceId,realReady,educational=
    <button aria-label={t('zoomOut')} onClick={()=>useMuseumNavigation.getState().zoomInspect(1)}><ZoomOut size={17}/></button>
    <button onClick={()=>useMuseumNavigation.getState().resetInspectView()}><RotateCcw size={14}/>{t('resetView')}</button>
    <button onClick={()=>document.querySelector<HTMLCanvasElement>('[data-museum-scene] canvas')?.focus()}>{t('focusArtifact')}</button>
+   {canAsk&&<button disabled={phase!=='active'} onClick={()=>useMuseumNavigation.getState().openOverlay('ai')}>{coreAICopy[locale].title}</button>}
   </div>
    {exp.lesson&&<div className="cpu-playback" aria-label={t('playback')}>
     <span role="status">{t(exp.lesson)} · {t(exp.status)}</span>

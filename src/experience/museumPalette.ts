@@ -6,6 +6,6 @@ export function useMuseumPalette() {
         const css = getComputedStyle(document.documentElement)
         const token = (name: string) => css.getPropertyValue(`--color-${name}`).trim()
         return {orange: token('orange'), amber: token('amber'), cyan: token('cyan'), ink: token('ink'),
-            graphite: '#22272b', steel: '#4b5358', stone: '#30363b', dark: '#101418', light: '#e6e8e8'}
+            graphite: '#292a2c', steel: '#3b3c3e', stone: '#303134', dark: '#202125', light: '#e6dfd4'}
     }, [])
 }

@@ -48,4 +48,5 @@ runtime.serve(createAdminUsersHandler(backend,{
     origins:env('CORE_ADMIN_ALLOWED_ORIGINS').split(',').map(value=>value.trim()).filter(Boolean),
     redirect:env('CORE_INVITE_REDIRECT_URL'),writesEnabled:env('CORE_ADMIN_WRITES_ENABLED') === 'true',
     guardsVerified:env('CORE_ADMIN_GUARDS_VERIFIED') === 'true',
+    deletionEnabled:false,
 }))

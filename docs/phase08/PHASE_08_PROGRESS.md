@@ -418,3 +418,101 @@ node node_modules/@playwright/test/cli.js test --config tests/showcase-final.pla
 ```
 
 Only `tests/showcase-final.spec.ts` and this report changed during acceptance. Landing, museum camera ownership, CMS, backend and the current completed application work were preserved. **Focused frontend visual acceptance passes; real CPU asset acceptance remains separate. Phase 08B has not started.**
+
+## Phase 08B — Entrance opening gallery (2026-10-20)
+
+### Scope and result
+
+The user explicitly authorized Phase 08B in the new Entrance brief and supplied a visual reference. This supersedes the earlier stop-before-08B boundary **only for the Entrance**. The Entrance is now a graphite/bronze opening gallery with a polished dark mineral floor, amber architectural trim, layered ceremonial doorway, orbital ceiling pendant, illuminated glass vitrines, and concise bilingual interpretation graphics. Passage and CPU Hall have not been redesigned.
+
+Six lightweight **educational design studies** introduce a vintage terminal, processor, graphics card, RAM, motherboard and disk storage. They are environmental illustrations, not invented published records, selectable catalog exhibits or replacements for uploaded GLBs. All six cases are beyond the existing ±5.5 m Entrance walking envelope; their closest frame edge is at ±5.59 m. The central route remains open, including the existing rear extension for additional category showcases.
+
+Five wall panels explain Processor, Graphics, Memory, Storage and Motherboard with corresponding restrained hardware engravings. The left introductory panel reads “Computing connects us” and introduces machines, ideas and people; its thematic footer references existing Exhibitions, Collection and Guided Tour features. These are exhibition graphics, not fake menu destinations. CORE / The Connected Archive / Interactive Computer Museum branding frames the original Passage sightline. Two limited historical panels introduce Ada Lovelace's 1843 notes and Alan Turing's 1936 universal-machine concept; the locally served portraits total approximately **196 KiB**, with provenance, public-domain references and content sources in the asset README. The portrait dates are distinct from the work dates on the panels.
+
+### Architecture and performance decisions
+
+- `EntranceGallery` replaces only the former Entrance geometry inside `MuseumArchitecture`. The Passage/CPU JSX suffix, rear category-extension logic, route, collision implementation and navigation owner are retained.
+- Repeated wall, plinth, frame and trim boxes are merged into **four finish batches**. Hardware reuses the existing low-poly preview geometry builder; there are **no new GLB requests**, dependencies or backend contracts.
+- One existing-style **256px planar floor reflection** is retained on desktop; mobile uses a simpler standard material. Procedural mineral veining requires no network texture. Glass uses low-opacity standard materials, without transmission/refraction passes or shadows.
+- Only the suspended orbital element moves slowly. It honors reduced motion, atmosphere pause, paused in-progress tours, hidden documents, Inspect and overlays. It never reads or writes camera transforms.
+- Panel textures redraw after font readiness, locale changes and portrait loading; demand rendering is invalidated for reduced-motion views. Async callbacks are guarded after unmount. Owned textures, merged geometries and materials are disposed on exit.
+- Visual review corrected an initially over-dark floor and a pendant key light positioned inside its sphere; the final captures show floor reflections and a lit solid orbital centerpiece. RAM was fitted within its glass enclosure and displays have explicit support stems.
+
+### Exact files changed in this task
+
+1. `src/experience/MuseumArchitecture.tsx` — connect the Entrance module, retain existing Passage/CPU and rear extension.
+2. `src/experience/EntranceGallery.tsx` — Entrance composition, floor, ceiling pendant, cases, local lighting and EN/FA content.
+3. `src/experience/EntranceArtifacts.tsx` — batched architectural finishes and educational hardware/terminal props with owned resource disposal.
+4. `src/experience/EntrancePanels.tsx` — localized, font-aware canvas graphics and local portrait textures.
+5. `public/images/museum/entrance/ada-lovelace.jpg` — 500px public-domain portrait derivative.
+6. `public/images/museum/entrance/alan-turing.jpg` — 500px public-domain portrait derivative.
+7. `public/images/museum/entrance/README.md` — image provenance, licensing references and historical copy sources.
+8. `tests/entrance.playwright.config.ts` — focused serial Edge/Vite configuration, reusing existing fixtures/configuration.
+9. `tests/entrance.spec.ts` — four Entrance scenarios and requested screenshots.
+10. `docs/phase08/PHASE_08_PROGRESS.md` — this record.
+
+### Focused verification
+
+**Final browser run: 4/4 passed, one Edge worker, 36.9 seconds.** No full regression suite was run.
+
+| Scenario | Evidence |
+| --- | --- |
+| Desktop arrival | Six cases outside the walkable envelope, eight interpretation panels, ceiling hero, one Canvas, EN controls, two local portrait resources, zero storage GLB requests and no page exceptions. On route exit all **17 tracked new resources** dispose: nine graphic/floor textures plus four batch geometries and four batch materials. |
+| Movement and saved Entrance | WASD movement stays in the Entrance; actual reload restores Free Explore position and quaternion. Subsequent Q look uses the existing camera owner and captures the vitrines. |
+| Entrance → Passage | Existing guided route approaches the doorway, Space pauses/resumes, camera settles to the paused target, then crosses into the Passage continuously with one Canvas. |
+| Mobile portrait | 390×844 touch emulation, EN and FA/RTL, no horizontal page overflow, frozen reduced-motion orbital element, simple mobile floor and touch-held forward movement. |
+
+The first development pass had two test timing failures: restoration was sampled before its readiness barrier, and pause was sampled during the existing camera damping. Tests now wait for the established ready phase and allow the original camera to settle before checking that it stays fixed; pose, quaternion and pause assertions remain strict. All four passed after that correction, then passed again after the final visual/resource changes. No camera or persistence code was changed to satisfy these tests.
+
+`tsc -b` and ESLint for all six changed/new TS/TSX files passed. **One final `npm run build` passed** (Vite production bundling: 25.01 seconds). It reports the existing large application chunk / ineffective dynamic-import warnings; no new dependency or bundler workaround was added. Test Vite started normally; no startup recovery or production-preview fallback was needed.
+
+Preservation checks compared pre-task file hashes: `MuseumNavigation.tsx`, `navigationState.ts`, `museumCollision.ts`, `CorridorExhibitions.tsx`, `CPUHall.tsx` and `package.json` are unchanged. The Passage/CPU architecture suffix is byte-equivalent after text decoding. Ignored evidence: `.tmp/phase08b/baseline-hashes.json` and `preservation-checks.json`. No Landing, CMS, Auth/RBAC, Supabase, data, migration or security files were modified.
+
+### Screenshots and visual acceptance
+
+The following actual browser renders were opened and inspected (ignored local evidence under `.tmp/phase08b/`):
+
+- `01-entrance-desktop.png` — initial symmetrical arrival, orbital ceiling, bilingual-capable interpretation, cases and floor reflection.
+- `02-entrance-vitrines.png` — Free Explore view of terminal/GPU/RAM, glass frames, interpretation panels and passage doorway.
+- `03-entrance-doorway.png` — paused approach toward the preserved Passage.
+- `04-entrance-mobile-en.png` — portrait EN arrival with existing compact overlays.
+- `05-entrance-mobile-fa.png` — portrait FA/RTL after touch movement, reduced motion and simplified mobile floor.
+
+The reference was adapted to the existing room and camera route, not recreated as a photorealistic asset pack. Props are recognizable procedural design studies, reflections are intentionally low-resolution/soft, and mobile does not render planar reflections. Narrow views prioritize the forward sightline; side interpretation/cases require looking around rather than fitting the whole gallery into the initial portrait frame. Mobile verification used Edge touch emulation, not a physical phone. Full museum regression and private real-CPU-GLB acceptance remain outside this focused Entrance pass; the earlier actual CPU asset limitation is unchanged. **Phase 08B Entrance implementation is complete; stop here.**
+
+## Visual realism and polish mission — 2026-10-24
+
+The new user mission authorizes visual polish of the existing Entrance/Passage, preserving their layout, camera/navigation, data and backend. Continued the existing Phase 08B working tree. Added generated IBL, procedural PBR surfaces/roughness, smoother imperfect floor reflection, warm local light pools, inexpensive contact AO, tiered atmosphere, framed layered EN/FA wall graphics, animated/camera-facing environmental prototypes, reflective Fresnel-like glass and a compact HUD with Details closed by default. Static Passage batching pays for the additional visual work. No new dependency/network artwork or portrait replacements.
+
+Full audit, exact files, quality tiers, before/after renderer numbers, screenshots and limitations: [`docs/museum/VISUAL_REALISM_PASS.md`](../museum/VISUAL_REALISM_PASS.md). Requested PNG/JSON evidence lives under `docs/museum/visual-pass/`.
+
+- High desktop full-frame calls: Entrance **578 → 506**, Passage **339 → 149**. Low mobile: **261 → 194**, **165 → 131**. Calls meet both budgets; extra high Entrance triangles are documented.
+- **11 museum integration + 7 focused unit tests passed**. Four distinct focused after browser cases passed in serial targeted runs, including motion/reduced motion, HUD/FA/touch targets, Space, Inspect camera return, WebGL recovery and 60-second walking memory. Memory held at **105 geometries / 35 textures**. One existing Landing scroll/entry/reload/cleanup browser case also passed.
+- Typecheck, changed-file lint and production builds passed. Full `npm run lint` retains the same two pre-existing `LandingIntro.tsx:291/:612` errors; no Landing fix or suppression was made. Generated lighting/LTC code is lazy-loaded only in the museum. Existing build warnings remain.
+- No console errors/page exceptions in final fixed-view acceptance. A shared WebGL X4122 precision info log also reproduces on the unchanged Landing, alongside existing renderer deprecations; not a clean-console certification. Physical-device FPS and private CPU asset appearance remain unverified.
+- Checked 77 protected source files: Landing, camera owner/state/route/collision, CPU Hall/schematic, GLB pipeline, CMS/auth/services/Supabase and package contracts remain unchanged.
+- Camera inertia/breathing/FOV work was **deliberately stopped** under the mission's explicit navigation prohibition. It requires separate authorization; no camera changes or new camera writer were introduced. Stop after this visual mission.
+
+## Phase 08B — Entrance wall layout correction — 2026-10-28
+
+Root cause: poster slots and column positions were independently authored; intermediate columns crossed frame bounds, and the rear poster had a different spacing interval. The original mounting height also intersected transverse ceiling trim.
+
+`entranceWallLayout.ts` now derives both walls from the existing 19 m wall and fixed edge columns at Z 3.4 / 19.2. Their inner edges leave **15.64 m** usable length. With unchanged **2.858 m outer beveled frames**, **0.16 m columns** and **0.30 m equal outer margins**, `L = 2M + 4P + 3C + 6G` gives **G = 0.521333 m** per side of each separator. Poster centres: **5.209, 9.269667, 13.330333, 17.391**; intermediate columns: **7.239333, 11.3, 15.360667**. Both walls mirror these coordinates. Uniform centre Y **3.075 m** leaves 0.15 m below the lowest transverse light strip. Poster content, dimensions, artwork and materials are unchanged. Six cases and their local floor contact effects follow their existing matching poster slots; X positions and walking boundaries remain unchanged.
+
+Files: new `src/experience/entranceWallLayout.ts`; updated `EntranceGallery.tsx`, `EntrancePanels.tsx` (frame mesh name for measurement), `entranceBayMap.ts`, `MuseumAtmosphere.tsx`; new `tests/entrance-layout.spec.ts` and config; existing `tests/visual-pass4.test.ts` slot expectation now follows the shared calculation. This progress entry and three PNGs under `docs/phase08/entrance-layout/` complete the evidence.
+
+Verification: **one actual-geometry check passed**, measuring generated frame/merged column/trim/light vertex bounds, four mirrored frames per wall, equal spacing/margins, centred separators, six aligned vitrines and walking clearance. **One focused visual case passed**; opened and inspected `center.png`, `left.png`, `right.png`. The initial hardware-WebGL capture lost its context and was rejected despite the test runner reporting success; added renderer-readiness/context-overlay assertions and reran only the visual case once using test-only SwiftShader. Final captures show the scene, with no page exceptions. TypeScript and changed-file ESLint passed. No broad suites or production build were run.
+
+Limitations: no recording accompanied this request. Final visual acceptance uses desktop software WebGL, not hardware-GPU reliability or mobile certification. No camera/navigation, Passage, CPU Hall, Landing, content/translation, CMS, Auth, backend, package or asset replacement changes were made for this correction; prior uncommitted work was preserved. Stop after this correction.
+
+## Cinematic Elevator Doors Gallery — 2026-10-28
+
+The Gallery action now appears only for a published selected UUID whose enabled gallery contains associated, nonempty image records. Catalog hydration joins `gallery_images.item_id` to the item ID in existing database sort order and ignores empty storage paths; covers, models and descriptions never supply gallery media. The existing catalog refresh resolves the list again, and changing item or gallery identity tears down pending loads and the overlay.
+
+`GalleryOverlay` now hosts a CORE graphite/amber DOM elevator with a scrollable numbered index, EN/FA controls and actual catalog captions. `useElevatorGallery` owns one GSAP context/timeline: close (0.44 s), travel (0.7 s), commit/load behind closed doors and open (0.62 s); rapid selections coalesce to the latest request. A single image element expands and returns with uniform scaling (0.52 s), so neither its identity nor aspect ratio changes. Reduced motion settles immediately. Loading and image failure are distinct; failure permits retry and navigation. Only the next image is preloaded. MuseumOverlay retains the Canvas and navigation lock, confines focus, locks scrolling, handles Escape in two stages and restores the initiating focus after cleanup, including React Strict Mode.
+
+Files: `src/features/gallery/{GalleryOverlay.tsx,useElevatorGallery.ts, galleryImages.ts,elevatorGallery.css}`; `src/pages/Museum/MuseumPage.tsx`; `src/features/museum/{MuseumOverlay.tsx,exhibitPresentation.ts}`; `src/lib/services/supabase/SupabaseMuseumItemsService.ts`; museum EN/FA locale files; `tests/elevator-gallery.spec.ts` and its Playwright config; updated gallery expectations in `tests/museum-final-qa.spec.ts`. Three test-fixture captures are in `docs/phase08/elevator-gallery/`.
+
+Verification: **four focused browser scenarios passed**, in targeted runs: unresolved/empty/disabled and foreign-UUID galleries; closed-door source switching, rapid choices, Step Inside/return, focus/camera/Canvas preservation and an in-flight item switch; a failed image, retry, selection and catalog refresh; and 12-image Persian mobile with reduced motion and keyboard selection. One existing targeted presentation unit test also passed, preserving direct Node TypeScript imports. The first run exposed a return-focus defect and a software-rendering timeout; the focus implementation was corrected and affected scenarios rerun. The follow-up exposed Strict Mode opener restoration and a cached-image test assumption; both were corrected, and the final affected case passed with a genuinely held uncached request. Typecheck, changed-file ESLint and one production build passed; the existing large-chunk and mixed dynamic/static import warnings remain. An initial typecheck briefly saw an unrelated unused Assembly type while that file was being edited separately; the final build passed without changing that file for this task.
+
+The supplied message did not include the two videos or standalone component source; the public reference page and its described interaction were used, so no frame-by-frame video comparison was possible. Browser verification used mocked Supabase data, local existing images and desktop software WebGL/mobile emulation, not production data or a physical device. No database, security configuration, package, external asset or unrelated museum scene was changed. Stop after the gallery redesign.

@@ -1,0 +1,182 @@
+{
+  "entrance": {
+    "calls": 116,
+    "triangles": 14963,
+    "frameMs": 7.649999998509884,
+    "memory": {
+      "geometries": 97,
+      "textures": 41
+    },
+    "lights": {
+      "AmbientLight": 1,
+      "HemisphereLight": 1,
+      "DirectionalLight": 1,
+      "PointLight": 5,
+      "SpotLight": 3
+    },
+    "materials": {
+      "MeshStandardMaterial": 289,
+      "MeshBasicMaterial": 137,
+      "LineBasicMaterial": 2
+    },
+    "shaderDiagnostics": [],
+    "dpr": 1,
+    "samples": [
+      {
+        "calls": 116,
+        "triangles": 14963
+      },
+      {
+        "calls": 116,
+        "triangles": 14963
+      },
+      {
+        "calls": 116,
+        "triangles": 14963
+      },
+      {
+        "calls": 116,
+        "triangles": 14963
+      },
+      {
+        "calls": 116,
+        "triangles": 14963
+      },
+      {
+        "calls": 116,
+        "triangles": 14963
+      },
+      {
+        "calls": 116,
+        "triangles": 14963
+      },
+      {
+        "calls": 116,
+        "triangles": 14963
+      }
+    ],
+    "tier": "low",
+    "environment": true,
+    "exposure": 0.9627185791497319
+  },
+  "passage": {
+    "calls": 48,
+    "triangles": 4283,
+    "frameMs": 6.675000004470348,
+    "memory": {
+      "geometries": 96,
+      "textures": 41
+    },
+    "lights": {
+      "AmbientLight": 1,
+      "HemisphereLight": 1,
+      "DirectionalLight": 1,
+      "PointLight": 5,
+      "SpotLight": 3
+    },
+    "materials": {
+      "MeshStandardMaterial": 289,
+      "MeshBasicMaterial": 137,
+      "LineBasicMaterial": 2
+    },
+    "shaderDiagnostics": [],
+    "dpr": 1,
+    "samples": [
+      {
+        "calls": 48,
+        "triangles": 4283
+      },
+      {
+        "calls": 48,
+        "triangles": 4283
+      },
+      {
+        "calls": 48,
+        "triangles": 4283
+      },
+      {
+        "calls": 48,
+        "triangles": 4283
+      },
+      {
+        "calls": 48,
+        "triangles": 4283
+      },
+      {
+        "calls": 48,
+        "triangles": 4283
+      },
+      {
+        "calls": 48,
+        "triangles": 4283
+      },
+      {
+        "calls": 48,
+        "triangles": 4283
+      }
+    ],
+    "tier": "low",
+    "environment": true,
+    "exposure": 1.117965816762776
+  },
+  "cpu": {
+    "calls": 27,
+    "triangles": 3213,
+    "frameMs": 6.937499992549419,
+    "memory": {
+      "geometries": 91,
+      "textures": 41
+    },
+    "lights": {
+      "AmbientLight": 1,
+      "HemisphereLight": 1,
+      "DirectionalLight": 1,
+      "PointLight": 5,
+      "SpotLight": 3
+    },
+    "materials": {
+      "MeshStandardMaterial": 289,
+      "MeshBasicMaterial": 137,
+      "LineBasicMaterial": 2
+    },
+    "shaderDiagnostics": [],
+    "dpr": 1,
+    "samples": [
+      {
+        "calls": 27,
+        "triangles": 3213
+      },
+      {
+        "calls": 27,
+        "triangles": 3213
+      },
+      {
+        "calls": 27,
+        "triangles": 3213
+      },
+      {
+        "calls": 27,
+        "triangles": 3213
+      },
+      {
+        "calls": 27,
+        "triangles": 3213
+      },
+      {
+        "calls": 27,
+        "triangles": 3213
+      },
+      {
+        "calls": 27,
+        "triangles": 3213
+      },
+      {
+        "calls": 27,
+        "triangles": 3213
+      }
+    ],
+    "tier": "low",
+    "environment": true,
+    "exposure": 0.9794476700288629
+  }
+}

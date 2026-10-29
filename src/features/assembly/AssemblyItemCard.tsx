@@ -1,0 +1,23 @@
+import {optionalCableIds} from './assemblyExtensions'
+import {ChevronRight,Focus,Undo2,ArrowRight} from 'lucide-react'
+import {useTranslation} from 'react-i18next'
+import {ExtensionGuide,PeripheralFeedback} from './AssemblyExtensionsPanel'
+import {useAssembly,nextAssembly,isPart} from './assemblyStore'
+import {parts,cables,partIds,type SlotId,type PartId} from './assemblyDefinition'
+
+/** Presentation of the accepted installation/connection controls. */
+export function AssemblyItemCard(){
+ const {t}=useTranslation('assembly'),state=useAssembly(),selected=state.selected,next=nextAssembly(state),active=selected??next,part=isPart(selected)?selected:null,wire=selected&&!isPart(selected)?cables[selected]:null,exploring=state.learningMode==='explore'
+ const label=(id:NonNullable<typeof selected>)=>t(`${isPart(id)?'parts':'cables'}.${id}.name`)
+ const drop=(event:React.DragEvent,slot:SlotId)=>{event.preventDefault();const id=event.dataTransfer.getData('application/core-part');if(partIds.includes(id as PartId)){state.select(id as PartId);state.install(id as PartId,slot)}}
+ return <article className="assembly-item-card assembly-guide" aria-label={t('guide')}>
+   {state.trayTab==='parts'?<><span className="assembly-eyebrow">{t(state.mode==='guided'&&!selected?'recommended':'selected')}</span><h2>{active?label(active):t('ready')}</h2>
+   {part&&<><div className="assembly-targets">{!exploring&&part!=='monitor'&&!state.installed[part]&&parts[part].targets.map(slot=><button key={slot} data-slot-button={slot} onDragOver={e=>e.preventDefault()} onDrop={e=>drop(e,slot)} onClick={()=>state.install(part,slot)}><span>{t('installAt')}</span><strong>{t(`slots.${slot}`)}</strong><ChevronRight size={15}/></button>)}</div><div className="assembly-part-actions"><button onClick={()=>state.command('focus',part)}><Focus size={14}/>{t('focus')}</button>{!exploring&&part!=='monitor'&&state.installed[part]&&<button onClick={()=>state.remove(part)}><Undo2 size={14}/>{t('remove')}</button>}</div></>}
+   {wire&&!exploring&&<><p className="assembly-port-hint">{t('twoEnds')}</p><div className="assembly-endpoints">{wire.ends.map(port=><button key={port} data-port-button={port} aria-pressed={state.firstPort===port} onDragOver={e=>e.preventDefault()} onDrop={e=>{e.preventDefault();if(e.dataTransfer.getData('application/core-cable')===wire.id)state.port(port)}} onClick={()=>state.port(port)}><span className={state.connected.includes(wire.id)?'connected':''}/>{t(`ports.${port}`)}</button>)}</div>{state.connected.includes(wire.id)&&<button className="assembly-unplug" onClick={()=>state.disconnect(wire.id)}>{t('disconnect')}</button>}</>}
+   {!selected&&next&&<button className="assembly-primary" onClick={()=>{state.select(next);if(isPart(next))state.command('focus',next)}}>{t('showNext')}<ArrowRight size={15}/></button>}
+   {state.mode==='guided'&&selected&&next&&selected!==next&&<button className="assembly-text-button" onClick={()=>{state.select(next);if(isPart(next))state.command('focus',next)}}>{t('showNext')}</button>}
+   <div className="assembly-feedback" aria-live="polite" role={state.issue?'alert':'status'}>{state.issue?<><strong>{t(`issues.${state.issue.code}`)}</strong>{state.issue.part&&<span>{t(`parts.${state.issue.part}.name`)}</span>}{state.issue.cable&&<span>{t(`cables.${state.issue.cable}.name`)}</span>}{state.issue.target&&<span>{t(`slots.${state.issue.target}`)}</span>}</>:<span>{t(state.restored?'restored':'interactionHint')}</span>}</div>
+   {state.diagnostics.length>0&&<ul className="assembly-diagnostics" aria-label={t('diagnostics')}>{state.diagnostics.map((issue,i)=><li key={i}><button onClick={()=>state.select(issue.part??issue.cable??null)}>{t(issue.part?'missingPart':'missingCable')}: {issue.part?t(`parts.${issue.part}.name`):t(`cables.${issue.cable}.name`)}</button></li>)}</ul>}</>:<ExtensionGuide/>}<details className="assembly-legend"><summary>{t('ui.more')}</summary><p>{t('reference')}</p><p>{t('optionalProgress',{count:state.optionalConnected.length,total:optionalCableIds.length})}</p><p>{t('simulation')}</p><p>{active?t(`${isPart(active)?'parts':'cables'}.${active}.about`):t('readyHint')}</p>{part&&<p>{t(`parts.${part}.hint`)}</p>}<p>{t('legendHint')}</p><span>▰ {t('legendPower')}</span><span>▰ {t('legendData')}</span><span>▰ {t('legendAudio')}</span></details>
+  <details className="assembly-guided-options"><summary>{t('guide')}</summary><div className="assembly-modes"><button aria-pressed={state.mode==='guided'} onClick={()=>state.setMode('guided')}>{t('guided')}</button><button aria-pressed={state.mode==='free'} onClick={()=>state.setMode('free')}>{t('free')}</button></div></details><PeripheralFeedback/>
+ </article>
+}

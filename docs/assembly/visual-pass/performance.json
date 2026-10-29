@@ -1,0 +1,83 @@
+{
+  "initial": {
+    "geometries": 15,
+    "textures": 5,
+    "calls": 295,
+    "triangles": 9840,
+    "programs": 7,
+    "dpr": 1,
+    "renderer": "WebKit WebGL",
+    "avg": 18.18888888888889,
+    "p95": 21.700000000186265,
+    "over33": 1,
+    "samples": 90,
+    "fps": 54.97861942577886
+  },
+  "orbit": {
+    "geometries": 15,
+    "textures": 5,
+    "calls": 285,
+    "triangles": 9448,
+    "programs": 7,
+    "dpr": 1,
+    "renderer": "WebKit WebGL",
+    "avg": 15.66581196581515,
+    "p95": 18.700000000186265,
+    "over33": 1,
+    "samples": 117,
+    "fps": 63.833269681911844
+  },
+  "install": {
+    "geometries": 19,
+    "textures": 5,
+    "calls": 314,
+    "triangles": 10594,
+    "programs": 8,
+    "dpr": 1,
+    "renderer": "WebKit WebGL",
+    "avg": 17.435416666664725,
+    "p95": 19.5,
+    "over33": 2,
+    "samples": 96,
+    "fps": 57.35452264309397
+  },
+  "memory": {
+    "before": {
+      "geometries": 29,
+      "textures": 5
+    },
+    "after": {
+      "geometries": 29,
+      "textures": 5
+    },
+    "cycles": 20
+  },
+  "powerOn": {
+    "geometries": 39,
+    "textures": 5,
+    "calls": 496,
+    "triangles": 36786,
+    "programs": 8,
+    "dpr": 1,
+    "renderer": "WebKit WebGL",
+    "avg": 15.743636363637492,
+    "p95": 17.90000000037253,
+    "over33": 2,
+    "samples": 165,
+    "fps": 63.51772722022873
+  },
+  "allPeripherals": {
+    "geometries": 41,
+    "textures": 5,
+    "calls": 522,
+    "triangles": 41504,
+    "programs": 8,
+    "dpr": 1,
+    "renderer": "WebKit WebGL",
+    "avg": 17.42903225806852,
+    "p95": 20.5,
+    "over33": 0,
+    "samples": 93,
+    "fps": 57.375532111776565
+  }
+}

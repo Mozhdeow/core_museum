@@ -48,7 +48,8 @@ export function LandingPage() {
         <a className="landing-skip" href="#welcome">{t('skipToContent')}</a>
         <LandingNav/>
         {diveMode === 'video'
-            ? <Suspense fallback={null}><VideoLandingExperience active={!introVisible} onEnter={enterMuseum}/></Suspense>
+            ?
+            <Suspense fallback={null}><VideoLandingExperience active={!introVisible} onEnter={enterMuseum}/></Suspense>
             : <ComputerJourney active={!introVisible} onEnter={enterMuseum}/>}
         {introVisible && <LandingIntro mode={introMode} onComplete={completeIntro}/>}
     </div>

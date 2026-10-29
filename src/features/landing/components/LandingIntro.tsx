@@ -853,18 +853,18 @@ export function LandingIntro({
                         aria-hidden="true"
                     >
                         <div className="landing-intro__orbit landing-intro__orbit--outer">
-                            <i />
-                            <i />
+                            <i/>
+                            <i/>
                         </div>
 
                         <div className="landing-intro__orbit landing-intro__orbit--inner">
-                            <i />
-                            <i />
+                            <i/>
+                            <i/>
                         </div>
 
-                        <div className="landing-intro__arc landing-intro__arc--left" />
+                        <div className="landing-intro__arc landing-intro__arc--left"/>
 
-                        <div className="landing-intro__arc landing-intro__arc--right" />
+                        <div className="landing-intro__arc landing-intro__arc--right"/>
 
                         {Array.from(
                             {length: 14},
@@ -878,7 +878,7 @@ export function LandingIntro({
                             ),
                         )}
 
-                        <div className="landing-intro__scanline" />
+                        <div className="landing-intro__scanline"/>
                     </div>
 
                     <div className="landing-intro__screen-content">
@@ -895,7 +895,7 @@ export function LandingIntro({
                                 }
                             />
 
-                            <i />
+                            <i/>
 
                             <TypingText
                                 text={
@@ -1061,7 +1061,7 @@ export function LandingIntro({
                 </DesktopMonitorShell>
             </div>
 
-            <div className="landing-intro__veil" />
+            <div className="landing-intro__veil"/>
 
             <button
                 className="landing-intro__skip"

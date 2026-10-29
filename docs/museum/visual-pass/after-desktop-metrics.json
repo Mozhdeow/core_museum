@@ -1,0 +1,317 @@
+{
+  "entrance": {
+    "calls": 506,
+    "triangles": 42073,
+    "frameMs": 41.662500001490116,
+    "memory": {
+      "geometries": 118,
+      "textures": 58
+    },
+    "lights": {
+      "AmbientLight": 1,
+      "HemisphereLight": 1,
+      "DirectionalLight": 1,
+      "SpotLight": 5,
+      "PointLight": 6,
+      "RectAreaLight": 2
+    },
+    "materials": {
+      "MeshStandardMaterial": 266,
+      "MeshBasicMaterial": 130,
+      "ShaderMaterial": 7,
+      "PointsMaterial": 1,
+      "LineBasicMaterial": 2
+    },
+    "shaderDiagnostics": [],
+    "dpr": 1,
+    "samples": [
+      {
+        "calls": 506,
+        "triangles": 42073
+      },
+      {
+        "calls": 506,
+        "triangles": 42073
+      },
+      {
+        "calls": 506,
+        "triangles": 42073
+      },
+      {
+        "calls": 506,
+        "triangles": 42073
+      },
+      {
+        "calls": 506,
+        "triangles": 42073
+      },
+      {
+        "calls": 506,
+        "triangles": 42073
+      },
+      {
+        "calls": 506,
+        "triangles": 42073
+      },
+      {
+        "calls": 506,
+        "triangles": 42073
+      }
+    ],
+    "tier": "high",
+    "environment": true,
+    "exposure": 0.95
+  },
+  "hardware-panels": {
+    "calls": 214,
+    "triangles": 15929,
+    "frameMs": 32.787500001490116,
+    "memory": {
+      "geometries": 118,
+      "textures": 60
+    },
+    "lights": {
+      "AmbientLight": 1,
+      "HemisphereLight": 1,
+      "DirectionalLight": 1,
+      "SpotLight": 5,
+      "PointLight": 6,
+      "RectAreaLight": 2
+    },
+    "materials": {
+      "MeshStandardMaterial": 266,
+      "MeshBasicMaterial": 130,
+      "ShaderMaterial": 7,
+      "PointsMaterial": 1,
+      "LineBasicMaterial": 2
+    },
+    "shaderDiagnostics": [],
+    "dpr": 1,
+    "samples": [
+      {
+        "calls": 214,
+        "triangles": 15929
+      },
+      {
+        "calls": 214,
+        "triangles": 15929
+      },
+      {
+        "calls": 214,
+        "triangles": 15929
+      },
+      {
+        "calls": 214,
+        "triangles": 15929
+      },
+      {
+        "calls": 214,
+        "triangles": 15929
+      },
+      {
+        "calls": 214,
+        "triangles": 15929
+      },
+      {
+        "calls": 214,
+        "triangles": 15929
+      },
+      {
+        "calls": 214,
+        "triangles": 15929
+      }
+    ],
+    "tier": "high",
+    "environment": true,
+    "exposure": 0.95
+  },
+  "portraits": {
+    "calls": 387,
+    "triangles": 23095,
+    "frameMs": 38.974999994039536,
+    "memory": {
+      "geometries": 118,
+      "textures": 60
+    },
+    "lights": {
+      "AmbientLight": 1,
+      "HemisphereLight": 1,
+      "DirectionalLight": 1,
+      "SpotLight": 5,
+      "PointLight": 6,
+      "RectAreaLight": 2
+    },
+    "materials": {
+      "MeshStandardMaterial": 266,
+      "MeshBasicMaterial": 130,
+      "ShaderMaterial": 7,
+      "PointsMaterial": 1,
+      "LineBasicMaterial": 2
+    },
+    "shaderDiagnostics": [],
+    "dpr": 1,
+    "samples": [
+      {
+        "calls": 387,
+        "triangles": 23095
+      },
+      {
+        "calls": 387,
+        "triangles": 23095
+      },
+      {
+        "calls": 387,
+        "triangles": 23095
+      },
+      {
+        "calls": 387,
+        "triangles": 23095
+      },
+      {
+        "calls": 387,
+        "triangles": 23095
+      },
+      {
+        "calls": 387,
+        "triangles": 23095
+      },
+      {
+        "calls": 387,
+        "triangles": 23095
+      },
+      {
+        "calls": 387,
+        "triangles": 23095
+      }
+    ],
+    "tier": "high",
+    "environment": true,
+    "exposure": 0.95
+  },
+  "case": {
+    "calls": 244,
+    "triangles": 17157,
+    "frameMs": 35.0625,
+    "memory": {
+      "geometries": 118,
+      "textures": 60
+    },
+    "lights": {
+      "AmbientLight": 1,
+      "HemisphereLight": 1,
+      "DirectionalLight": 1,
+      "SpotLight": 5,
+      "PointLight": 6,
+      "RectAreaLight": 2
+    },
+    "materials": {
+      "MeshStandardMaterial": 266,
+      "MeshBasicMaterial": 130,
+      "ShaderMaterial": 7,
+      "PointsMaterial": 1,
+      "LineBasicMaterial": 2
+    },
+    "shaderDiagnostics": [],
+    "dpr": 1,
+    "samples": [
+      {
+        "calls": 244,
+        "triangles": 17157
+      },
+      {
+        "calls": 244,
+        "triangles": 17157
+      },
+      {
+        "calls": 244,
+        "triangles": 17157
+      },
+      {
+        "calls": 244,
+        "triangles": 17157
+      },
+      {
+        "calls": 244,
+        "triangles": 17157
+      },
+      {
+        "calls": 244,
+        "triangles": 17157
+      },
+      {
+        "calls": 244,
+        "triangles": 17157
+      },
+      {
+        "calls": 244,
+        "triangles": 17157
+      }
+    ],
+    "tier": "high",
+    "environment": true,
+    "exposure": 0.95
+  },
+  "passage": {
+    "calls": 149,
+    "triangles": 6014,
+    "frameMs": 26.474999994039536,
+    "memory": {
+      "geometries": 117,
+      "textures": 60
+    },
+    "lights": {
+      "AmbientLight": 1,
+      "HemisphereLight": 1,
+      "DirectionalLight": 1,
+      "SpotLight": 5,
+      "PointLight": 6,
+      "RectAreaLight": 2
+    },
+    "materials": {
+      "MeshStandardMaterial": 266,
+      "MeshBasicMaterial": 130,
+      "ShaderMaterial": 7,
+      "PointsMaterial": 1,
+      "LineBasicMaterial": 2
+    },
+    "shaderDiagnostics": [],
+    "dpr": 1,
+    "samples": [
+      {
+        "calls": 149,
+        "triangles": 6014
+      },
+      {
+        "calls": 149,
+        "triangles": 6014
+      },
+      {
+        "calls": 149,
+        "triangles": 6014
+      },
+      {
+        "calls": 149,
+        "triangles": 6014
+      },
+      {
+        "calls": 149,
+        "triangles": 6014
+      },
+      {
+        "calls": 149,
+        "triangles": 6014
+      },
+      {
+        "calls": 149,
+        "triangles": 6014
+      },
+      {
+        "calls": 149,
+        "triangles": 6014
+      }
+    ],
+    "tier": "high",
+    "environment": true,
+    "exposure": 0.95
+  }
+}

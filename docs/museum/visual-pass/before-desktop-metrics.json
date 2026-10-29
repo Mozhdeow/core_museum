@@ -1,0 +1,292 @@
+{
+  "entrance": {
+    "calls": 578,
+    "triangles": 31419,
+    "memory": {
+      "geometries": 93,
+      "textures": 31
+    },
+    "lights": {
+      "AmbientLight": 1,
+      "HemisphereLight": 1,
+      "DirectionalLight": 1,
+      "PointLight": 9,
+      "SpotLight": 7
+    },
+    "materials": {
+      "MeshStandardMaterial": 267,
+      "MeshBasicMaterial": 126,
+      "LineBasicMaterial": 2
+    },
+    "dpr": 1,
+    "samples": [
+      {
+        "calls": 578,
+        "triangles": 31419
+      },
+      {
+        "calls": 578,
+        "triangles": 31419
+      },
+      {
+        "calls": 578,
+        "triangles": 31419
+      },
+      {
+        "calls": 578,
+        "triangles": 31419
+      },
+      {
+        "calls": 578,
+        "triangles": 31419
+      },
+      {
+        "calls": 578,
+        "triangles": 31419
+      },
+      {
+        "calls": 578,
+        "triangles": 31419
+      },
+      {
+        "calls": 578,
+        "triangles": 31419
+      }
+    ],
+    "tier": "legacy",
+    "environment": false,
+    "exposure": 1
+  },
+  "hardware-panels": {
+    "calls": 275,
+    "triangles": 10373,
+    "memory": {
+      "geometries": 93,
+      "textures": 31
+    },
+    "lights": {
+      "AmbientLight": 1,
+      "HemisphereLight": 1,
+      "DirectionalLight": 1,
+      "PointLight": 9,
+      "SpotLight": 7
+    },
+    "materials": {
+      "MeshStandardMaterial": 267,
+      "MeshBasicMaterial": 126,
+      "LineBasicMaterial": 2
+    },
+    "dpr": 1,
+    "samples": [
+      {
+        "calls": 275,
+        "triangles": 10373
+      },
+      {
+        "calls": 275,
+        "triangles": 10373
+      },
+      {
+        "calls": 275,
+        "triangles": 10373
+      },
+      {
+        "calls": 275,
+        "triangles": 10373
+      },
+      {
+        "calls": 275,
+        "triangles": 10373
+      },
+      {
+        "calls": 275,
+        "triangles": 10373
+      },
+      {
+        "calls": 275,
+        "triangles": 10373
+      },
+      {
+        "calls": 275,
+        "triangles": 10373
+      }
+    ],
+    "tier": "legacy",
+    "environment": false,
+    "exposure": 1
+  },
+  "portraits": {
+    "calls": 491,
+    "triangles": 19569,
+    "memory": {
+      "geometries": 93,
+      "textures": 31
+    },
+    "lights": {
+      "AmbientLight": 1,
+      "HemisphereLight": 1,
+      "DirectionalLight": 1,
+      "PointLight": 9,
+      "SpotLight": 7
+    },
+    "materials": {
+      "MeshStandardMaterial": 267,
+      "MeshBasicMaterial": 126,
+      "LineBasicMaterial": 2
+    },
+    "dpr": 1,
+    "samples": [
+      {
+        "calls": 491,
+        "triangles": 19569
+      },
+      {
+        "calls": 491,
+        "triangles": 19569
+      },
+      {
+        "calls": 491,
+        "triangles": 19569
+      },
+      {
+        "calls": 491,
+        "triangles": 19569
+      },
+      {
+        "calls": 491,
+        "triangles": 19569
+      },
+      {
+        "calls": 491,
+        "triangles": 19569
+      },
+      {
+        "calls": 491,
+        "triangles": 19569
+      },
+      {
+        "calls": 491,
+        "triangles": 19569
+      }
+    ],
+    "tier": "legacy",
+    "environment": false,
+    "exposure": 1
+  },
+  "case": {
+    "calls": 275,
+    "triangles": 11637,
+    "memory": {
+      "geometries": 93,
+      "textures": 31
+    },
+    "lights": {
+      "AmbientLight": 1,
+      "HemisphereLight": 1,
+      "DirectionalLight": 1,
+      "PointLight": 9,
+      "SpotLight": 7
+    },
+    "materials": {
+      "MeshStandardMaterial": 267,
+      "MeshBasicMaterial": 126,
+      "LineBasicMaterial": 2
+    },
+    "dpr": 1,
+    "samples": [
+      {
+        "calls": 275,
+        "triangles": 11637
+      },
+      {
+        "calls": 275,
+        "triangles": 11637
+      },
+      {
+        "calls": 275,
+        "triangles": 11637
+      },
+      {
+        "calls": 275,
+        "triangles": 11637
+      },
+      {
+        "calls": 275,
+        "triangles": 11637
+      },
+      {
+        "calls": 275,
+        "triangles": 11637
+      },
+      {
+        "calls": 275,
+        "triangles": 11637
+      },
+      {
+        "calls": 275,
+        "triangles": 11637
+      }
+    ],
+    "tier": "legacy",
+    "environment": false,
+    "exposure": 1
+  },
+  "passage": {
+    "calls": 339,
+    "triangles": 10665,
+    "memory": {
+      "geometries": 93,
+      "textures": 31
+    },
+    "lights": {
+      "AmbientLight": 1,
+      "HemisphereLight": 1,
+      "DirectionalLight": 1,
+      "PointLight": 9,
+      "SpotLight": 7
+    },
+    "materials": {
+      "MeshStandardMaterial": 267,
+      "MeshBasicMaterial": 126,
+      "LineBasicMaterial": 2
+    },
+    "dpr": 1,
+    "samples": [
+      {
+        "calls": 339,
+        "triangles": 10665
+      },
+      {
+        "calls": 339,
+        "triangles": 10665
+      },
+      {
+        "calls": 339,
+        "triangles": 10665
+      },
+      {
+        "calls": 339,
+        "triangles": 10665
+      },
+      {
+        "calls": 339,
+        "triangles": 10665
+      },
+      {
+        "calls": 339,
+        "triangles": 10665
+      },
+      {
+        "calls": 339,
+        "triangles": 10665
+      },
+      {
+        "calls": 339,
+        "triangles": 10665
+      }
+    ],
+    "tier": "legacy",
+    "environment": false,
+    "exposure": 1
+  }
+}

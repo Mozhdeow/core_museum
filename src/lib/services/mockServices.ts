@@ -1,7 +1,8 @@
 import {mockItems, mockSections} from '@/data/mock/museum'
 import type {AuthService, CuratorService, MuseumItemsService} from '@/types/services'
 import type {MuseumItem} from '@/types/museum'
-import {curatorDemo} from '@/features/museum/curatorDemo'
+import {coreAIClient} from '@/features/coreAI/coreAIClient'
+import type {VerifiedExhibit} from '@/features/coreAI/coreAIContracts'
 
 // PHASE 1 ONLY. No identity verification, password storage, or security boundary.
 // Replace this adapter with Supabase Auth and enforce roles on the server in Phase 2.
@@ -44,6 +45,8 @@ export const mockMuseumItemsService: MuseumItemsService = {
 }
 export const mockCuratorService:CuratorService={
  async ask({currentItemId,locale,explanationMode,question,exhibitContext}){
-  return {answer:curatorDemo(currentItemId,locale,explanationMode,question,exhibitContext),isMock:true}
+  const item=exhibitContext,exhibit:VerifiedExhibit|null=item&&item.id===currentItemId&&item.status==='published'?{id:item.id,status:'published',title:item.title,description:{en:item.description.en||item.shortDescription.en,fa:item.description.fa||item.shortDescription.fa},specifications:item.specifications,category:''}:null
+  const response=await coreAIClient.ask({locale,question:explanationMode==='compare'?'compare':explanationMode==='technical'?question+' specifications':question,context:{kind:'museum',exhibit}})
+  return {answer:response.answer,isMock:response.provider==='mock'}
  }
 }

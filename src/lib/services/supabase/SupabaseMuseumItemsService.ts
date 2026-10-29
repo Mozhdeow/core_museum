@@ -47,7 +47,7 @@ function mapItem(row: Row<'museum_items'>, categories: Row<'categories'>[], sect
     shortDescription: {en: row.short_description_en ?? '', fa: row.short_description_fa ?? ''}, description: {en: row.description_en ?? '', fa: row.description_fa ?? ''},
     specifications: specs.filter(s => s.item_id === row.id).map(s => ({label: {en: s.label_en, fa: s.label_fa}, value: s.value})),
     thumbnail: row.thumbnail_path ? storageService.publicUrl('museum-images', row.thumbnail_path) : '', thumbnailPath: row.thumbnail_path,
-    galleryImages: gallery.filter(g => g.item_id === row.id).map(g => ({id: g.id, url: storageService.publicUrl('museum-images', g.storage_path), storagePath: g.storage_path, caption: {en: g.caption_en ?? '', fa: g.caption_fa ?? ''}})),
+    galleryImages: gallery.filter(g => g.item_id === row.id&&g.storage_path.trim().length>0).map(g => ({id: g.id, url: storageService.publicUrl('museum-images', g.storage_path), storagePath: g.storage_path, caption: {en: g.caption_en ?? '', fa: g.caption_fa ?? ''}})),
     model3DUrl: row.model_path ? storageService.publicUrl('museum-models', row.model_path) : null, modelPath: row.model_path, modelOriginalFilename: row.model_original_filename, modelFileSize: row.model_file_size,
     sortOrder: row.sort_order, status: row.status, featured: row.featured, updatedAt: row.updated_at,
     enableGallery: row.enable_gallery, enableAiCurator: row.enable_ai_curator, enableExplodedView: row.enable_exploded_view,

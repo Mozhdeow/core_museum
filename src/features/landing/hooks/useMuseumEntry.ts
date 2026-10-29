@@ -2,7 +2,6 @@ import {useCallback, useEffect, useRef, useState, type RefObject} from 'react'
 import gsap from 'gsap'
 import {useReducedMotion} from '@/hooks/usePreferences'
 
-// The entry camera uses an outer wrapper so it never competes with scroll geometry.
 export function useMuseumEntry(root: RefObject<HTMLElement | null>, onEnter: () => void) {
     const [entering, setEntering] = useState(false)
     const transition = useRef<gsap.Context | null>(null)
@@ -37,7 +36,12 @@ export function useMuseumEntry(root: RefObject<HTMLElement | null>, onEnter: () 
         const glass = screen.getBoundingClientRect()
         const scale = Math.max(viewport.width / glass.width, viewport.height / glass.height) * 1.04
         transition.current = gsap.context(() => {
-            const timeline = gsap.timeline({onComplete: () => {releaseInput.current?.(); onEnter()}})
+            const timeline = gsap.timeline({
+                onComplete: () => {
+                    releaseInput.current?.();
+                    onEnter()
+                }
+            })
             if (reduced) timeline.to(portal, {opacity: 0, duration: .18})
             else timeline.to(portal, {
                 scale,

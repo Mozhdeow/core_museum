@@ -1,0 +1,12 @@
+{
+  "seconds": 60,
+  "thresholdChanges": 6,
+  "before": {
+    "geometries": 124,
+    "textures": 34
+  },
+  "after": {
+    "geometries": 124,
+    "textures": 34
+  }
+}

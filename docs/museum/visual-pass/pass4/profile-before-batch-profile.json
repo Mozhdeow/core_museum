@@ -1,0 +1,92 @@
+{
+  "before": [
+    {
+      "batchBuilds": 2,
+      "batchMs": 5.5
+    },
+    {
+      "batchBuilds": 2,
+      "batchMs": 4
+    }
+  ],
+  "after": [
+    {
+      "batchBuilds": 3,
+      "batchMs": 4.700000047683716
+    },
+    {
+      "batchBuilds": 3,
+      "batchMs": 1.100000023841858
+    }
+  ],
+  "frames": {
+    "at": "2026-10-26T17:27:45.258Z",
+    "tier": "high",
+    "reason": "URL override",
+    "dpr": 1,
+    "calls": 77,
+    "triangles": 6054,
+    "geometries": 123,
+    "textures": 40,
+    "programs": 38,
+    "lights": 2,
+    "gpu": "ANGLE (Intel, Intel(R) UHD Graphics (0x0000A7A8) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+    "postprocessing": false,
+    "reflector": "baked",
+    "reflectionCaptures": 1,
+    "hall": "corridor",
+    "position": [
+      0,
+      1.72,
+      -10.325120000076296
+    ],
+    "timeOrigin": 1793035648207.3,
+    "fps": 41.211539231279524,
+    "avg": 24.265048543515714,
+    "p95": 44.69999998807907,
+    "p99": 50.80000001192093,
+    "over33": 33,
+    "over50": 3,
+    "samples": 206,
+    "hitches": [
+      {
+        "at": 13303.899999976158,
+        "ms": 88.79999995231628,
+        "hall": "corridor",
+        "position": [
+          0,
+          1.72,
+          1.7331199998855595
+        ]
+      },
+      {
+        "at": 16886.799999952316,
+        "ms": 50.80000001192093,
+        "hall": "corridor",
+        "position": [
+          0,
+          1.72,
+          -9.729600000190738
+        ]
+      },
+      {
+        "at": 17215.799999952316,
+        "ms": 51.19999998807907,
+        "hall": "corridor",
+        "position": [
+          0,
+          1.72,
+          -10.778560000228884
+        ]
+      }
+    ],
+    "changes": [
+      {
+        "at": 4630.299999952316,
+        "tier": "high",
+        "reason": "URL override",
+        "dpr": 1
+      }
+    ]
+  }
+}

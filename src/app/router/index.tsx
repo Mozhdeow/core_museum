@@ -10,6 +10,7 @@ import {ProfilePage} from '@/pages/Profile/ProfilePage';
 import {AdminLoginPage, DashboardPage, ItemsPage, ItemFormPage, PlaceholderAdminPage} from '@/pages/Admin/AdminPages';
 import {AdminUsersPage} from '@/pages/Admin/AdminUsersPage';
 import {ProtectedRoute, AdminGuard} from './guards'
+import {AssemblyRoute} from '@/features/assembly/AssemblyRoute'
 
 export const router = createBrowserRouter([{
     path: '/', element: <RootLayout/>, children: [
@@ -25,7 +26,7 @@ export const router = createBrowserRouter([{
         },
         {
             element: <ProtectedRoute/>,
-            children: [{
+            children: [{path:'museum/assembly',element:<AssemblyRoute/>},{
                 element: <MuseumLayout/>,
                 children: [{path: 'museum', element: <MuseumPage/>}]
             }, {path: 'profile', element: <ProfilePage/>}]
@@ -40,12 +41,14 @@ export const router = createBrowserRouter([{
                 }, {path: 'admin/items/new', element: <ItemFormPage/>}, {
                     path: 'admin/items/:id/edit',
                     element: <ItemFormPage/>
-                }, {element:<AdminGuard/>,children:[
-                    {path:'admin/dashboard',element:<DashboardPage/>},
-                    {path:'admin/categories',element:<PlaceholderAdminPage section="categories"/>},
-                    {path:'admin/sections',element:<PlaceholderAdminPage section="sections"/>},
-                    {path:'admin/users',element:<AdminUsersPage/>},
-                ]}]
+                }, {
+                    element: <AdminGuard/>, children: [
+                        {path: 'admin/dashboard', element: <DashboardPage/>},
+                        {path: 'admin/categories', element: <PlaceholderAdminPage section="categories"/>},
+                        {path: 'admin/sections', element: <PlaceholderAdminPage section="sections"/>},
+                        {path: 'admin/users', element: <AdminUsersPage/>},
+                    ]
+                }]
             }]
         },
         {path: '*', element: <Navigate to="/" replace/>},

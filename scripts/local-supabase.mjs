@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import {execFileSync,spawn} from 'node:child_process'
 import {createRequire} from 'node:module'
-import {mkdirSync,writeFileSync} from 'node:fs'
+import {mkdirSync,writeFileSync,readFileSync} from 'node:fs'
 import {pathToFileURL} from 'node:url'
 
 const cli=['node_modules/supabase/dist/supabase.js']
@@ -47,7 +47,7 @@ export function applyLocalCors(project='core-museum'){
 async function main(){
     const action=process.argv[2]
     if(action==='cors'){applyLocalCors();return}
-    assert.ok(['dev','edge'].includes(action),'Usage: node scripts/local-supabase.mjs dev|edge|cors')
+    assert.ok(['dev','edge','edge-verified'].includes(action),'Usage: node scripts/local-supabase.mjs dev|edge|edge-verified|cors')
     const status=JSON.parse(execFileSync(process.execPath,[...cli,'status','--output','json'],{encoding:'utf8',stdio:['ignore','pipe','pipe'],timeout:15000}))
     assert.equal(new URL(status.API_URL).origin,'http://127.0.0.1:54321','Refuse non-local API')
     assert.ok(status.ANON_KEY)
@@ -56,8 +56,13 @@ async function main(){
     if(action==='dev')args=['node_modules/vite/bin/vite.js','--host','127.0.0.1','--port','5191','--strictPort']
     else{
         mkdirSync('.tmp/local-supabase',{recursive:true})
-        const file='.tmp/local-supabase/edge.env'
-        writeFileSync(file,'CORE_ADMIN_ALLOWED_ORIGINS=http://localhost:5173,http://127.0.0.1:5191\nCORE_INVITE_REDIRECT_URL=http://127.0.0.1:5191/reset-password\nCORE_ADMIN_WRITES_ENABLED=false\nCORE_ADMIN_GUARDS_VERIFIED=false\n')
+        const file=action==='edge-verified' ? '.tmp/local-supabase/admin-users-approved.env' : '.tmp/local-supabase/edge.env'
+        if(action==='edge-verified'){
+            // Explicit operator-created local activation file only. The ordinary
+            // edge command remains default-off and never creates this file.
+            const approved=readFileSync(file,'utf8')
+            assert.equal(approved,'CORE_ADMIN_ALLOWED_ORIGINS=http://localhost:5173,http://127.0.0.1:5191\nCORE_INVITE_REDIRECT_URL=http://127.0.0.1:5191/reset-password\nCORE_ADMIN_WRITES_ENABLED=true\nCORE_ADMIN_GUARDS_VERIFIED=true\n','Unexpected local activation scope')
+        }else writeFileSync(file,'CORE_ADMIN_ALLOWED_ORIGINS=http://localhost:5173,http://127.0.0.1:5191\nCORE_INVITE_REDIRECT_URL=http://127.0.0.1:5191/reset-password\nCORE_ADMIN_WRITES_ENABLED=false\nCORE_ADMIN_GUARDS_VERIFIED=false\n')
         args=[...cli,'functions','serve','admin-users','--env-file',file]
     }
     const child=spawn(process.execPath,args,{env,stdio:['inherit','pipe','pipe'],windowsHide:true})

@@ -1,9 +1,10 @@
-import {useEffect} from 'react'
+import {useEffect,useMemo} from 'react'
 import {useMuseumNavigation} from '@/features/museum/navigationState'
 import {museumPresentation} from '@/features/museum/exhibitPresentation'
 import {useTranslation} from 'react-i18next'
 import {useGLTF} from '@react-three/drei'
 import {GalleryOverlay} from '@/features/gallery/GalleryOverlay'
+import {eligibleGalleryImages} from '@/features/gallery/galleryImages'
 import {AICuratorPanel} from '@/features/museum/AICuratorPanel'
 import {useMuseumStore} from '@/features/museum/museumStore'
 import {selectedMuseumItem} from '@/features/museum/museumState'
@@ -34,6 +35,11 @@ function MuseumContent() {
     const categories=useMuseumStore(s=>s.categories),selectionUnavailable=useMuseumStore(s=>s.selectionUnavailable)
     const presentation=museumPresentation({items,sections,categories,focusedItemId:item?.id??null,modelStatus},location),cpuItem=presentation.cpuCompatible
     const locale = i18n.language === 'fa' ? 'fa' : 'en'
+    const galleryImages=useMemo(()=>status==='ready'?eligibleGalleryImages(item):[],[item,status])
+    const canGallery=galleryImages.length>0
+    useEffect(()=>{
+        if(overlay==='gallery'&&!canGallery)closeOverlay()
+    },[overlay,canGallery,closeOverlay])
     const section = sections.find(s => s.id === sectionId)
     const refresh = () => {
         if (userId) void useMuseumStore.getState().load(userId, true)
@@ -96,8 +102,8 @@ function MuseumContent() {
                             <p className="mt-2 text-xs text-muted">{item.creator}{item.license ? ` / ${item.license}` : ''}</p>}
                     </div>
                     <div className="flex flex-wrap gap-2">
-                        <Button variant="outline" disabled={!presentation.canGallery}
-                                onClick={() => useMuseumNavigation.getState().openOverlay('gallery')}>{t('viewGallery')}</Button>
+                        {canGallery&&<Button variant="outline"
+                                onClick={() => useMuseumNavigation.getState().openOverlay('gallery')}>{t('viewGallery')}</Button>}
                         {presentation.canCurator &&
                             <Button variant="outline"
                                     onClick={() => useMuseumNavigation.getState().openOverlay('ai')}>{t('askAI')}</Button>}
@@ -112,8 +118,8 @@ function MuseumContent() {
                                                                onClick={retryModel}>{t('retryModel', {ns: 'museum'})}</Button>}
             </div>
         </details>}
-        {item && overlay === 'gallery' && presentation.canGallery &&
-            <GalleryOverlay key={item.id} images={item.galleryImages} locale={locale}
+        {item && overlay === 'gallery' && canGallery &&
+            <GalleryOverlay key={item.id} itemId={item.id} title={item.title[locale]} images={galleryImages} locale={locale}
                             onClose={closeOverlay}/>}
         {item && overlay === 'ai' && presentation.canCurator &&
             <AICuratorPanel key={item.id} item={item} locale={locale} section={sectionId ?? ''}

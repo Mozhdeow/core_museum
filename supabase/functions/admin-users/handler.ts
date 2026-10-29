@@ -1,4 +1,17 @@
 import {UserManagementError, validateUserRequest, type OperationResult, type UserCapabilities, type UserErrorCode} from '../_shared/adminUsers.ts'
+import {databaseRoles, type DatabaseRole} from '../_shared/roles.ts'
+
+// The legacy 03B command rejects the editor filter. Probe the installed, trusted
+// read contract, never infer support from which account rows happen to exist.
+export async function discoverAdminRoles(backend: AdminBackend, actor: string): Promise<DatabaseRole[]> {
+    try {
+        await backend.command(actor,'list',null,{page:1,perPage:10,search:crypto.randomUUID(),role:'editor',status:'all'})
+        return [...databaseRoles]
+    } catch (error) {
+        if (error instanceof UserManagementError && error.code === 'invalidInput' && !error.uncertain) return ['user','admin']
+        throw error
+    }
+}
 
 export interface AdminBackend {
     authenticate(token: string): Promise<{id: string} | null>
@@ -6,7 +19,7 @@ export interface AdminBackend {
     invite(email: string, data: Record<string, string>, redirect: string): Promise<void>
     deleteUser(id: string): Promise<void>
 }
-export interface HandlerConfig {origins: string[]; redirect: string; writesEnabled: boolean; guardsVerified: boolean}
+export interface HandlerConfig {origins: string[]; redirect: string; writesEnabled: boolean; guardsVerified: boolean; deletionEnabled?: boolean}
 export class AuthAdminRejection extends Error {
     code: 'duplicateAccount' | 'assetsOwned' | 'requestFailed'
     constructor(code: AuthAdminRejection['code']) {super(code); this.code = code}
@@ -50,11 +63,16 @@ export function createAdminUsersHandler(backend: AdminBackend, config: HandlerCo
             await backend.command(caller.id,'authorize',null,{})
             const input = validateUserRequest(await readBody(request))
             const capabilities: UserCapabilities = {canInvite:config.writesEnabled && inviteReady(config),canEdit:config.writesEnabled,
-                canChangeRoles:config.writesEnabled && config.guardsVerified,canDelete:config.writesEnabled && config.guardsVerified}
-            if (input.action === 'capabilities') return reply({ok:true,data:capabilities})
+                canChangeRoles:config.writesEnabled && config.guardsVerified,canDelete:config.writesEnabled && config.guardsVerified && config.deletionEnabled===true}
+            if (input.action === 'capabilities') return reply({ok:true,data:{...capabilities,
+                supportedRoles:await discoverAdminRoles(backend,caller.id),
+                inviteUnavailableReason:!config.writesEnabled ? 'writesDisabled' : !inviteReady(config) ? 'inviteConfiguration' : null}})
             if (input.action === 'list') return reply({ok:true,data:await backend.command(caller.id,'list',null,{...input})})
             operationId = input.operationId
             if (input.action === 'reconcile') return reply({ok:true,data:await backend.command(caller.id,'status',operationId,{writesEnabled:config.writesEnabled,rolesEnabled:config.guardsVerified})})
+            // Local invitation/role activation must not activate account deletion.
+            // Historical receipts can still be reconciled above without resending Auth calls.
+            if (input.action === 'delete' && config.deletionEnabled!==true) throw new UserManagementError('forbidden')
             if (!config.writesEnabled) throw new UserManagementError('writesDisabled')
             if (input.action === 'invite' && input.role !== 'user' && !config.guardsVerified) throw new UserManagementError('guardUnverified')
             if (input.action === 'delete' && !config.guardsVerified) throw new UserManagementError('guardUnverified')

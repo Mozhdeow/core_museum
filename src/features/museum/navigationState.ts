@@ -24,7 +24,7 @@ type NavigationState = {
 }
 export const useMuseumNavigation=create<NavigationState>((set,get)=>({
     intent:0,arrivalRevision:0,
-    overlay:null,artifactFocusY:2.25,artifactRadius:1.5,openOverlay:overlay=>{if(get().mode!=='inspect'&&!get().overlay)set({overlay,move:0})},closeOverlay:()=>set({overlay:null,move:0}),
+    overlay:null,artifactFocusY:2.25,artifactRadius:1.5,openOverlay:overlay=>{const s=get();if(!s.overlay&&(s.mode!=='inspect'||overlay==='ai'&&s.inspection==='active'))set({overlay,move:0})},closeOverlay:()=>set({overlay:null,move:0}),
     setArtifactFocus:(y,radius=1.5)=>set({artifactFocusY:Number.isFinite(y)?Math.max(.5,Math.min(3.5,y)):2.25,artifactRadius:Math.max(.1,Math.min(1.5,radius))}),
     mode:'guided',playing:false,progress:0,location:'entrance',request:{id:0,target:0,instant:true},move:0,atmospherePaused:false,
     inspection:'closed',returnTo:null,inspectCommand:{id:0,zoom:0,reset:true},

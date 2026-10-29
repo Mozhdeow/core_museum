@@ -1,5 +1,7 @@
 import {UserManagementError, userErrorCodes, userUuid, type UserErrorCode, type UserRequest, type UserQuery,
     type UserPage, type UserCapabilities, type OperationResult} from '../../../../supabase/functions/_shared/adminUsers.ts'
+import {databaseRole} from '../../../../supabase/functions/_shared/roles.ts'
+export {databaseRoles, roleLabelKey} from '../../../../supabase/functions/_shared/roles.ts'
 
 export {UserManagementError}
 export type {AdminUser, UserFields, UserCapabilities, OperationResult, UserQuery} from '../../../../supabase/functions/_shared/adminUsers.ts'
@@ -45,7 +47,7 @@ export function createAdminUsersClient(getClient: () => Client) {
             const page = await call({action:'list',...query}) as UserPage | null
             if (!page || !Array.isArray(page.users) || !Number.isSafeInteger(page.total) || page.total < 0 || page.page !== query.page || page.perPage !== query.perPage) throw new UserManagementError('serviceUnavailable')
             for (const user of page.users) {
-                if (!user || !userUuid(user.id) || !['user','editor','admin'].includes(user.role) || !['en','fa'].includes(user.preferredLocale)
+                if (!user || !userUuid(user.id) || !databaseRole(user.role) || !['en','fa'].includes(user.preferredLocale)
                     || !['active','invited','unconfirmed','banned','deleting'].includes(user.status) || typeof user.activeAdmin !== 'boolean'
                     || ![user.email,user.fullName,user.lastSignInAt].every(value=>value === null || typeof value === 'string')
                     || typeof user.createdAt !== 'string' || typeof user.updatedAt !== 'string') throw new UserManagementError('serviceUnavailable')
@@ -56,6 +58,9 @@ export function createAdminUsersClient(getClient: () => Client) {
         async capabilities(): Promise<UserCapabilities> {
             const result = await call({action:'capabilities'}) as UserCapabilities | null
             if (!result || !['canInvite','canEdit','canChangeRoles','canDelete'].every(key=>typeof result[key as keyof UserCapabilities] === 'boolean')) throw new UserManagementError('serviceUnavailable')
+            if (result.supportedRoles !== undefined && (!Array.isArray(result.supportedRoles) || !result.supportedRoles.length
+                || !result.supportedRoles.every(role=>databaseRole(role)) || new Set(result.supportedRoles).size!==result.supportedRoles.length)) throw new UserManagementError('serviceUnavailable')
+            if (result.inviteUnavailableReason !== undefined && result.inviteUnavailableReason !== null && !['writesDisabled','inviteConfiguration'].includes(result.inviteUnavailableReason)) throw new UserManagementError('serviceUnavailable')
             return result
         },
         mutate: (request: UserMutation) => operation(request),

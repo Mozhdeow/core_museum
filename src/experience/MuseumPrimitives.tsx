@@ -1,11 +1,13 @@
 import {useEffect, useMemo, useRef} from 'react'
 import {useFrame} from '@react-three/fiber'
-import {MeshBasicMaterial, MathUtils} from 'three'
+import {MeshBasicMaterial, MathUtils, Vector3, type SpotLight} from 'three'
 import {useMuseumNavigation} from '@/features/museum/navigationState'
 import {CanvasTexture, SRGBColorSpace, Object3D} from 'three'
 import {MeshReflectorMaterial} from '@react-three/drei'
 import {useMuseumPalette} from './museumPalette'
 import {useArchitecturalMaterial} from './architectureResources'
+import {useMuseumVisualResources} from './MuseumVisualResources'
+import {useMuseumQuality} from './useMuseumQuality'
 
 type Triple = [number, number, number]
 
@@ -17,16 +19,18 @@ export function Block({at, size, color = '#22272b', metal = .55, roughness = .38
     roughness?: number
 }) {
     const resources = useArchitecturalMaterial(color, metal, roughness)
-    return <mesh position={at} scale={size} geometry={resources.geometry} material={resources.material} dispose={null}/>
+    return <mesh name="museum-architecture-block" position={at} scale={size} geometry={resources.geometry} material={resources.material} dispose={null}/>
 }
 
 export function Inlay({at, size, cyan = false}: { at: Triple; size: Triple; cyan?: boolean }) {
     const palette = useMuseumPalette()
     const resources = useArchitecturalMaterial(cyan ? palette.cyan : palette.orange, 0, 0, true)
-    return <mesh position={at} scale={size} geometry={resources.geometry} material={resources.material} dispose={null}/>
+    return <mesh name="museum-architecture-inlay" position={at} scale={size} geometry={resources.geometry} material={resources.material} dispose={null}/>
 }
 
 export function Downlight({x, z, y = 5.9, intensity = 32}: { x: number; z: number; y?: number; intensity?: number }) {
+    const light = useRef<SpotLight>(null), world = useMemo(() => new Vector3(), []), tier = useMuseumQuality(s => s.tier)
+    useFrame(({camera}) => {if (light.current) {light.current.getWorldPosition(world); light.current.intensity = intensity*(1-MathUtils.smoothstep(world.distanceTo(camera.position),tier==='low'?7:11,tier==='low'?9:15))}})
     const target = useMemo(() => {
         const node = new Object3D();
         node.position.set(x, 0, z);
@@ -34,7 +38,7 @@ export function Downlight({x, z, y = 5.9, intensity = 32}: { x: number; z: numbe
     }, [x, z])
     return <>
         <primitive object={target}/>
-        <spotLight position={[x, y, z]} target={target} color="#f2e6da" intensity={intensity} distance={13} angle={.65}
+        <spotLight ref={light} position={[x, y, z]} target={target} color="#f2d5ae" intensity={intensity} distance={13} angle={.65}
                    penumbra={.7}/>
     </>
 }
@@ -120,13 +124,14 @@ export function PortalFrame({z, width = 6.8, height = 4.8, amber = false}: {
 }
 
 export function Floor({at, size, reflective = false}: { at: Triple; size: [number, number]; reflective?: boolean }) {
+    const resources = useMuseumVisualResources()
     return <mesh rotation={[-Math.PI / 2, 0, 0]} position={at}>
         <planeGeometry args={size}/>
         {reflective ?
             <MeshReflectorMaterial resolution={256} blur={[100, 35]} mixBlur={.75} mixStrength={.3} mirror={.12}
                                    color="#30363b" metalness={.5} roughness={.48} depthScale={.15}
                                    minDepthThreshold={.4} maxDepthThreshold={1.4}/>
-            : <meshStandardMaterial color="#30363b" metalness={.45} roughness={.4}/>}
+            : <meshStandardMaterial color="#45443f" map={resources.textures.stone} roughnessMap={resources.textures.roughness} metalness={.2} roughness={.46} envMapIntensity={.5}/>}
     </mesh>
 }
 

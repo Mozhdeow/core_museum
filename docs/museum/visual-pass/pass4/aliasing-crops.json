@@ -1,0 +1,11 @@
+{
+  "clip": {
+    "x": 1300,
+    "y": 0,
+    "width": 220,
+    "height": 240
+  },
+  "resized": false,
+  "before": "before-entrance-perf.png",
+  "after": "after-entrance.png"
+}

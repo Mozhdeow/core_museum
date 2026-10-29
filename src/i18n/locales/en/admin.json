@@ -54,13 +54,10 @@
     "pending": "An operation has an unconfirmed outcome. Check its result before submitting another change. The receipt is retained for this signed-in account.",
     "pendingDialog": "Close this editor and use Check result to reconcile the operation. Do not submit it again.",
     "checkResult": "Check result",
-    "guardNotice": "Role changes and account deletion are disabled until database concurrency guards are verified and enabled on the server.",
+    "guardNotice": "Role changes and privileged invitations are disabled until database concurrency guards are verified and enabled on the server.",
     "writesNotice": "Account changes are disabled on the server.",
     "roles": {
-      "all": "All roles",
-      "user": "Visitor",
-      "admin": "Administrator",
-      "editor": "Editor"
+      "all": "All roles"
     },
     "statuses": {
       "all": "All statuses",
@@ -76,7 +73,7 @@
       "forbidden": "Your current account is not authorized to manage users.",
       "selfProtected": "You cannot delete your own account or change your own administrator role.",
       "lastAdmin": "The last active administrator must be retained.",
-      "conflict": "This profile changed. Close the editor, reload users and reopen it.",
+      "conflict": "This profile changed. Your edits are retained. Discard them and reload the current profile before saving again.",
       "duplicateAccount": "An account already exists for this email. It has not been overwritten.",
       "assetsOwned": "This account owns Storage assets. Resolve ownership separately before deletion.",
       "operationBusy": "Another operation is pending, or the invitation limit was reached. Check existing results before retrying.",
@@ -85,8 +82,14 @@
       "serviceUnavailable": "User management is unavailable. Check the Edge Function deployment and your connection, then reload.",
       "guardUnverified": "Role and deletion protections have not been verified and enabled on the server.",
       "writesDisabled": "Account changes are disabled on the server.",
-      "receiptUnavailable": "This browser could not retain an operation receipt. No request was sent."
-    }
+      "receiptUnavailable": "This browser could not retain an operation receipt. No request was sent.",
+      "profileUnavailable": "This account is no longer available. Close the editor and reload users."
+    },
+    "roleGate": "Administrator and Editor assignment requires verified server guards. Profile name and language can still be edited when writes are enabled.",
+    "deletionUnavailable": "Account deletion is unavailable in this workspace.",
+    "deploymentNotice": "The deployed Edge Function does not report supported roles. Update the matching admin-users contract before enabling account changes.",
+    "inviteConfiguration": "Invitations are unavailable: the server invitation redirect must match an allowed application origin and /reset-password.",
+    "reloadProfile": "Discard edits and reload current profile"
   },
   "rbac": {
     "roles": {

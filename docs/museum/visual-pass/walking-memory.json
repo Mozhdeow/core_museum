@@ -1,0 +1,11 @@
+{
+  "seconds": 60,
+  "before": {
+    "geometries": 105,
+    "textures": 35
+  },
+  "after": {
+    "geometries": 105,
+    "textures": 35
+  }
+}

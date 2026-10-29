@@ -1,6 +1,7 @@
 import type {Locale, MuseumItem, MuseumSectionData, SectionId, MuseumCatalog} from './museum'
+import type {DisplayRole} from '../../supabase/functions/_shared/roles.ts'
 
-export type UserRole = 'visitor' | 'editor' | 'admin'
+export type UserRole = DisplayRole
 
 export interface AuthUser {
     id: string;
